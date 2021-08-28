@@ -1,0 +1,11 @@
+nvidia-pyindex
+geventhttpclient
+gevent
+python-rapidjson
+numpy
+fastapi
+attrdict
+uvicorn
+google-api-python-client
+grpcio
+python-multipart
