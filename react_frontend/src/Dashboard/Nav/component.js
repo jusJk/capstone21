@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
-
+import {makeStyles} from '@material-ui/core'
 
 import { createTheme } from '@material-ui/core/styles';
 
@@ -38,15 +38,25 @@ const theme = createTheme({
         '"Segoe UI Emoji"',
         '"Segoe UI Symbol"',
       ].join(','),
-    }
+    },
+
   },
 });
+const useStyles = makeStyles((theme) => ({
+  appBar: {
+    position: 'relative',
+    zIndex: 1400,
+},
+}))
+
 export default function Nav() {
+  const  classes = useStyles();
+
   return(
   <div>
     <Box sx={{ flexGrow: 1 }}>
-      <ThemeProvider theme={theme}>
-      <AppBar position="static" >
+     
+      <AppBar  className={classes.appBar}>
         <Toolbar>
           <IconButton
             size="xlarge"
@@ -71,7 +81,7 @@ export default function Nav() {
         </Toolbar>
       </AppBar>
 
-      </ThemeProvider>
+      
       
     </Box>
     </div>
