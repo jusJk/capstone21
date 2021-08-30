@@ -1,4 +1,4 @@
-
+import React from 'react'
 import './App.css';
 import Nav from './Dashboard/Nav';
 import Dash from './Dashboard/Dash';

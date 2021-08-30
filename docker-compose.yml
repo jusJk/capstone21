@@ -16,6 +16,7 @@ services:
   #   ports:
   #     - "5000:5000"
   react-frontend: 
+    stdin_open: true
     build: ./react_frontend
     container_name: react-frontend
     volumes: 
