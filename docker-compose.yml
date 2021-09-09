@@ -8,6 +8,7 @@ services:
   #     - "8001:8001"
   #     - "8002:8002"
   #     - "8003:8003"
+
   # python-client:
   #   build: ./python_client
   #   container_name: python-client
@@ -15,27 +16,28 @@ services:
   #     - ./python_client:/app
   #   ports:
   #     - "5000:5000"
-  react-frontend: 
-    stdin_open: true
-    build: ./react_frontend
-    container_name: react-frontend
-    volumes: 
-      - ./react_frontend:/app
-    ports:
-      - "3000:3000"
-    environment:  
-      - CHOKIDAR_USEPOLLING=true
+
+  # react-frontend: 
+  #   stdin_open: true
+  #   build: ./react_frontend
+  #   container_name: react-frontend
+  #   volumes: 
+  #     - ./react_frontend:/app
+  #   ports:
+  #     - "3000:3000"
+  #   environment:  
+  #     - CHOKIDAR_USEPOLLING=true
   
-    # python-backend: 
-    # stdin_open: true
-    # build: ./python_backend
-    # container_name: python-backend
-    # volumes: 
-    #   - ./python-backend:/app
-    # ports:
-    #   - "5000:5000"
-    # environment:  
-    #   - CHOKIDAR_USEPOLLING=true
+  python-backend: 
+    build: ./python_backend
+    container_name: python-backend
+    volumes: 
+      - ./python_backend:/app
+    ports:
+      - "5000:5000"
+    environment: 
+      - FLASK_APP=website_api.py
+      - FLASK_ENV=development
 
   # triton-client:
   #   build: ./triton_client

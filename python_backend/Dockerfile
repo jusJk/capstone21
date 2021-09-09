@@ -15,4 +15,4 @@ ENV VERSION="0.0.0"
 
 # WORKDIR /app
 
-CMD ["flask", "run"]
+CMD ["flask", "run", "--host=0.0.0.0"]
