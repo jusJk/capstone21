@@ -6,7 +6,7 @@ import {
   Card,
   Grid,
   CardContent,
-  Container,
+  Alert,
   Typography,
   Stack,
   Button,
@@ -16,6 +16,7 @@ import {
 } from '@material-ui/core';
 // utils
 
+import { sendPostRequest } from '../../../../API/component';
 // ----------------------------------------------------------------------
 
 // ----------------------------------------------------------------------
@@ -28,12 +29,34 @@ const ImgStyle = styled('img')({
   borderRadius: '25px'
 });
 
-export default function UploadPicture() {
+export default function UploadPicture(props) {
   const [imgSrc, setImgSrc] = useState('');
+  const [uploadFile, setUploadFile] = useState({});
+  const [content, setContent] = useState('');
+
   const _onChange = function (e) {
     const file = e.target.files[0];
     const url = URL.createObjectURL(file);
     setImgSrc(url);
+    setUploadFile(file);
+  };
+
+  const handleFormUpload = function () {
+    const formData = new FormData();
+    formData.append('file', uploadFile);
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data'
+      }
+    };
+    sendPostRequest(
+      props.api.endpoint,
+      formData,
+      (e) => {
+        setContent(JSON.stringify(e));
+      },
+      config
+    );
   };
   return (
     <Card
@@ -43,12 +66,18 @@ export default function UploadPicture() {
       <CardContent>
         <Stack direction="row">
           <Typography variant="h5" component="h2">
-            Image Prediction Demo
+            {props.api.name}
           </Typography>
         </Stack>
-
+        <Divider sx={{ my: '1%' }} />
         <Box>
-          <Divider sx={{ my: '1%' }} />
+          <Box>
+            {content === '' ? null : (
+              <Alert sx={{ m: '1.5%' }} severity="info">
+                {content}
+              </Alert>
+            )}
+          </Box>
           <Grid container justify>
             {imgSrc ? (
               <Stack>
@@ -69,7 +98,16 @@ export default function UploadPicture() {
                 }}
               />
             </Button>
-            <Button variant="text" component="label" color="info" size="large" disabled={!imgSrc}>
+            <Button
+              variant="text"
+              component="label"
+              color="info"
+              size="large"
+              disabled={!imgSrc}
+              onClick={() => {
+                handleFormUpload();
+              }}
+            >
               Submit
             </Button>
           </ButtonGroup>

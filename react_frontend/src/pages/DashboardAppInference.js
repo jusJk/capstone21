@@ -37,7 +37,7 @@ export default function DashboardAppInference(props) {
           </Typography>
           {modelEndpoints.map((item) => (
             <Item>
-              <APIEndPoint type={item.type} endpoint={item.endpoint} />
+              <APIEndPoint api={item} />
             </Item>
           ))}
 

@@ -26,7 +26,14 @@ export default function DashboardApp(props) {
         <Typography variant="h6" sx={{ mb: '1%' }}>
           Start by uploading an image:
         </Typography>
-        <APIEndPoint type="POST" endpoint={`${id.id}/model/infer`} />
+        <APIEndPoint
+          api={{
+            type: 'POST',
+            body_type: 'image',
+            name: 'Image Model Explainability',
+            endpoint: `api/${id.id}/`
+          }}
+        />
         <Grid sx={{ mt: '5%' }}>
           <Box>
             <Skeleton />

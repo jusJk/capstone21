@@ -32,7 +32,7 @@ export default function DashboardAppInference(props) {
       <Container maxWidth="lg" sx={{ ml: '20%', mt: '2%' }}>
         <Stack>
           <Typography variant="h2" sx={{ mb: '1%' }}>
-            Model Drift
+            Model Performance
           </Typography>
           <Typography variant="p">
             Model drift is an important factor when using AI for business applications.
