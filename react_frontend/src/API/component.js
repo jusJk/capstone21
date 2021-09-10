@@ -1,8 +1,9 @@
 import axios from 'axios';
 
+const baseURL = 'http://localhost:5000/';
 const data = [
   {
-    id: 'lpd_net',
+    id: 'lpdnet',
     status: 'ready',
     name: 'License Plate Detection',
     email: 'zhilong@stengineering.com',
@@ -57,8 +58,30 @@ export function getModelDetails(id) {
 
 export function getAvailableDemo(id) {
   return [
-    { type: 'GET', endpoint: `${id}/model/information`, body_type: 'json' },
-    { type: 'POST', endpoint: `${id}/model/predict`, body_type: 'image' },
-    { type: 'DELETE', endpoint: `${id}/model/nuke`, body_type: 'json' }
+    { type: 'GET', endpoint: `api/${id}/`, body_type: 'json', name: 'Model Status' },
+    { type: 'POST', endpoint: `api/${id}/`, body_type: 'image', name: 'Image Demo' },
+    { type: 'DELETE', endpoint: `${id}/model/nuke/`, body_type: 'json', name: 'Delete Something' }
   ];
+}
+
+export function sendGetRequest(endpoint, callback, config) {
+  axios
+    .get(baseURL + endpoint, config)
+    .then((e) => {
+      callback(e.data);
+    })
+    .catch(() => {
+      callback('Endpoint inactive');
+    });
+}
+
+export function sendPostRequest(endpoint, data, callback, config) {
+  axios
+    .post(baseURL + endpoint, data, config)
+    .then((e) => {
+      callback(e.data);
+    })
+    .catch(() => {
+      callback('Endpoint inactive');
+    });
 }
