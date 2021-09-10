@@ -36,7 +36,7 @@ services:
     ports:
       - "5000:5000"
     environment: 
-      - FLASK_APP=website_api.py
+      - FLASK_APP=app.py
       - FLASK_ENV=development
 
   # triton-client:
