@@ -1,0 +1,19 @@
+{
+    "model_name":"License Plate Detection Net",
+    "status":"active",
+    "information":"Lorem ipsum lorem ipsum",
+    "api":{
+        "GET":{
+            "endpoint":"/api/lpdnet/",
+            "status":"active",
+            "input":"Just ping the API to test if API is running",
+            "return":"String with status active or inactive"
+        },
+        "POST":{
+            "endpoint":"/api/lpdnet/",
+            "status":"active",
+            "input":"Image to run inference on",
+            "return":"JSON object with bounding box and confidence score"
+        }
+    }
+}
