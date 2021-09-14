@@ -157,7 +157,7 @@ def parse_command_line(args=None):
                         '--url',
                         type=str,
                         required=False,
-                        default='35.240.147.255:8100',
+                        default='localhost:8000',
                         help='Inference server URL. Default is localhost:8000.')
     parser.add_argument('-i',
                         '--protocol',
