@@ -1,0 +1,19 @@
+linewidth: 4
+stride: 16
+classwise_clustering_config{
+    key: "license_plate"
+    value: {
+        coverage_threshold: 0.005
+        minimum_bounding_box_height: 4
+        dbscan_config{
+            dbscan_eps: 0.3
+            dbscan_min_samples: 0.05
+            dbscan_confidence_threshold: 0.9
+        }
+        bbox_color{
+            R: 0
+            G: 255
+            B: 0
+        }
+    }
+}
