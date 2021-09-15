@@ -6,7 +6,7 @@ def get_all_models():
     This function responds to the interal API call of obtaining
     all models currently in the inference server
 
-    :return: JSON object 
+    :return: Dictionary//JSON 
     """
     models = {'1':'lpdnet', '2':'lprnet'}
 
@@ -17,7 +17,8 @@ def get_model_info(id):
     """
     This function responds to the interal API call of obtaining
     whether a model is active in the inference server
-    :return: JSON object 
+    
+    :return: Dictionary//JSON 
     """
     models = {'lpdnet':{'is_active':True}, 'lprnet':{'is_active':False}}
     if id in models:
