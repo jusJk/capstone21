@@ -11,6 +11,7 @@ import DashboardAppDrift from './pages/DashboardAppDrift';
 import Products from './pages/Products';
 import NotFound from './pages/Page404';
 import About from './pages/About';
+import Landing from './pages/Landing';
 
 // ----------------------------------------------------------------------
 
@@ -34,7 +35,8 @@ export default function Router() {
       element: <DashboardLayout />,
       children: [
         { path: '404', element: <NotFound /> },
-        { path: '/about', element: <About /> }
+        { path: '/about', element: <About /> },
+        { path: '/', element: <Landing /> }
       ]
     },
 

@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
-import { Icon } from '@iconify/react';
-import menu2Fill from '@iconify/icons-eva/menu-2-fill';
+
 // material
 import { alpha, styled } from '@material-ui/core/styles';
 import { Box, Stack, AppBar, Toolbar, IconButton, Button } from '@material-ui/core';
@@ -47,7 +46,7 @@ export default function DashboardNavbar({ onOpenSidebar }) {
     <RootStyle>
       <ToolbarStyle>
         <Box sx={{ px: 1, py: 1 }}>
-          <Box component={RouterLink} to="/dashboard/catalog/" sx={{ display: 'inline-flex' }}>
+          <Box component={RouterLink} to="/" sx={{ display: 'inline-flex' }}>
             <Logo />
           </Box>
         </Box>
@@ -55,6 +54,11 @@ export default function DashboardNavbar({ onOpenSidebar }) {
           <Typography variant="h4" sx={{ color: 'black' }}>
             <b>AI-aaS</b>
           </Typography>
+        </Box>
+        <Box component={RouterLink} to="/">
+          <Button fullWidth size="large" variant={loc.pathname === '/' ? 'contained' : 'outlined'}>
+            <Typography variant="subtitle1">Home</Typography>
+          </Button>
         </Box>
         <Box component={RouterLink} to="/dashboard/catalog/" sx={{ px: 1 }}>
           <Button
@@ -67,15 +71,6 @@ export default function DashboardNavbar({ onOpenSidebar }) {
             }
           >
             <Typography variant="subtitle1">Model Catalog</Typography>
-          </Button>
-        </Box>
-        <Box component={RouterLink} to="/about/">
-          <Button
-            fullWidth
-            size="large"
-            variant={loc.pathname === '/about/' ? 'contained' : 'outlined'}
-          >
-            <Typography variant="subtitle1">About</Typography>
           </Button>
         </Box>
       </ToolbarStyle>

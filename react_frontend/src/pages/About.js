@@ -12,8 +12,7 @@ export default function About() {
     <Page title="About">
       <Container>
         <Typography variant="h4" sx={{ my: 5 }}>
-          This website is free software, licensed under the MIT license. It is made with Slave
-          Labour from the National University of Singapore.
+          about
         </Typography>
       </Container>
     </Page>
