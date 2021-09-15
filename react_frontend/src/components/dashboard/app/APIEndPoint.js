@@ -1,8 +1,10 @@
 // material
+import PropTypes from 'prop-types';
 import { React, useState } from 'react';
 import { styled } from '@material-ui/core/styles';
 import { Card, CardContent, Typography, Stack, Button, Box } from '@material-ui/core';
 import { ImageRequest, TextRequest, PlaceholderRequest } from '.';
+
 // utils
 
 // ----------------------------------------------------------------------
@@ -91,3 +93,7 @@ export default function APIEndPoint({ api }) {
     </>
   );
 }
+
+APIEndPoint.propTypes = {
+  api: PropTypes.object
+};

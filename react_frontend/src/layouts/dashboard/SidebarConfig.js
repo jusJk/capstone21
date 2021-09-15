@@ -27,7 +27,7 @@ const sidebarConfig = [
     icon: getIcon(pieChart2Fill)
   },
   {
-    title: 'Model Drift',
+    title: 'Model Performance',
     path: '/dashboard/app/drift',
     icon: getIcon(activityFill)
   },
