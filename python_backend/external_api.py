@@ -1,7 +1,12 @@
 from app import app
 from flask import request
 from flask_cors import CORS, cross_origin
+import json
 CORS(app)
+
+import sys
+sys.path.insert(1, 'triton_client/model_client')
+from triton_client.model_client.lpd_model_class import LpdModelClass
 
 @app.route('/api/lpdnet/',methods= ['POST', 'GET'])
 def call_lpdnet():
@@ -11,6 +16,7 @@ def call_lpdnet():
 
     :return: JSON object 
     """
+    lpd = LpdModelClass('dummy')
     model_status = {
                     'code':200,
                     'status':'active'
@@ -24,8 +30,13 @@ def call_lpdnet():
     if request.method=='GET':
         return model_status
     elif request.method=='POST':
-        imagefile = request.files.get('imagefile', '')
-        print(imagefile, flush=True)
-        return prediction   
+        input_stream = request.files['image']
+        fname = request.form['filename']
+        input_stream.save(f"triton_client/input/test/{fname}")
+        response = lpd.predict("triton_client/input/test/")
+        processed = {}
+        for i, info in enumerate(response):
+            processed[i] = info
+        return processed
     else:
         return {'code':404,'error':'Request not found'}
