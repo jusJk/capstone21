@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class BaseModelClass(ABC):
+class BaseModelClass:
 
     '''
     Abstract class to enforce consistency across various model

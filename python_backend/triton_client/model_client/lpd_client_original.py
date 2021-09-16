@@ -104,36 +104,116 @@ def requestGenerator(batched_image_data, input_name, output_name, dtype, protoco
 
     yield inputs, outputs
 
-def lpd_predict(**FLAGS):
-    #verbose, async_set, streaming, model_name, model_version, batch_size, mode, url, protocol, image_filename, class_list, output_path, postprocessing_config
 
+def parse_command_line(args=None):
+    """Parsing command line arguments."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-v',
+                        '--verbose',
+                        action="store_true",
+                        required=False,
+                        default=False,
+                        help='Enable verbose output')
+    parser.add_argument('-a',
+                        '--async',
+                        dest="async_set",
+                        action="store_true",
+                        required=False,
+                        default=False,
+                        help='Use asynchronous inference API')
+    parser.add_argument('--streaming',
+                        action="store_true",
+                        required=False,
+                        default=False,
+                        help='Use streaming inference API. ' +
+                        'The flag is only available with gRPC protocol.')
+    parser.add_argument('-m',
+                        '--model-name',
+                        type=str,
+                        required=True,
+                        help='Name of model')
+    parser.add_argument('-x',
+                        '--model-version',
+                        type=str,
+                        required=False,
+                        default="",
+                        help='Version of model. Default is to use latest version.')
+    parser.add_argument('-b',
+                        '--batch-size',
+                        type=int,
+                        required=False,
+                        default=1,
+                        help='Batch size. Default is 1.')
+    parser.add_argument('--mode',
+                        type=str,
+                        choices=['Classification', "DetectNet_v2"],
+                        required=False,
+                        default='NONE',
+                        help='Type of scaling to apply to image pixels. Default is NONE.')
+    parser.add_argument('-u',
+                        '--url',
+                        type=str,
+                        required=False,
+                        default='localhost:8000',
+                        help='Inference server URL. Default is localhost:8000.')
+    parser.add_argument('-i',
+                        '--protocol',
+                        type=str,
+                        required=False,
+                        default='HTTP',
+                        help='Protocol (HTTP/gRPC) used to communicate with ' +
+                        'the inference service. Default is HTTP.')
+    parser.add_argument('image_filename',
+                        type=str,
+                        nargs='?',
+                        default=None,
+                        help='Input image / Input folder.')
+    parser.add_argument('--class_list',
+                        type=str,
+                        default="person,bag,face",
+                        help="Comma separated class names",
+                        required=False)
+    parser.add_argument('--output_path',
+                        type=str,
+                        default=os.path.join(os.getcwd(), "outputs"),
+                        help="Path to where the inferenced outputs are stored.",
+                        required=True)
+    parser.add_argument("--postprocessing_config",
+                        type=str,
+                        default="",
+                        help="Path to the DetectNet_v2 clustering config.")
+    return parser.parse_args()
+
+
+def main():
     """Running the inferencer client."""
-    if FLAGS['mode'].lower() == "detectnet_v2":
-        assert os.path.isfile(FLAGS['postprocessing_config']), (
+    FLAGS = parse_command_line(sys.argv[1:])
+    if FLAGS.mode.lower() == "detectnet_v2":
+        assert os.path.isfile(FLAGS.postprocessing_config), (
             "Clustering config must be defined for DetectNet_v2."
         )
     log_level = "INFO"
-    if FLAGS['verbose']:
+    if FLAGS.verbose:
         log_level = "DEBUG"
     # Configure logging to get Maglev log messages.
     logging.basicConfig(format='%(asctime)s [%(levelname)s] '
                                '%(name)s: %(message)s',
                         level=log_level)
 
-    if FLAGS['streaming'] and FLAGS['protocol'].lower() != "grpc":
+    if FLAGS.streaming and FLAGS.protocol.lower() != "grpc":
         raise Exception("Streaming is only allowed with gRPC protocol")
 
     try:
-        if FLAGS['protocol'].lower() == "grpc":
+        if FLAGS.protocol.lower() == "grpc":
             # Create gRPC client for communicating with the server
             triton_client = grpcclient.InferenceServerClient(
-                url=FLAGS['url'], verbose=FLAGS['verbose'])
+                url=FLAGS.url, verbose=FLAGS.verbose)
         else:
             # Specify large enough concurrency to handle the
             # the number of requests.
-            concurrency = 20 if FLAGS['async_set'] else 1
+            concurrency = 20 if FLAGS.async_set else 1
             triton_client = httpclient.InferenceServerClient(
-                url=FLAGS['url'], verbose=FLAGS['verbose'], concurrency=concurrency)
+                url=FLAGS.url, verbose=FLAGS.verbose, concurrency=concurrency)
     except Exception as e:
         print("client creation failed: " + str(e))
         sys.exit(1)
@@ -142,49 +222,50 @@ def lpd_predict(**FLAGS):
     # properties of the model that we need for preprocessing
     try:
         model_metadata = triton_client.get_model_metadata(
-            model_name=FLAGS['model_name'], model_version=FLAGS['model_version'])
+            model_name=FLAGS.model_name, model_version=FLAGS.model_version)
     except InferenceServerException as e:
         print("failed to retrieve the metadata: " + str(e))
         sys.exit(1)
 
     try:
         model_config = triton_client.get_model_config(
-            model_name=FLAGS['model_name'], model_version=FLAGS['model_version'])
+            model_name=FLAGS.model_name, model_version=FLAGS.model_version)
     except InferenceServerException as e:
         print("failed to retrieve the config: " + str(e))
         sys.exit(1)
 
-    if FLAGS['protocol'].lower() == "grpc":
+    if FLAGS.protocol.lower() == "grpc":
         model_config = model_config.config
     else:
         model_metadata, model_config = convert_http_metadata_config(
             model_metadata, model_config)
 
-    triton_model = TRITON_MODEL_DICT[FLAGS['mode'].lower()].from_metadata(model_metadata, model_config)
+    print(FLAGS)
+    triton_model = TRITON_MODEL_DICT[FLAGS.mode.lower()].from_metadata(model_metadata, model_config)
     target_shape = (triton_model.c, triton_model.h, triton_model.w)
     npdtype = triton_to_np_dtype(triton_model.triton_dtype)
     max_batch_size = triton_model.max_batch_size
     frames = []
-    if os.path.isdir(FLAGS['image_filename']):
+    if os.path.isdir(FLAGS.image_filename):
         frames = [
-            Frame(os.path.join(FLAGS['image_filename'], f),
+            Frame(os.path.join(FLAGS.image_filename, f),
                   triton_model.data_format,
                   npdtype,
                   target_shape)
-            for f in os.listdir(FLAGS['image_filename'])
-            if os.path.isfile(os.path.join(FLAGS['image_filename'], f)) and
+            for f in os.listdir(FLAGS.image_filename)
+            if os.path.isfile(os.path.join(FLAGS.image_filename, f)) and
             os.path.splitext(f)[-1] in [".jpg", ".jpeg", ".png"]
         ]
     else:
         frames = [
-            Frame(os.path.join(FLAGS['image_filename']),
+            Frame(os.path.join(FLAGS.image_filename),
                   triton_model.data_format,
                   npdtype,
                   target_shape)
         ]
 
-    # Send requests of FLAGS['batch_size images. If the number of
-    # images isn't an exact multiple of FLAGS['batch_size then just
+    # Send requests of FLAGS.batch_size images. If the number of
+    # images isn't an exact multiple of FLAGS.batch_size then just
     # start over with the first images until the batch is filled.
     requests = []
     responses = []
@@ -193,24 +274,21 @@ def lpd_predict(**FLAGS):
     image_idx = 0
     last_request = False
     user_data = UserData()
-    class_list = FLAGS['class_list'].split(",")
+    class_list = FLAGS.class_list.split(",")
     args_postprocessor = [
-        FLAGS['batch_size'], frames, FLAGS['output_path'], triton_model.data_format
+        FLAGS.batch_size, frames, FLAGS.output_path, triton_model.data_format
     ]
-    if FLAGS['mode'].lower() == "detectnet_v2":
-        args_postprocessor.extend([class_list, FLAGS['postprocessing_config'], target_shape])
-    postprocessor = POSTPROCESSOR_DICT[FLAGS['mode'].lower()](*args_postprocessor)
+    if FLAGS.mode.lower() == "detectnet_v2":
+        args_postprocessor.extend([class_list, FLAGS.postprocessing_config, target_shape])
+    postprocessor = POSTPROCESSOR_DICT[FLAGS.mode.lower()](*args_postprocessor)
 
     # Holds the handles to the ongoing HTTP async requests.
     async_requests = []
 
     sent_count = 0
 
-    if FLAGS['streaming']:
+    if FLAGS.streaming:
         triton_client.start_stream(partial(completion_callback, user_data))
-
-    #Creating final json object
-    final_response = []
 
     logger.info("Sending inference request for batches of data")
     with tqdm(total=len(frames)) as pbar:
@@ -218,7 +296,7 @@ def lpd_predict(**FLAGS):
             input_filenames = []
             repeated_image_data = []
 
-            for idx in range(FLAGS['batch_size']):
+            for idx in range(FLAGS.batch_size):
                 frame = frames[image_idx]
                 img = frame.load_image()
                 repeated_image_data.append(
@@ -239,58 +317,58 @@ def lpd_predict(**FLAGS):
             try:
                 req_gen_args = [batched_image_data, triton_model.input_names,
                     triton_model.output_names, triton_model.triton_dtype,
-                    FLAGS['protocol'].lower()]
+                    FLAGS.protocol.lower()]
                 req_gen_kwargs = {}
-                if FLAGS['mode'].lower() == "classification":
+                if FLAGS.mode.lower() == "classification":
                     req_gen_kwargs["num_classes"] = model_config.output[0].dims[0]
                 req_generator = requestGenerator(*req_gen_args, **req_gen_kwargs)
                 for inputs, outputs in req_generator:
                     sent_count += 1
-                    if FLAGS['streaming']:
+                    if FLAGS.streaming:
                         triton_client.async_stream_infer(
-                            FLAGS['model_name'],
+                            FLAGS.model_name,
                             inputs,
                             request_id=str(sent_count),
-                            model_version=FLAGS['model_version'],
+                            model_version=FLAGS.model_version,
                             outputs=outputs)
-                    elif FLAGS['async_set']:
-                        if FLAGS['protocol'].lower() == "grpc":
+                    elif FLAGS.async_set:
+                        if FLAGS.protocol.lower() == "grpc":
                             triton_client.async_infer(
-                                FLAGS['model_name'],
+                                FLAGS.model_name,
                                 inputs,
                                 partial(completion_callback, user_data),
                                 request_id=str(sent_count),
-                                model_version=FLAGS['model_version'],
+                                model_version=FLAGS.model_version,
                                 outputs=outputs)
                         else:
                             async_requests.append(
                                 triton_client.async_infer(
-                                    FLAGS['model_name'],
+                                    FLAGS.model_name,
                                     inputs,
                                     request_id=str(sent_count),
-                                    model_version=FLAGS['model_version'],
+                                    model_version=FLAGS.model_version,
                                     outputs=outputs))
                     else:
                         responses.append(
-                            triton_client.infer(FLAGS['model_name'],
+                            triton_client.infer(FLAGS.model_name,
                                                 inputs,
                                                 request_id=str(sent_count),
-                                                model_version=FLAGS['model_version'],
+                                                model_version=FLAGS.model_version,
                                                 outputs=outputs))
 
             except InferenceServerException as e:
                 print("inference failed: " + str(e))
-                if FLAGS['streaming']:
+                if FLAGS.streaming:
                     triton_client.stop_stream()
                 sys.exit(1)
             
-            pbar.update(FLAGS['batch_size'])
+            pbar.update(FLAGS.batch_size)
 
-    if FLAGS['streaming']:
+    if FLAGS.streaming:
         triton_client.stop_stream()
 
-    if FLAGS['protocol'].lower() == "grpc":
-        if FLAGS['streaming'] or FLAGS['async_set']:
+    if FLAGS.protocol.lower() == "grpc":
+        if FLAGS.streaming or FLAGS.async_set:
             processed_count = 0
             while processed_count < sent_count:
                 (results, error) = user_data._completed_requests.get()
@@ -300,7 +378,7 @@ def lpd_predict(**FLAGS):
                     sys.exit(1)
                 responses.append(results)
     else:
-        if FLAGS['async_set']:
+        if FLAGS.async_set:
             # Collect results from the ongoing async requests
             # for HTTP Async requests.
             for async_request in async_requests:
@@ -311,24 +389,16 @@ def lpd_predict(**FLAGS):
     with tqdm(total=len(frames)) as pbar:
         while processed_request < sent_count:
             response = responses[processed_request]
-            if FLAGS['protocol'].lower() == "grpc":
+            if FLAGS.protocol.lower() == "grpc":
                 this_id = response.get_response().id
             else:
                 this_id = response.get_response()["id"]
-            final_image_bbox_response, file_name = postprocessor.apply(
+            postprocessor.apply(
                 response, this_id, render=True
             )
             processed_request += 1
-            pbar.update(FLAGS['batch_size'])
-
-            final_image_bbox_response = list(final_image_bbox_response)
-            final_image_response = {"bbox": final_image_bbox_response, "file_name": file_name}
-            final_response.append(final_image_response)
-
-    return final_response
-
+            pbar.update(FLAGS.batch_size)
     logger.info("PASS")
 
-# if __name__ == '__main__':
-
-#verbose, async_set, streaming, model_name, model_version, batch_size, mode, url, protocol, image_filename, class_list, output_path, postprocessing_config
+if __name__ == '__main__':
+    main()
