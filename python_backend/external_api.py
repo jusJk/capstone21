@@ -29,14 +29,27 @@ def call_lpdnet():
 
     if request.method=='GET':
         return model_status
+    
     elif request.method=='POST':
-        input_stream = request.files['image']
-        fname = request.form['filename']
-        input_stream.save(f"triton_client/input/test/{fname}")
+        # Load input images
+        # input_stream = request.files['image']
+        files = request.files.to_dict(flat=False)['image']
+
+        # Load filenames
+        filenames = request.form.getlist('filename')
+        
+        # Save input images
+        for i, f in enumerate(files):
+            f.save(f"triton_client/input/test/{filenames[i]}")
+        
+        # Call triton inference server
         response = lpd.predict("triton_client/input/test/")
+        
+        # Process response to return
         processed = {}
         for i, info in enumerate(response):
             processed[i] = info
         return processed
+    
     else:
         return {'code':404,'error':'Request not found'}
