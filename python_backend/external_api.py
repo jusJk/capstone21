@@ -11,16 +11,21 @@ def call_lpdnet():
 
     :return: JSON object 
     """
-    model_status='active'
-    prediction = {'bounding_box':[0,120,100,10],
+    model_status = {
+                    'code':200,
+                    'status':'active'
+                    }
+    prediction = {
+                'code':200,
+                'bounding_box':[0,120,100,10],
                 'confidence_score':0.98
                 }
 
     if request.method=='GET':
-        return {'status':model_status}
+        return model_status
     elif request.method=='POST':
         imagefile = request.files.get('imagefile', '')
         print(imagefile, flush=True)
         return prediction   
     else:
-        return {'error':'invalid api call'}
+        return {'code':404,'error':'Request not found'}
