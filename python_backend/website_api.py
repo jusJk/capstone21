@@ -1,4 +1,5 @@
 from app import app
+from database import model_info
 
 @app.route('/api/models/list')
 def get_all_models():
@@ -8,9 +9,9 @@ def get_all_models():
 
     :return: Dictionary//JSON 
     """
-    models = {'1':'lpdnet', '2':'lprnet'}
-
-    return models
+    info = {'code':200, 
+            'models':[m for m in model_info.keys()]}
+    return info
 
 @app.route('/api/info/<id>')
 def get_model_info(id):
@@ -20,8 +21,8 @@ def get_model_info(id):
     
     :return: Dictionary//JSON 
     """
-    models = {'lpdnet':{'is_active':True}, 'lprnet':{'is_active':False}}
-    if id in models:
-        return {id:models[id]}
+    
+    if id in model_info:
+        return {id:model_info[id]}
     else:
         return {'error':'invalid model name'}

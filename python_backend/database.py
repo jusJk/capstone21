@@ -10,3 +10,7 @@ import os
 
 model_files = os.listdir('./model_configs/') #list of files in the directory
 model_names = [m.split('.')[0] for m in model_files] #get list of model names, like lpdnet/lprnet
+
+model_info = {}
+for m in model_names:
+    model_info[m] = json.load(open(f'./model_configs/{m}.json'))
