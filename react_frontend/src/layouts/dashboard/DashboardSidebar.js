@@ -1,9 +1,7 @@
-import PropTypes from 'prop-types';
-import { useEffect } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 // material
 import { styled } from '@material-ui/core/styles';
-import { Box, Link, Drawer, Typography } from '@material-ui/core';
+import { Box, Link as link, Drawer, Typography } from '@material-ui/core';
 // components
 
 import Scrollbar from '../../components/Scrollbar';
@@ -33,20 +31,9 @@ const AccountStyle = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-DashboardSidebar.propTypes = {
-  isOpenSidebar: PropTypes.bool,
-  onCloseSidebar: PropTypes.func
-};
-
-export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar, id }) {
-  const { pathname } = useLocation();
-
-  useEffect(() => {
-    if (isOpenSidebar) {
-      onCloseSidebar();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+export default function DashboardSidebar() {
+  const loc = useLocation();
+  const id = loc.pathname.split('/').slice(-1)[0];
 
   const renderContent = (
     <Scrollbar
@@ -56,17 +43,15 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar, id }) 
       }}
     >
       <Box sx={{ mt: 15, mb: 5, mx: 2.5 }}>
-        <Link underline="none">
-          <AccountStyle>
-            {/* <Avatar src={account.photoURL} alt="photoURL" /> */}
-            <Box sx={{ ml: 2 }}>
-              Model
-              <Typography variant="h5" sx={{ color: 'text.primary' }}>
-                <b>{id}</b>
-              </Typography>
-            </Box>
-          </AccountStyle>
-        </Link>
+        <AccountStyle>
+          {/* <Avatar src={account.photoURL} alt="photoURL" /> */}
+          <Box sx={{ ml: 2 }}>
+            Model
+            <Typography variant="h5" sx={{ color: 'text.primary' }}>
+              <b>{id}</b>
+            </Typography>
+          </Box>
+        </AccountStyle>
       </Box>
 
       <NavSection navConfig={sidebarConfig} id={id} />
@@ -79,8 +64,6 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar, id }) 
     <RootStyle>
       <MHidden width="lgUp">
         <Drawer
-          open={isOpenSidebar}
-          onClose={onCloseSidebar}
           PaperProps={{
             sx: { width: DRAWER_WIDTH }
           }}

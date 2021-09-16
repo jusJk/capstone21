@@ -2,24 +2,19 @@
 import { Box, Grid, Container, Typography, Skeleton } from '@material-ui/core';
 // components
 import { useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+
 import Page from '../components/Page';
-import DashboardSidebar from '../layouts/dashboard/DashboardSidebar';
-import { getModelDetails } from '../API/component';
+
 import { APIEndPoint } from '../components/dashboard/app';
 
 // ----------------------------------------------------------------------
 
-export default function DashboardApp(props) {
-  const [modelInfo, setModelInfo] = useState({});
+export default function DashboardApp() {
   const id = useParams();
-  useEffect(() => {
-    setModelInfo(getModelDetails(id.id));
-  }, [id]);
+
   return (
     <Page title="Model Dashboard">
-      <DashboardSidebar id={id.id} />
-      <Container maxWidth="lg" sx={{ ml: '20%', mt: '2%' }}>
+      <Container maxWidth="lg" sx={{ ml: '5%', mt: '2%' }}>
         <Box sx={{ pb: 5 }}>
           <Typography variant="h2">Model Explainability</Typography>
         </Box>

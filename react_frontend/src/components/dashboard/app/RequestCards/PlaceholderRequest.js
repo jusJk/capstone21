@@ -1,5 +1,6 @@
 // material
-import { React, useState } from 'react';
+import { React } from 'react';
+import PropTypes from 'prop-types';
 import { Divider, Card, CardContent, Typography, Stack } from '@material-ui/core';
 // utils
 
@@ -16,7 +17,7 @@ export default function PlaceHolderRequest(props) {
       <CardContent>
         <Stack direction="row">
           <Typography variant="h5" component="h2">
-            {props.api.name}
+            {props.api.input}
           </Typography>
         </Stack>
         <Divider sx={{ my: '1%' }} />
@@ -24,3 +25,7 @@ export default function PlaceHolderRequest(props) {
     </Card>
   );
 }
+
+PlaceHolderRequest.propTypes = {
+  api: PropTypes.object
+};

@@ -10,7 +10,14 @@ def get_all_models():
     :return: Dictionary//JSON 
     """
     info = {'code':200, 
-            'models':[m for m in model_info.keys()]}
+            'models':[
+                {
+                'id': m, 
+                'name': model_info.get(m).get('model_name'),
+                'cover' : model_info.get(m).get('cover'),
+                'status' : model_info.get(m).get('status')
+                } 
+            for m in model_info.keys()]}  
     return info
 
 @app.route('/api/info/<id>')

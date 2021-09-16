@@ -1,5 +1,6 @@
 // material
 import { React, useState } from 'react';
+import PropTypes from 'prop-types';
 import { styled } from '@material-ui/core/styles';
 import {
   Divider,
@@ -11,8 +12,7 @@ import {
   Stack,
   Button,
   Box,
-  ButtonGroup,
-  ButtonGroupContent
+  ButtonGroup
 } from '@material-ui/core';
 // utils
 
@@ -34,14 +34,14 @@ export default function UploadPicture(props) {
   const [uploadFile, setUploadFile] = useState({});
   const [content, setContent] = useState('');
 
-  const _onChange = function (e) {
+  const _onChange = (e) => {
     const file = e.target.files[0];
     const url = URL.createObjectURL(file);
     setImgSrc(url);
     setUploadFile(file);
   };
 
-  const handleFormUpload = function () {
+  const handleFormUpload = () => {
     const formData = new FormData();
     formData.append('file', uploadFile);
     const config = {
@@ -66,7 +66,7 @@ export default function UploadPicture(props) {
       <CardContent>
         <Stack direction="row">
           <Typography variant="h5" component="h2">
-            {props.api.name}
+            {props.api.input}
           </Typography>
         </Stack>
         <Divider sx={{ my: '1%' }} />
@@ -117,3 +117,6 @@ export default function UploadPicture(props) {
     </Card>
   );
 }
+UploadPicture.propTypes = {
+  api: PropTypes.object
+};

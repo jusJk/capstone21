@@ -1,18 +1,7 @@
 // material
 import { React, useState } from 'react';
-import { styled } from '@material-ui/core/styles';
-import {
-  Card,
-  CardActions,
-  CardContent,
-  Typography,
-  Stack,
-  Button,
-  ButtonGroup,
-  Box,
-  Alert,
-  Divider
-} from '@material-ui/core';
+import PropTypes from 'prop-types';
+import { Card, CardContent, Typography, Button, Box, Alert, Divider } from '@material-ui/core';
 // utils
 import { sendGetRequest } from '../../../../API/component';
 // ----------------------------------------------------------------------
@@ -28,7 +17,7 @@ export default function SimpleResponse(props) {
     >
       <CardContent>
         <Typography variant="h5" component="h2">
-          {props.api.name}
+          {props.api.input}
         </Typography>
         <Box>
           {content === '' ? null : (
@@ -41,7 +30,7 @@ export default function SimpleResponse(props) {
         <Divider sx={{ my: '1%' }} />
         <Box>
           <Button
-            onClick={(e) => {
+            onClick={() => {
               setContent(' ');
               sendGetRequest(props.api.endpoint, (e) => {
                 setContent(JSON.stringify(e));
@@ -55,3 +44,7 @@ export default function SimpleResponse(props) {
     </Card>
   );
 }
+
+SimpleResponse.propTypes = {
+  api: PropTypes.object
+};

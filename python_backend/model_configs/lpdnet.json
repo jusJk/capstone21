@@ -1,19 +1,28 @@
 {
-    "model_name":"License Plate Detection Net",
-    "status":"active",
-    "information":"Lorem ipsum lorem ipsum",
-    "api":{
-        "GET":{
-            "endpoint":"/api/lpdnet/",
-            "status":"active",
-            "input":"Just ping the API to test if API is running",
-            "return":"String with status active or inactive"
-        },
-        "POST":{
-            "endpoint":"/api/lpdnet/",
-            "status":"active",
-            "input":"Image to run inference on",
-            "return":"JSON object with bounding box and confidence score"
-        }
+  "model_name": "License Plate Detection Net",
+  "status": "active",
+  "information": "Lorem ipsum lorem ipsum",
+  "email": "abc@stengineering.com",
+  "phone": "12345678",
+  "cover": "https://www.researchgate.net/profile/Zain-Masood-4/publication/315489495/figure/fig3/AS:900203120967681@1591636557193/Figure-shows-some-results-of-our-end-to-end-license-plate-detection-and-recognition.png",
+  "api": [
+    {
+      "type": "GET",
+      "endpoint": "/api/lpdnet/",
+      "status": "active",
+      "input": "Just ping the API to test if API is running",
+      "input_type": "json",
+      "return_type": "json",
+      "return": "String with status active or inactive"
+    },
+    {
+      "type": "POST",
+      "endpoint": "/api/lpdnet/",
+      "status": "active",
+      "input": "Image to run inference on",
+      "input_type": "image",
+      "return_type": "json",
+      "return": "JSON object with bounding box and confidence score"
     }
+  ]
 }

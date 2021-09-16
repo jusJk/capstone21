@@ -26,11 +26,11 @@ const sidebarConfig = [
     path: '/dashboard/app/explainability',
     icon: getIcon(pieChart2Fill)
   },
-  {
-    title: 'Model Performance',
-    path: '/dashboard/app/drift',
-    icon: getIcon(activityFill)
-  },
+  // {
+  //   title: 'Model Performance',
+  //   path: '/dashboard/app/drift',
+  //   icon: getIcon(activityFill)
+  // },
   {
     title: 'Contact',
     path: '/dashboard/app/contact',
