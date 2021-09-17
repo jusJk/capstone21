@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 
 import { useState, useEffect } from 'react';
 import Page from '../components/Page';
-import { getModelDetails, getInfoMd as getMd, getImageUrl } from '../API/component';
+import { getModelDetails, getMd } from '../API/component';
 import { Markdown } from '../components/dashboard/markdown/markdownRenderer';
 // ----------------------------------------------------------------------
 
