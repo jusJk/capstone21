@@ -22,7 +22,7 @@ def call_lpdnet(id):
 
     :return: JSON object 
     """
-
+    
     lpd = LpdModelClass(id)
 
     model_status = {

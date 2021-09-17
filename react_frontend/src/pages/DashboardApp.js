@@ -2,19 +2,25 @@
 import { Box, Grid, Container, Typography } from '@material-ui/core';
 // components
 import { useParams } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
+
 import { useState, useEffect } from 'react';
 import Page from '../components/Page';
-import { getModelDetails } from '../API/component';
-
+import { getModelDetails, getMd } from '../API/component';
+import { Markdown } from '../components/dashboard/markdown/markdownRenderer';
 // ----------------------------------------------------------------------
 
 export default function DashboardApp() {
   const [modelInfo, setModelInfo] = useState({});
+  const [infoMarkdown, setInfoMarkdown] = useState('');
   const id = useParams();
   useEffect(() => {
     getModelDetails(id.id, setModelInfo);
   }, [id]);
+
+  useEffect(() => {
+    getMd(modelInfo.information_md, setInfoMarkdown);
+  }, [modelInfo]);
+
   return (
     <Page title="Model Dashboard">
       {/* <DashboardSidebar id={id.id} /> */}
@@ -29,7 +35,7 @@ export default function DashboardApp() {
         </Box>
         <Grid container spacing={3}>
           <Grid item sx={{ whiteSpace: 'pre-line' }}>
-            <ReactMarkdown>{modelInfo.information}</ReactMarkdown>
+            <Markdown infoMarkdown={infoMarkdown} />
           </Grid>
         </Grid>
       </Container>
