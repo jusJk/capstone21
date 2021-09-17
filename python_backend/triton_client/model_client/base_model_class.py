@@ -23,37 +23,10 @@ class BaseModelClass:
         '''
         pass
 
-    @abstractmethod
-    def get_status_input_schema(self):
-        '''
-        Returns the schema of the input required for status calls.
-        '''
-        pass
-
-    @abstractmethod
-    def get_status_output_schema(self):
-        '''
-        Returns the schema of the output of the status calls.
-        '''
-        pass
     
     @abstractmethod
     def predict(self):
         '''
         Returns the output of the model after inference.
-        '''
-        pass
-
-    @abstractmethod
-    def get_predict_input_schema(self):
-        '''
-        Returns the schema of the input required for predict calls.
-        '''
-        pass
-
-    @abstractmethod
-    def get_predict_output_schema(self):
-        '''
-        Returns the schema of the output of the predict calls.
         '''
         pass

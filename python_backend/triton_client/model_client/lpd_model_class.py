@@ -1,6 +1,6 @@
 import os
-from base_model_class import BaseModelClass
-from lpd_client import lpd_predict
+from .base_model_class import BaseModelClass
+from .lpd_client import lpd_predict
 
 class LpdModelClass(BaseModelClass):
 
@@ -11,7 +11,7 @@ class LpdModelClass(BaseModelClass):
         model.
         '''
         BaseModelClass.__init__(self, client_info)
-        self._post_processing_config = "./tao_triton/python/clustering_specs/clustering_config_lpdnet.prototxt"
+        self._post_processing_config = "triton_client/model_client/tao_triton/python/clustering_specs/clustering_config_lpdnet.prototxt"
         self._url = "35.240.147.255:6000"
         self._model_name = "lpdnet_usa"
         self._mode = "DetectNet_v2"
@@ -21,19 +21,8 @@ class LpdModelClass(BaseModelClass):
         '''
         Returns the status of the model
         '''
-        pass
+        return {'status':'active'}
 
-    # def get_status_input_schema(self):
-    #     '''
-    #     Returns the schema of the input required for status calls.
-    #     '''
-    #     pass
-
-    def get_status_output_schema(self):
-        '''
-        Returns the schema of the output of the status calls.
-        '''
-        pass
     
     def predict(self, file_path):
         '''
@@ -42,7 +31,8 @@ class LpdModelClass(BaseModelClass):
         if os.path.exists(file_path):
             return self._predict(file_path)
         else:
-            return "File Path does not exist!"
+            return {'code':400, 
+                    'error':"File Path does not exist!"}
 
     def _predict(self, file_path):
         return lpd_predict(model_name = self._model_name, mode = self._mode, class_list = self._class_list, \
@@ -50,18 +40,7 @@ class LpdModelClass(BaseModelClass):
                             url = self._url, image_filename = file_path, verbose = False, streaming = False, async_set = False, \
                             protocol = 'HTTP', model_version = "", batch_size = 1)
 
-    # def get_predict_input_schema(self):
-    #     '''
-    #     Returns the schema of the input required for predict calls.
-    #     '''
-    #     pass
-
-    def get_predict_output_schema(self):
-        '''
-        Returns the schema of the output of the predict calls.
-        '''
-        pass
 
 
-test_model = LpdModelClass("hellosss");
-print(test_model.predict("../input/"))
+# test_model = LpdModelClass("hellosss");
+# print(test_model.predict("../input/"))

@@ -1,5 +1,5 @@
 /admin
 
-*/__pycache__/*
+**/__pycache__/*
 */.flaskenv
 .DS_Store
