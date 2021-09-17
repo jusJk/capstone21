@@ -1,5 +1,7 @@
 from app import app
 from database import model_info
+import os
+from flask import send_file, request
 
 @app.route('/api/models/list')
 def get_all_models():
@@ -34,19 +36,11 @@ def get_model_info(id):
     else:
         return {'error':'invalid model name'}
 
-@app.route('/api/info/md/<id>')
-def get_model_info_markdown(id):
-    """ 
-    Return markdown for this model 
-    """ 
 
-    md = """
-        # Heading 1
-
-        ## Heading 2
-
-        This is a markdown test adfhaujsbdfjbas;l
-    
-        """
-    if id in model_info: 
-        return md
+@app.route('/api/get_image')
+def get_image():
+    file_path = request.args.get('path')
+    if os.path.isfile(file_path):
+        return send_file(file_path)
+    else:
+        return {'error':'invalid file name'}
