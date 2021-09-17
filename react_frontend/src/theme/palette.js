@@ -95,12 +95,12 @@ const GRADIENTS = {
 
 const palette = {
   common: { black: '#000', white: '#fff' },
-  primary: { ...PRIMARY },
-  secondary: { ...SECONDARY },
-  info: { ...INFO },
-  success: { ...SUCCESS },
-  warning: { ...WARNING },
-  error: { ...F },
+  primary: { ...F },
+  secondary: { ...F },
+  info: { ...F },
+  success: { ...F },
+  warning: { ...F },
+  error: { ...ERROR },
   grey: GREY,
   gradients: GRADIENTS,
   divider: GREY[500_24],
