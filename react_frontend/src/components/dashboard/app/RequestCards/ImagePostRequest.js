@@ -33,7 +33,8 @@ const ImgStyle = styled('img')({
 export default function UploadPicture(props) {
   const [imgSrc, setImgSrc] = useState('');
   const [uploadFile, setUploadFile] = useState({});
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState();
+  const [loading, setLoading] = useState(false);
 
   const _onChange = (e) => {
     const file = e.target.files[0];
@@ -55,11 +56,17 @@ export default function UploadPicture(props) {
       props.api.endpoint,
       formData,
       (e) => {
-        setContent(JSON.stringify(e));
+        setContent(JSON.stringify(e, null, 2));
       },
       config
     );
   };
+
+  const ProgressOrNothing = (progress) =>
+    progress ? (
+      <LinearProgress color="secondary" sx={{ m: '3%', height: '2vh', borderRadius: '5px' }} />
+    ) : null;
+
   return (
     <Card
       variant="outlined"
@@ -74,14 +81,11 @@ export default function UploadPicture(props) {
         <Divider sx={{ my: '1%' }} />
         <Box>
           <Box>
-            {content === '' ? (
-              <LinearProgress
-                color="secondary"
-                sx={{ m: '3%', height: '2vh', borderRadius: '5px' }}
-              />
+            {content === undefined ? (
+              ProgressOrNothing(loading)
             ) : (
               <Alert sx={{ m: '1.5%' }} severity="info">
-                {content}
+                <pre>{content}</pre>
               </Alert>
             )}
           </Box>
@@ -112,7 +116,8 @@ export default function UploadPicture(props) {
               size="large"
               disabled={!imgSrc}
               onClick={() => {
-                setContent('');
+                setContent(undefined);
+                setLoading(true);
                 handleFormUpload();
               }}
             >

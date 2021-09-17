@@ -2,6 +2,7 @@
 import { Box, Grid, Container, Typography } from '@material-ui/core';
 // components
 import { useParams } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import { useState, useEffect } from 'react';
 import Page from '../components/Page';
 import { getModelDetails } from '../API/component';
@@ -28,8 +29,7 @@ export default function DashboardApp() {
         </Box>
         <Grid container spacing={3}>
           <Grid item sx={{ whiteSpace: 'pre-line' }}>
-            <Typography variant="h3">Information</Typography>
-            <Typography variant="p">{modelInfo.information}</Typography>
+            <ReactMarkdown>{modelInfo.information}</ReactMarkdown>
           </Grid>
         </Grid>
       </Container>

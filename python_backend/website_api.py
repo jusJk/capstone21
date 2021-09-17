@@ -21,15 +21,32 @@ def get_all_models():
     return info
 
 @app.route('/api/info/<id>')
-def get_model_info(id):
+def get_model_info(id):  
     """
     This function responds to the interal API call of obtaining
     whether a model is active in the inference server
     
     :return: Dictionary//JSON 
-    """
+    """ 
     
-    if id in model_info:
+    if id in model_info: 
         return {id:model_info[id]}
     else:
         return {'error':'invalid model name'}
+
+@app.route('/api/info/md/<id>')
+def get_model_info_markdown(id):
+    """ 
+    Return markdown for this model 
+    """ 
+
+    md = """
+        # Heading 1
+
+        ## Heading 2
+
+        This is a markdown test adfhaujsbdfjbas;l
+    
+        """
+    if id in model_info: 
+        return md
