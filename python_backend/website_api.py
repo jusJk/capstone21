@@ -12,25 +12,42 @@ def get_all_models():
     :return: Dictionary//JSON 
     """
     info = {'code':200, 
-            'models':[m for m in model_info.keys()]}
+            'models':[ 
+                {
+                'id': m, 
+                'name': model_info.get(m).get('model_name'),
+                'cover' : model_info.get(m).get('cover'),
+                'status' : model_info.get(m).get('status')
+                } 
+            for m in model_info.keys()]}   
     return info
 
 @app.route('/api/info/<id>')
-def get_model_info(id):
+def get_model_info(id):  
     """
     This function responds to the interal API call of obtaining
     whether a model is active in the inference server
     
     :return: Dictionary//JSON 
-    """
+    """ 
     
-    if id in model_info:
+    if id in model_info: 
         return {id:model_info[id]}
     else:
         return {'error':'invalid model name'}
 
+
 @app.route('/api/get_image')
 def get_image():
+    file_path = request.args.get('path')
+    if os.path.isfile(file_path):
+        return send_file(file_path)
+    else:
+        return {'error':'invalid file name'} 
+
+
+@app.route('/api/get_md')
+def get_md(): 
     file_path = request.args.get('path')
     if os.path.isfile(file_path):
         return send_file(file_path)

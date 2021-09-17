@@ -46,7 +46,8 @@ const ListItemIconStyle = styled(ListItemIcon)({
 
 NavItem.propTypes = {
   item: PropTypes.object,
-  active: PropTypes.func
+  active: PropTypes.func,
+  id: PropTypes.string
 };
 
 function NavItem({ item, active, id }) {
@@ -99,8 +100,6 @@ function NavItem({ item, active, id }) {
               return (
                 <ListItemStyle
                   key={title}
-                  // component={RouterLink}
-                  // to={path}
                   sx={{
                     ...(isActiveSub && activeSubStyle)
                   }}
@@ -150,7 +149,8 @@ function NavItem({ item, active, id }) {
 }
 
 NavSection.propTypes = {
-  navConfig: PropTypes.array
+  navConfig: PropTypes.array,
+  id: PropTypes.string
 };
 
 export default function NavSection({ navConfig, id, ...other }) {

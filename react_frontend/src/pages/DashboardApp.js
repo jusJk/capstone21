@@ -1,27 +1,33 @@
 // material
-import { Box, Grid, Container, Typography, Skeleton } from '@material-ui/core';
+import { Box, Grid, Container, Typography } from '@material-ui/core';
 // components
 import { useParams } from 'react-router-dom';
+
 import { useState, useEffect } from 'react';
 import Page from '../components/Page';
-import DashboardSidebar from '../layouts/dashboard/DashboardSidebar';
-import { getModelDetails } from '../API/component';
-
+import { getModelDetails, getMd } from '../API/component';
+import { Markdown } from '../components/dashboard/markdown/markdownRenderer';
 // ----------------------------------------------------------------------
 
-export default function DashboardApp(props) {
+export default function DashboardApp() {
   const [modelInfo, setModelInfo] = useState({});
+  const [infoMarkdown, setInfoMarkdown] = useState('');
   const id = useParams();
   useEffect(() => {
-    setModelInfo(getModelDetails(id.id));
+    getModelDetails(id.id, setModelInfo);
   }, [id]);
+
+  useEffect(() => {
+    getMd(modelInfo.information_md, setInfoMarkdown);
+  }, [modelInfo]);
+
   return (
     <Page title="Model Dashboard">
-      <DashboardSidebar id={id.id} />
-      <Container maxWidth="lg" sx={{ ml: '20%', mt: '2%' }}>
+      {/* <DashboardSidebar id={id.id} /> */}
+      <Container maxWidth="lg" sx={{ ml: '5%', mt: '2%' }}>
         <Box sx={{ pb: 5 }}>
           <Typography variant="h2">
-            <b>{modelInfo.name}</b>
+            <b>{modelInfo.model_name}</b>
           </Typography>
           <Typography>
             Model ID: <b>{id.id}</b>
@@ -29,8 +35,7 @@ export default function DashboardApp(props) {
         </Box>
         <Grid container spacing={3}>
           <Grid item sx={{ whiteSpace: 'pre-line' }}>
-            <Typography variant="h3">Information</Typography>
-            <Typography variant="p">{modelInfo.info}</Typography>
+            <Markdown infoMarkdown={infoMarkdown} />
           </Grid>
         </Grid>
       </Container>
