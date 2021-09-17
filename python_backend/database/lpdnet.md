@@ -1,5 +1,13 @@
-# Heading 1
+# Information on LPD Net
 
-## Heading 2
+This is the markdown file for LPD Net to be displayed under the information page
 
-This is a markdown test adfhaujsbdfjbas;lk
+## How it works
+
+This is a markdown test
+
+## Examples
+
+We can do many things with markdown syntax:
+
+![test image](static/test1.jpg)

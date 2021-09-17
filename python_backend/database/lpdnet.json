@@ -1,14 +1,15 @@
 {
   "model_name": "License Plate Detection Net",
   "status": "active",
-  "information": "### This is a big heading",
+  "information": "Lorem ipsum",
+  "information_md": "database/lpdnet.md",
   "email": "abc@stengineering.com",
   "phone": "12345678",
-  "cover": "https://www.researchgate.net/profile/Zain-Masood-4/publication/315489495/figure/fig3/AS:900203120967681@1591636557193/Figure-shows-some-results-of-our-end-to-end-license-plate-detection-and-recognition.png",
+  "cover": "static/test2.jpg",
   "api": [
     {
       "type": "GET",
-      "endpoint": "/api/lpdnet/",
+      "endpoint": "/api/lpdnet/internal",
       "status": "active",
       "input": "Just ping the API to test if API is running",
       "input_type": "json",
@@ -17,7 +18,7 @@
     },
     {
       "type": "POST",
-      "endpoint": "/api/lpdnet/",
+      "endpoint": "/api/lpdnet/internal",
       "status": "active",
       "input": "Image to run inference on",
       "input_type": "image",

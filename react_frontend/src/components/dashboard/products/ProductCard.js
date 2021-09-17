@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // material
 import { Box, Card, Link, Typography, Stack } from '@material-ui/core';
@@ -6,6 +7,7 @@ import { styled } from '@material-ui/core/styles';
 // utils
 //
 import Label from './Label';
+import { getImageUrl } from '../../../API/component';
 
 // ----------------------------------------------------------------------
 
@@ -25,7 +27,10 @@ ShopProductCard.propTypes = {
 
 export default function ShopProductCard({ product }) {
   const { name, cover, status, id } = product;
-
+  const [coverUrl, setCoverUrl] = useState();
+  useEffect(() => {
+    getImageUrl(cover, setCoverUrl);
+  }, [cover]);
   return (
     <Card>
       <Box sx={{ pt: '100%', position: 'relative' }}>
@@ -44,7 +49,7 @@ export default function ShopProductCard({ product }) {
             {status}
           </Label>
         )}
-        <ProductImgStyle alt={name} src={cover} />
+        <ProductImgStyle alt={name} src={coverUrl} />
       </Box>
 
       <Stack spacing={2} sx={{ p: 3 }}>

@@ -17,13 +17,13 @@ import {
 } from '@material-ui/core';
 // utils
 
-import { sendPostRequest } from '../../../../API/component';
+import { sendPostRequest, getImageUrl } from '../../../../API/component';
 // ----------------------------------------------------------------------
 
 // ----------------------------------------------------------------------
 const ImgStyle = styled('img')({
   top: 0,
-  maxWidth: '20vw',
+  maxWidth: '40vw',
   margin: '4%',
   marginLeft: '1%',
   alignItems: 'center',
@@ -57,6 +57,7 @@ export default function UploadPicture(props) {
       formData,
       (e) => {
         setContent(JSON.stringify(e, null, 2));
+        getImageUrl(e['0'].overlay_image, setImgSrc);
       },
       config
     );

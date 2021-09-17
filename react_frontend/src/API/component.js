@@ -97,3 +97,18 @@ export function sendPostRequest(endpoint, data, callback, config) {
       callback('Endpoint inactive');
     });
 }
+
+export function getImageUrl(path, callback) {
+  callback(`${baseURL}api/get_image?path=${path}`);
+}
+
+export function getMd(path, callback) {
+  axios
+    .get(`${baseURL}api/get_md?path=${path}`)
+    .then((e) => {
+      callback(e.data);
+    })
+    .catch(() => {
+      callback('Endpoint inactive');
+    });
+}
