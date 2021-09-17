@@ -170,6 +170,7 @@ class DetectNetPostprocessor(Postprocessor):
                     w_min = np.min(w)
                     b = classwise_bboxes[labeling == label]
                     mean_bbox = np.sum((b.T*w_norm).T, axis=0)
+                    mean_bbox = np.array(mean_bbox, dtype='float64')
 
                     # Compute coefficient of variation of the box coords
                     mean_box_w = mean_bbox[2] - mean_bbox[0]
