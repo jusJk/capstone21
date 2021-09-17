@@ -12,7 +12,8 @@ import {
   Stack,
   Button,
   Box,
-  ButtonGroup
+  ButtonGroup,
+  LinearProgress
 } from '@material-ui/core';
 // utils
 
@@ -43,7 +44,8 @@ export default function UploadPicture(props) {
 
   const handleFormUpload = () => {
     const formData = new FormData();
-    formData.append('file', uploadFile);
+    formData.append('image', uploadFile);
+    formData.append('filename', uploadFile.name);
     const config = {
       headers: {
         'content-type': 'multipart/form-data'
@@ -72,7 +74,12 @@ export default function UploadPicture(props) {
         <Divider sx={{ my: '1%' }} />
         <Box>
           <Box>
-            {content === '' ? null : (
+            {content === '' ? (
+              <LinearProgress
+                color="secondary"
+                sx={{ m: '3%', height: '2vh', borderRadius: '5px' }}
+              />
+            ) : (
               <Alert sx={{ m: '1.5%' }} severity="info">
                 {content}
               </Alert>
@@ -81,7 +88,7 @@ export default function UploadPicture(props) {
           <Grid container justify>
             {imgSrc ? (
               <Stack>
-                <Typography variant="subtitle1">File Preview:</Typography>
+                <Typography variant="subtitle1"> {uploadFile.name}</Typography>
                 <ImgStyle src={imgSrc} alt="" />
               </Stack>
             ) : null}
@@ -105,6 +112,7 @@ export default function UploadPicture(props) {
               size="large"
               disabled={!imgSrc}
               onClick={() => {
+                setContent('');
                 handleFormUpload();
               }}
             >
