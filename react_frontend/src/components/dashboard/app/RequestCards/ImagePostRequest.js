@@ -12,7 +12,8 @@ import {
   Stack,
   Button,
   Box,
-  ButtonGroup
+  ButtonGroup,
+  LinearProgress
 } from '@material-ui/core';
 // utils
 
@@ -32,7 +33,8 @@ const ImgStyle = styled('img')({
 export default function UploadPicture(props) {
   const [imgSrc, setImgSrc] = useState('');
   const [uploadFile, setUploadFile] = useState({});
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState();
+  const [loading, setLoading] = useState(false);
 
   const _onChange = (e) => {
     const file = e.target.files[0];
@@ -43,7 +45,8 @@ export default function UploadPicture(props) {
 
   const handleFormUpload = () => {
     const formData = new FormData();
-    formData.append('file', uploadFile);
+    formData.append('image', uploadFile);
+    formData.append('filename', uploadFile.name);
     const config = {
       headers: {
         'content-type': 'multipart/form-data'
@@ -53,11 +56,17 @@ export default function UploadPicture(props) {
       props.api.endpoint,
       formData,
       (e) => {
-        setContent(JSON.stringify(e));
+        setContent(JSON.stringify(e, null, 2));
       },
       config
     );
   };
+
+  const ProgressOrNothing = (progress) =>
+    progress ? (
+      <LinearProgress color="secondary" sx={{ m: '3%', height: '2vh', borderRadius: '5px' }} />
+    ) : null;
+
   return (
     <Card
       variant="outlined"
@@ -72,16 +81,18 @@ export default function UploadPicture(props) {
         <Divider sx={{ my: '1%' }} />
         <Box>
           <Box>
-            {content === '' ? null : (
+            {content === undefined ? (
+              ProgressOrNothing(loading)
+            ) : (
               <Alert sx={{ m: '1.5%' }} severity="info">
-                {content}
+                <pre>{content}</pre>
               </Alert>
             )}
           </Box>
           <Grid container justify>
             {imgSrc ? (
               <Stack>
-                <Typography variant="subtitle1">File Preview:</Typography>
+                <Typography variant="subtitle1"> {uploadFile.name}</Typography>
                 <ImgStyle src={imgSrc} alt="" />
               </Stack>
             ) : null}
@@ -105,6 +116,8 @@ export default function UploadPicture(props) {
               size="large"
               disabled={!imgSrc}
               onClick={() => {
+                setContent(undefined);
+                setLoading(true);
                 handleFormUpload();
               }}
             >

@@ -12,15 +12,19 @@ import sys
 sys.path.insert(1, 'triton_client/model_client')
 from triton_client.model_client.lpd_model_class import LpdModelClass
 
+
 @app.route('/api/lpdnet/<id>',methods= ['POST', 'GET'])
 def call_lpdnet(id):
+
     """
     This function responds to the external API call of obtaining
     lpdnet
 
     :return: JSON object 
     """
+
     lpd = LpdModelClass(id)
+
     model_status = {
                     'code':200,
                     'status':'active'

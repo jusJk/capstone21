@@ -23,18 +23,19 @@ def get_all_models():
     return info
 
 @app.route('/api/info/<id>')
-def get_model_info(id):
+def get_model_info(id):  
     """
     This function responds to the interal API call of obtaining
     whether a model is active in the inference server
     
     :return: Dictionary//JSON 
-    """
+    """ 
     
-    if id in model_info:
+    if id in model_info: 
         return {id:model_info[id]}
     else:
         return {'error':'invalid model name'}
+
 
 @app.route('/api/get_image')
 def get_image():

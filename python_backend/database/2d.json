@@ -1,10 +1,10 @@
 {
-  "model_name": "License Plate Detection Net",
+  "model_name": "2D Body Pose",
   "status": "active",
-  "information": "### This is a big heading",
+  "information": "Lorem ipsum lorem ipsum",
   "email": "abc@stengineering.com",
   "phone": "12345678",
-  "cover": "https://www.researchgate.net/profile/Zain-Masood-4/publication/315489495/figure/fig3/AS:900203120967681@1591636557193/Figure-shows-some-results-of-our-end-to-end-license-plate-detection-and-recognition.png",
+  "cover": "https://developer-blogs.nvidia.com/wp-content/uploads/2021/06/output-image.png",
   "api": [
     {
       "type": "GET",
