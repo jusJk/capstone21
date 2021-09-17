@@ -24,8 +24,8 @@ export default function DashboardApp() {
         <APIEndPoint
           api={{
             type: 'POST',
-            body_type: 'image',
-            name: 'Image Model Explainability',
+            input_type: 'image',
+            model_name: 'Image Model Explainability',
             endpoint: `api/${id.id}/`
           }}
         />

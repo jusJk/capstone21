@@ -14,8 +14,8 @@ const RootStyle = styled(Card)(({ theme }) => ({
   // backgroundColor: theme.palette.info.lighter
   color: theme.palette.primary.lighter,
   background: `linear-gradient(
-          rgba(0, 0, 0, 1),
-          rgba(0, 0, 0, 1)
+          rgba(0, 0, 0, 0.6),
+          rgba(0, 0, 0, 0.5)
         ), url(
     'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/book-quotes-1531945007.jpg?crop=1.00xw:0.753xh;0,0.247xh&resize=1200:*'
   )`,
@@ -38,8 +38,8 @@ const RootStyleNVIDIA = styled(Card)(({ theme }) => ({
   // backgroundColor: theme.palette.info.lighter
   color: theme.palette.info.lighter,
   background: `linear-gradient(
-          rgba(0, 0, 0, 1),
-          rgba(0, 0, 0, 1)
+          rgba(0, 0, 0, 0.6),
+          rgba(0, 0, 0, 0.4)
         ), url(
     'https://developer-blogs.nvidia.com/wp-content/uploads/2020/12/triton.png'
   )`,
