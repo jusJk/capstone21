@@ -3,3 +3,6 @@
 **/__pycache__/*
 */.flaskenv
 .DS_Store
+
+**/triton_client/input/**
+**/triton_client/output/**
