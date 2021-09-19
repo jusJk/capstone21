@@ -14,7 +14,6 @@ def render_image(frame, box, output_image_file, outline_color='red', linewidth=1
             y2 = min(image.size[1], box[3] + i)
             draw.rectangle(box, outline=outline_color)
     image.save(output_image_file)
-    return image
 
 
 def crop_image(frame, box, output_cropped_file):
