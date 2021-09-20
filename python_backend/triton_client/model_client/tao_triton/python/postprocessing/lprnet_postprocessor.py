@@ -111,7 +111,7 @@ class LprnetPostprocessor(Postprocessor):
             key = predictions[0][key_counter]
             if (key != prev_char) & (key < length_dict):
                 final_output+=mapping_dictionary[key]
-                confidence_scores_indv_image.append(confidence_score[0][key_counter])
+                confidence_scores_indv_image.append(np.float64(confidence_score[0][key_counter]))
             prev_char = key
 
         return final_output, confidence_scores_indv_image, filename
