@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 // material
 import { styled } from '@material-ui/core/styles';
 //
-import DashboardNavbar from './DashboardNavbar';
+import DashboardNavbar from '../basic/DashboardNavbar';
 import DashboardSidebar from './DashboardSidebar';
 
 // ----------------------------------------------------------------------
@@ -33,11 +33,15 @@ const MainStyle = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function DashboardLayout() {
+export default function DashboardLayout({ userProfile, setUserProfile }) {
   const [open, setOpen] = useState(false);
   return (
     <RootStyle>
-      <DashboardNavbar onOpenSidebar={() => setOpen(true)} />
+      <DashboardNavbar
+        onOpenSidebar={() => setOpen(true)}
+        userProfile={userProfile}
+        setUserProfile={setUserProfile}
+      />
       <DashboardSidebar isOpenSidebar={open} onCloseSidebar={() => setOpen(false)} />
       <MainStyle>
         <Outlet />

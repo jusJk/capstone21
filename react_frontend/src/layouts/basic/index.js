@@ -31,10 +31,10 @@ const MainStyle = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function BasicLayout() {
+export default function BasicLayout({ userProfile, setUserProfile }) {
   return (
     <RootStyle>
-      <DashboardNavbar />
+      <DashboardNavbar userProfile={userProfile} setUserProfile={setUserProfile} />
       <MainStyle>
         <Outlet />
       </MainStyle>

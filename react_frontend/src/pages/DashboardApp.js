@@ -18,8 +18,8 @@ export default function DashboardApp() {
   }, [id]);
 
   useEffect(() => {
-    getMd(modelInfo.information_md, setInfoMarkdown);
-  }, [modelInfo]);
+    getMd(`${id.id}/${id.id}_info.md`, setInfoMarkdown);
+  }, [id.id]);
 
   return (
     <Page title="Model Dashboard">
@@ -35,7 +35,7 @@ export default function DashboardApp() {
         </Box>
         <Grid container spacing={3}>
           <Grid item sx={{ whiteSpace: 'pre-line' }}>
-            <Markdown infoMarkdown={infoMarkdown} />
+            <Markdown infoMarkdown={infoMarkdown} id={id.id} />
           </Grid>
         </Grid>
       </Container>

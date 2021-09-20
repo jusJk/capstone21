@@ -13,4 +13,4 @@ model_names = [m.split('.')[0] for m in model_files] #get list of model names, l
 
 model_info = {}
 for m in model_names:
-    model_info[m] = json.load(open(f'./database/{m}.json'))
+    model_info[m] = json.load(open(f'./database/{m}/{m}.json')) 

@@ -30,7 +30,7 @@ export default function ShopProductCard({ product }) {
   const [coverUrl, setCoverUrl] = useState();
   useEffect(() => {
     getImageUrl(cover, setCoverUrl);
-  }, [cover]);
+  }, [id]);
   return (
     <Card>
       <Box sx={{ pt: '100%', position: 'relative' }}>
