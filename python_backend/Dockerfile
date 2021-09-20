@@ -4,6 +4,8 @@ COPY ./triton_client /triton_client
 WORKDIR /triton_client
 
 RUN pip install --no-cache-dir -r requirements.txt
+# Dependency for OpenCV
+RUN apt-get update && apt-get install -y libgl1 
 
 EXPOSE 8002
 
