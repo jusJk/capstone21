@@ -328,6 +328,7 @@ def lpr_predict(**FLAGS):
         #Need to play around with confidence scores. LPRNet seems to give nonsense output (even with low confidence scores),
         #Check if they have a check going on such as the one in lpdnet
         #Also check if we can implement batch processing here
+        #also confirm whether confidence score is actually confidence score
 
     logger.info("{} PASS".format(FLAGS['mode'].lower()))
     return final_response
