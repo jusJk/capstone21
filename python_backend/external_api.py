@@ -5,31 +5,36 @@ from utils import crop_image, render_image
 import json
 import os
 from datetime import datetime
-from io import BytesIO
 CORS(app)
 
 import sys
 sys.path.insert(1, 'triton_client/model_client')
 from triton_client.model_client.lpd_model_class import LpdModelClass
 
+
 @app.route('/api/lpdnet/<id>',methods= ['POST', 'GET'])
 def call_lpdnet(id):
+
     """
     This function responds to the external API call of obtaining
     lpdnet
 
     :return: JSON object 
     """
+    
     lpd = LpdModelClass(id)
+
     model_status = {
                     'code':200,
                     'status':'active'
                     }
 
     if request.method=='GET':
+
         return model_status
     
     elif request.method=='POST':
+
         # Create directories for input and output images
         now = datetime.now()
         curr_time = now.strftime("%H%M%S")
@@ -61,11 +66,18 @@ def call_lpdnet(id):
         # Process response to return
         processed = {}
         for i, info in enumerate(response):
-            # crop_image(images[info['file_name']],info['bbox'],f"triton_client/output/{id}/{curr_time}/{info['file_name']}")
-            if id=='internal':
-                overlayed_image = render_image(images[info['file_name']],info['bbox'],f"static/overlay_lpdnet_{info['file_name']}")
-                info['overlay_image'] = f"static/overlay_lpdnet_{info['file_name']}"
-            processed[i] = info
+            if info['HTTPStatus']==204:
+                # No inference bounding box was found
+                processed[i] = info
+            else:
+                # info is a list of bbox, bbox is a dict containing a list (bbox)
+                # and a single number, confidence score
+                for j, bbox_info in enumerate(info["all_bboxes"]):
+                    crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/output/{id}/{curr_time}/{j}_{info['file_name']}")
+                    if id=='internal':
+                        render_image(images[info['file_name']],bbox_info['bbox'],f"static/overlay_lpdnet_{info['file_name']}")
+                        info['overlay_image'] = f"static/overlay_lpdnet_{info['file_name']}"
+                processed[i] = info
         return processed        
     
     else:

@@ -1,5 +1,6 @@
 // material
 import { React, useState } from 'react';
+import PropTypes from 'prop-types';
 import { styled } from '@material-ui/core/styles';
 import {
   Divider,
@@ -12,17 +13,17 @@ import {
   Button,
   Box,
   ButtonGroup,
-  ButtonGroupContent
+  LinearProgress
 } from '@material-ui/core';
 // utils
 
-import { sendPostRequest } from '../../../../API/component';
+import { sendPostRequest, getImageUrl } from '../../../../API/component';
 // ----------------------------------------------------------------------
 
 // ----------------------------------------------------------------------
 const ImgStyle = styled('img')({
   top: 0,
-  maxWidth: '20vw',
+  maxWidth: '40vw',
   margin: '4%',
   marginLeft: '1%',
   alignItems: 'center',
@@ -32,18 +33,20 @@ const ImgStyle = styled('img')({
 export default function UploadPicture(props) {
   const [imgSrc, setImgSrc] = useState('');
   const [uploadFile, setUploadFile] = useState({});
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState();
+  const [loading, setLoading] = useState(false);
 
-  const _onChange = function (e) {
+  const _onChange = (e) => {
     const file = e.target.files[0];
     const url = URL.createObjectURL(file);
     setImgSrc(url);
     setUploadFile(file);
   };
 
-  const handleFormUpload = function () {
+  const handleFormUpload = () => {
     const formData = new FormData();
-    formData.append('file', uploadFile);
+    formData.append('image', uploadFile);
+    formData.append('filename', uploadFile.name);
     const config = {
       headers: {
         'content-type': 'multipart/form-data'
@@ -53,11 +56,18 @@ export default function UploadPicture(props) {
       props.api.endpoint,
       formData,
       (e) => {
-        setContent(JSON.stringify(e));
+        setContent(JSON.stringify(e, null, 2));
+        getImageUrl(e['0'].overlay_image, setImgSrc);
       },
       config
     );
   };
+
+  const ProgressOrNothing = (progress) =>
+    progress ? (
+      <LinearProgress color="secondary" sx={{ m: '3%', height: '2vh', borderRadius: '5px' }} />
+    ) : null;
+
   return (
     <Card
       variant="outlined"
@@ -66,22 +76,24 @@ export default function UploadPicture(props) {
       <CardContent>
         <Stack direction="row">
           <Typography variant="h5" component="h2">
-            {props.api.name}
+            {props.api.input}
           </Typography>
         </Stack>
         <Divider sx={{ my: '1%' }} />
         <Box>
           <Box>
-            {content === '' ? null : (
+            {content === undefined ? (
+              ProgressOrNothing(loading)
+            ) : (
               <Alert sx={{ m: '1.5%' }} severity="info">
-                {content}
+                <pre>{content}</pre>
               </Alert>
             )}
           </Box>
           <Grid container justify>
             {imgSrc ? (
               <Stack>
-                <Typography variant="subtitle1">File Preview:</Typography>
+                <Typography variant="subtitle1"> {uploadFile.name}</Typography>
                 <ImgStyle src={imgSrc} alt="" />
               </Stack>
             ) : null}
@@ -105,6 +117,8 @@ export default function UploadPicture(props) {
               size="large"
               disabled={!imgSrc}
               onClick={() => {
+                setContent(undefined);
+                setLoading(true);
                 handleFormUpload();
               }}
             >
@@ -117,3 +131,6 @@ export default function UploadPicture(props) {
     </Card>
   );
 }
+UploadPicture.propTypes = {
+  api: PropTypes.object
+};

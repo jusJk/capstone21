@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types';
 import { React, useState } from 'react';
 import { styled } from '@material-ui/core/styles';
-import { Card, CardContent, Typography, Stack, Button, Box } from '@material-ui/core';
+import { Card, Typography, Stack, Button, Box } from '@material-ui/core';
 import { ImageRequest, TextRequest, PlaceholderRequest } from '.';
 
 // utils
@@ -33,17 +33,9 @@ const buttonVariantPicker = (type) => {
   return colors[type];
 };
 
-const getJsonCard = function (api) {
-  return <TextRequest api={api} />;
-};
-
-const postImageCard = function (api) {
-  return <ImageRequest api={api} />;
-};
-
-const placeholderCard = function (api) {
-  return <PlaceholderRequest api={api} />;
-};
+const getJsonCard = (api) => <TextRequest api={api} />;
+const postImageCard = (api) => <ImageRequest api={api} />;
+const placeholderCard = (api) => <PlaceholderRequest api={api} />;
 // ----------------------------------------------------------------------
 
 export default function APIEndPoint({ api }) {
@@ -63,11 +55,12 @@ export default function APIEndPoint({ api }) {
       DELETE: { json: placeholderCard },
       POST: { image: postImageCard }
     };
-    const func = componentMap[api.type][api.body_type];
-    console.log(func);
+    const func = componentMap[api.type][api.input_type];
+
     if (func !== undefined) {
       return func(api);
     }
+    return null;
   };
 
   return (
