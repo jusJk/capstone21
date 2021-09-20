@@ -204,8 +204,8 @@ def call_combined(id):
         return {'code':404,'error':'Request not found'}
 
 
-@app.route('/api/bodyposenet/<id>',methods= ['POST', 'GET'])
-def call_bodyposenet(id):
+@app.route('/api/bpnet/<id>',methods= ['POST', 'GET'])
+def call_bpnet(id):
 
     """
     This function responds to the external API call of obtaining
@@ -240,23 +240,23 @@ def call_bodyposenet(id):
             f.save(f"triton_client/bpnet/input/{id}/{curr_time}/{filenames[i]}")
         
         # Call triton inference server
-        response = lpd.predict(f"triton_client/bpnet/input/{id}/{curr_time}")
-        
+        response = bpn.predict(f"triton_client/bpnet/input/{id}/{curr_time}")
+        #return str(response['results'])
         # Process response to return
         processed = {}
-        for i, info in enumerate(response):
-            if info['HTTPStatus']==204:
-                # No inference bounding box was found
-                processed[i] = info
-            else:
-                # info is a list of bbox, bbox is a dict containing a list (bbox)
-                # and a single number, confidence score
-                # for j, bbox_info in enumerate(info["all_bboxes"]):
-                    # crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/bpnet/output/{id}/{curr_time}/{j}_{info['file_name']}")
-                    # if id=='internal':
-                    #     render_image(images[info['file_name']],bbox_info['bbox'],f"database/bpnet/tmp/overlay_bpnet_{info['file_name']}")
-                    #     info['overlay_image'] = f"database/bpnet/tmp/overlay_lpdnet_{info['file_name']}"
-                processed[i] = info
+        for file_name, info in response['results'].items():
+            # info is a list of keypoints, keypoints is a dict containing a numpy array (coordinates)
+            # and confidence score and a number total corresponding to the number of key points identified
+            user_list = []
+            for i, keypoints in enumerate(info):
+                temp = {}
+                for k, v in keypoints.items():
+                    if k in ['total','score']:
+                        temp[k] = v
+                    else:
+                        temp[k] = v.tolist()
+                user_list.append(temp)
+            processed[file_name] = user_list
         return processed        
     
     else:
