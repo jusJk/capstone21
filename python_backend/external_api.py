@@ -75,8 +75,8 @@ def call_lpdnet(id):
                 for j, bbox_info in enumerate(info["all_bboxes"]):
                     crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/output/{id}/{curr_time}/{j}_{info['file_name']}")
                     if id=='internal':
-                        render_image(images[info['file_name']],bbox_info['bbox'],f"static/overlay_lpdnet_{info['file_name']}")
-                        info['overlay_image'] = f"static/overlay_lpdnet_{info['file_name']}"
+                        render_image(images[info['file_name']],bbox_info['bbox'],f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}")
+                        info['overlay_image'] = f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}"
                 processed[i] = info
         return processed        
     

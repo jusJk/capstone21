@@ -3,9 +3,9 @@ import remarkGfm from 'remark-gfm';
 import { styled } from '@material-ui/core/styles';
 import { getImageUrl } from '../../../API/component';
 
-const linkhandler = (link) => {
+const linkhandler = (link, id) => {
   let imgUrl = '';
-  getImageUrl(link, (e) => {
+  getImageUrl(`database/${id}/${link}`, (e) => {
     imgUrl = e;
   });
   return imgUrl;
@@ -20,11 +20,11 @@ const ImgStyle = styled('img')({
 
 const Image = (props) => <ImgStyle {...props} />;
 
-export function Markdown({ infoMarkdown, ...others }) {
+export function Markdown({ infoMarkdown, id, ...others }) {
   return (
     <ReactMarkdown
       children={infoMarkdown}
-      transformImageUri={linkhandler}
+      transformImageUri={(link) => linkhandler(link, id)}
       components={{ img: Image }}
       remarkPlugins={[remarkGfm]}
     />

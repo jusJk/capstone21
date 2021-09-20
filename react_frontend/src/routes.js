@@ -1,4 +1,5 @@
 import { Navigate, useRoutes } from 'react-router-dom';
+import { useState } from 'react';
 // layouts
 import DashboardLayout from './layouts/dashboard';
 import BasicLayout from './layouts/basic';
@@ -17,10 +18,11 @@ import Landing from './pages/Landing';
 // ----------------------------------------------------------------------
 
 export default function Router() {
+  const [userProfile, setUserProfile] = useState('Admin');
   return useRoutes([
     {
       path: '/dashboard',
-      element: <DashboardLayout />,
+      element: <DashboardLayout userProfile={userProfile} setUserProfile={setUserProfile} />,
       children: [
         { path: '/', element: <Navigate to="/dashboard/catalog/" replace /> },
         { path: 'app/info/:id', element: <DashboardApp /> },
@@ -33,7 +35,7 @@ export default function Router() {
 
     {
       path: '/',
-      element: <BasicLayout />,
+      element: <BasicLayout userProfile={userProfile} setUserProfile={setUserProfile} />,
       children: [
         { path: '404', element: <NotFound /> },
         { path: 'catalog', element: <Products /> },
