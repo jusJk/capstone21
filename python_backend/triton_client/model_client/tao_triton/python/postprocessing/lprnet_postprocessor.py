@@ -93,42 +93,52 @@ class LprnetPostprocessor(Postprocessor):
         for output_name in self.output_names:
             output_array[output_name] = results.as_numpy(output_name)
         # print(output_array)
+        print(output_array)
         predictions = output_array["tf_op_layer_ArgMax"]
+        confidence_score = output_array["tf_op_layer_Max"]
         #Reading mapping file and creating a dictionary for mapping
         with open(mapping_output_file) as f:
             lines = f.read().splitlines()
         mapping_dictionary = {k:v for k,v in enumerate(lines)}
         length_dict = len(mapping_dictionary)
         final_output = ''
+        confidence_scores_indv_image = []
         #Performing Mapping
         prev_char = -1
-        for key in predictions[0]:
-            if (key != prev_char) & (key < length_dict):
-                final_output+=mapping_dictionary[key]
-            prev_char = key
-
-        #Creating final output file directory if it does not exist
         current_frame = self.frames[this_id-1] 
         filename = os.path.basename(current_frame._image_path)
-        output_label_file = os.path.join(
-            self.output_path, "infer_labels",
-            "{}.txt".format(os.path.splitext(filename)[0])
-        )
+        for key_counter in range(len(predictions[0])):
+            key = predictions[0][key_counter]
+            if (key != prev_char) & (key < length_dict):
+                final_output+=mapping_dictionary[key]
+                confidence_scores_indv_image.append(confidence_score[0][key_counter])
+            prev_char = key
 
-        # output_image_file = os.path.join(
-        #     self.output_path, "infer_images",
-        #     "{}.jpg".format(os.path.splitext(filename)[0])
+        return final_output, confidence_scores_indv_image, filename
+
+        # #Creating final output file directory if it does not exist
+        # current_frame = self.frames[this_id-1] 
+        # filename = os.path.basename(current_frame._image_path)
+        # output_label_file = os.path.join(
+        #     self.output_path, "infer_labels",
+        #     "{}.txt".format(os.path.splitext(filename)[0])
         # )
 
-        if not os.path.exists(os.path.dirname(output_label_file)):
-            os.makedirs(os.path.dirname(output_label_file))
+        # # output_image_file = os.path.join(
+        # #     self.output_path, "infer_images",
+        # #     "{}.jpg".format(os.path.splitext(filename)[0])
+        # # )
 
-        # if not os.path.exists(os.path.dirname(output_image_file)):
-        #     os.makedirs(os.path.dirname(output_image_file))
-        # file_path = output_label_file + ""
+        # if not os.path.exists(os.path.dirname(output_label_file)):
+        #     os.makedirs(os.path.dirname(output_label_file))
 
-        #Creating text file for final output
-        with open(output_label_file, 'w') as file:
-            file.write(final_output)
+        # # if not os.path.exists(os.path.dirname(output_image_file)):
+        # #     os.makedirs(os.path.dirname(output_image_file))
+        # # file_path = output_label_file + ""
+
+        # #Creating text file for final output
+        # print(output_label_file)
+        # with open(output_label_file, 'w') as file:
+        #     file.write(final_output)
 
         

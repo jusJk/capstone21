@@ -201,6 +201,7 @@ class DetectNetPostprocessor(Postprocessor):
                         break
                     current_frame = self.frames[current_idx]
                     filename = os.path.basename(current_frame._image_path)
+                    
                     #Returns BBOX of all license plates in it
                     final_bboxes = return_bbox_info(current_frame, batchwise_boxes[image_idx])
                     batch_boxes_output.append([final_bboxes, filename])

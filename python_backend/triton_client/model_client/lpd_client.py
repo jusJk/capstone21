@@ -44,16 +44,15 @@ from tao_triton.python.utils.kitti import write_kitti_annotation
 from tao_triton.python.model.detectnet_model import DetectnetModel
 from tao_triton.python.model.classification_model import ClassificationModel
 
+
 logger = logging.getLogger(__name__)
 
 TRITON_MODEL_DICT = {
-    # "classification": ClassificationModel,
-    "detectnet_v2": DetectnetModel
+    "detectnet_v2": DetectnetModel,
 }
 
 POSTPROCESSOR_DICT = {
-    # "classification": ClassificationPostprocessor,
-    "detectnet_v2": DetectNetPostprocessor
+    "detectnet_v2": DetectNetPostprocessor,
 }
 
 
