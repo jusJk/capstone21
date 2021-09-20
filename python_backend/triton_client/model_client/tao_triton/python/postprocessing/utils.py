@@ -225,7 +225,6 @@ def plot_keypoints(results, image_filename, image_path, render_limbs=True):
         person = list(person.items())
         for i in range(total-2):  # exclude last 2 elements which are score and total keypoints
             center = person[i][1]
-            print(center)
             cv.circle(canvas, (int(center[0]), int(
                 center[1])), radius, colors[i], thickness=-1)
     to_plot = cv.addWeighted(to_plot, 0.3, canvas, 0.7, 0)
@@ -234,7 +233,6 @@ def plot_keypoints(results, image_filename, image_path, render_limbs=True):
         return to_plot
 
     for person in image_res:
-        print(person)
         # Each edge is a joint represented by tuple (keypoint_a, keypoint_b)
         for i, edge in enumerate(skeleton_edge_names):
             keypoint_a = edge[0]
@@ -245,7 +243,6 @@ def plot_keypoints(results, image_filename, image_path, render_limbs=True):
                 # Get the y coords of each keypoint
                 Y = (person[keypoint_a ][0], person[keypoint_b][0])
                 cur_canvas = canvas.copy()
-                print(edge, X, Y)
                 mX = np.mean(X)
                 mY = np.mean(Y)
                 length = ((X[0] - X[1]) ** 2 + (Y[0] - Y[1]) ** 2) ** 0.5
