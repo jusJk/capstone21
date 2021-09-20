@@ -1,4 +1,8 @@
 import os
+
+import requests
+from requests.exceptions import ConnectionError
+
 from base_model_class import BaseModelClass
 from bodyposenet_client import bodyposenet_predict
 from tao_triton.python.postprocessing.utils import plot_keypoints
@@ -21,7 +25,13 @@ class BodyPoseNetClass(BaseModelClass):
         '''
         Returns the status of the model
         '''
-        return {'status': 'active'}
+        try:
+            triton_server_url = "http://" + self._url + "/v2/health/ready"
+            response = requests.get(triton_server_url)
+        except ConnectionError as error:
+            return {'HTTPStatus' : 503, 'status':'Inactive'}
+        else:
+            return {'HTTPStatus' : 200, 'status':'Active'}
 
     def predict(self, file_path):
         """Runs inference on images in file_path if it exists
