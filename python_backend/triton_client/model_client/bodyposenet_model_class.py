@@ -5,6 +5,7 @@ from requests.exceptions import ConnectionError
 
 from base_model_class import BaseModelClass
 from bodyposenet_client import bodyposenet_predict
+from tao_triton.python.postprocessing.utils import plot_keypoints
 
 
 class BodyPoseNetClass(BaseModelClass):
@@ -64,10 +65,6 @@ class BodyPoseNetClass(BaseModelClass):
 if __name__ == '__main__':
     bp = BodyPoseNetClass(1)
     res = bp._predict('../input/bodyposenet')
+    output = plot_keypoints(res, 'bp-sample.png', '../input/bodyposenet/bp-sample.png') # image with keypoints/limbs rendered
+    # TODO: Save the image in correct output path
 
-    import pickle
-    with open('filename.pickle', 'wb') as handle:
-        pickle.dump(res, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-    print(res)
-    print(len(res['results']['bp-sample.png']))
