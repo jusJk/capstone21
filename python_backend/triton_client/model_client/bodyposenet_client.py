@@ -307,5 +307,6 @@ def bodyposenet_predict(**FLAGS):
     final_results = {}
     final_results['results'] = results
     final_results['skeleton_edge_names'] = postprocessor.params['skeleton_edge_names']
+    final_results['keypoints'] = postprocessor.params['keypoints']
 
     return final_results
