@@ -68,7 +68,3 @@ if __name__ == '__main__':
     output = plot_keypoints(res, 'bp-sample.png', '../input/bodyposenet/bp-sample.png') # image with keypoints/limbs rendered
     # TODO: Save the image in correct output path
 
-    import pickle
-    with open('output.pickle', 'wb') as handle:
-        pickle.dump(output, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
