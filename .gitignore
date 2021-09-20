@@ -4,7 +4,11 @@
 */.flaskenv
 .DS_Store
 
-**/triton_client/input/**
-**/triton_client/output/**
+**/triton_client/*/input/**
+**/triton_client/*/output/**
 
 **/static/*
+
+**/tmp/*
+
+*/test_images/*

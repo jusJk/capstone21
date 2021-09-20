@@ -1,8 +1,11 @@
 import os
+
 import requests
+from requests.exceptions import ConnectionError
+
 from base_model_class import BaseModelClass
 from lpr_client import lpr_predict
-from requests.exceptions import ConnectionError
+
 
 class LprModelClass(BaseModelClass):
 
@@ -18,7 +21,7 @@ class LprModelClass(BaseModelClass):
         self._model_name = "lprnet_usa"
         self._mode = "Lprnet"
         self._class_list = "license_plate"
-        self.mapping_output_file = "../postprocessing_config/us_lp_characters.txt"
+        self.mapping_output_file = "/app/triton_client/postprocessing_config/us_lp_characters.txt"
     
     def status(self):
         '''
@@ -39,8 +42,8 @@ class LprModelClass(BaseModelClass):
         if os.path.exists(file_path):
             return self._predict(file_path)
         else:
-            return {'HTTPStatus':400, 
-                    'error':"File Path does not exist!"}
+            return [{'HTTPStatus':400, 
+                    'error':"File Path does not exist!"}]
 
     def _predict(self, file_path):
         number_files = len([name for name in os.listdir(file_path) if os.path.isfile(file_path+name)])
@@ -53,10 +56,9 @@ class LprModelClass(BaseModelClass):
                             output_path = "./output/lprnet_usa/", postprocessing_config = self._post_processing_config, \
                             url = self._url, image_filename = file_path, verbose = False, streaming = False, async_set = False, \
                             protocol = 'HTTP', model_version = "", batch_size = 1, \
-                                mapping_output_file = "../postprocessing_config/us_lp_characters.txt")
+                                mapping_output_file = "/app/triton_client/postprocessing_config/us_lp_characters.txt")
 
-#To handle output_pathi
 
-test_model = LprModelClass("hellosss");
-# print(test_model.predict("../input/"))
-print(test_model.predict("../input/lpr/"))
+# test_model = LprModelClass("hellosss");
+# # print(test_model.predict("../input/"))
+# print(test_model.predict("../input/lpr/"))
