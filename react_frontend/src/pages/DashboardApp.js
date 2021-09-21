@@ -33,11 +33,8 @@ export default function DashboardApp() {
             Model ID: <b>{id.id}</b>
           </Typography>
         </Box>
-        <Grid container spacing={3}>
-          <Grid item sx={{ whiteSpace: 'pre-line' }}>
-            <Markdown infoMarkdown={infoMarkdown} id={id.id} />
-          </Grid>
-        </Grid>
+
+        <Markdown markdown={infoMarkdown} id={id.id} />
       </Container>
     </Page>
   );

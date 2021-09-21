@@ -42,7 +42,11 @@ export default function DashboardLayout({ userProfile, setUserProfile }) {
         userProfile={userProfile}
         setUserProfile={setUserProfile}
       />
-      <DashboardSidebar isOpenSidebar={open} onCloseSidebar={() => setOpen(false)} />
+      <DashboardSidebar
+        userProfile={userProfile}
+        isOpenSidebar={open}
+        onCloseSidebar={() => setOpen(false)}
+      />
       <MainStyle>
         <Outlet />
       </MainStyle>

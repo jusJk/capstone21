@@ -8,7 +8,7 @@ import Scrollbar from '../../components/Scrollbar';
 import NavSection from '../../components/NavSection';
 import { MHidden } from '../../components/@material-extend';
 //
-import sidebarConfig from './SidebarConfig';
+import { sidebarConfigProvider } from './SidebarConfig';
 
 // ----------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ const AccountStyle = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function DashboardSidebar() {
+export default function DashboardSidebar({ userProfile, ...rest }) {
   const loc = useLocation();
   const id = loc.pathname.split('/').slice(-1)[0];
 
@@ -54,8 +54,7 @@ export default function DashboardSidebar() {
         </AccountStyle>
       </Box>
 
-      <NavSection navConfig={sidebarConfig} id={id} />
-
+      <NavSection navConfig={sidebarConfigProvider(userProfile === 'Admin')} id={id} />
       <Box sx={{ flexGrow: 1 }} />
     </Scrollbar>
   );
