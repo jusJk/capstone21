@@ -39,8 +39,8 @@ class LpdModelClass(BaseModelClass):
         if os.path.exists(file_path):
             return self._predict(file_path)
         else:
-            return {'HTTPStatus':400, 
-                    'error':"File Path does not exist!"}
+            return [{'HTTPStatus':400, 
+                    'error':"File Path does not exist!"}]
 
     def _predict(self, file_path):
         number_files = len([name for name in os.listdir(file_path) if os.path.isfile(file_path+name)])

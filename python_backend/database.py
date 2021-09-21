@@ -8,8 +8,8 @@ import os
 ### for the internal API calls -- and possibly to define the external API calls
 ### programmatically (to be discussed)
 
-model_files = os.listdir('./database/') #list of files in the directory
-model_names = [m.split('.')[0] for m in model_files] #get list of model names, like lpdnet/lprnet
+model_folders = os.listdir('./database/') #list of files in the directory
+model_names = [m for m in model_folders] #get list of model names, like lpdnet/lprnet
 
 model_info = {}
 for m in model_names:
