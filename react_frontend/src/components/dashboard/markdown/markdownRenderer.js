@@ -1,6 +1,8 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { styled } from '@material-ui/core/styles';
+import { Grid, Typography } from '@material-ui/core';
+
 import { getImageUrl } from '../../../API/component';
 
 const linkhandler = (link, id) => {
@@ -20,13 +22,15 @@ const ImgStyle = styled('img')({
 
 const Image = (props) => <ImgStyle {...props} />;
 
-export function Markdown({ infoMarkdown, id, ...others }) {
+export function Markdown({ markdown, id, ...others }) {
+  console.log(markdown);
   return (
-    <ReactMarkdown
-      children={infoMarkdown}
-      transformImageUri={(link) => linkhandler(link, id)}
-      components={{ img: Image }}
-      remarkPlugins={[remarkGfm]}
-    />
+    <Typography variant="p" sx={{ whiteSpace: 'pre-line' }}>
+      <ReactMarkdown
+        children={markdown}
+        transformImageUri={(link) => linkhandler(link, id)}
+        components={{ img: Image }}
+      />
+    </Typography>
   );
 }

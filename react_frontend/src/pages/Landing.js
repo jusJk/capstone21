@@ -1,7 +1,7 @@
 // material
 import { styled } from '@material-ui/core/styles';
 import { Link as RouterLink } from 'react-router-dom';
-import { Button, Card, Grid, Typography } from '@material-ui/core';
+import { Button, Card, Grid, Typography, ButtonGroup } from '@material-ui/core';
 // components
 import Page from '../components/Page';
 
@@ -46,13 +46,35 @@ const RootStyleNVIDIA = styled(Card)(({ theme }) => ({
   backgroundSize: 'cover'
 }));
 
-export default function Landing() {
+export default function Landing({ userProfile, setUserProfile }) {
   return (
     <Page title="Home" sx={{ marginLeft: '10%', marginTop: '3%' }}>
       <Grid container spacing={3}>
         <Grid item md={12} sx={{ padding: '2%' }}>
           <Typography variant="h1">Welcome!</Typography>
           ST Engineering's AI-as-a-Service platform powered by NVIDIA AI Toolkit
+        </Grid>
+        <Grid item md={12}>
+          <Typography variant="h5">User Profile</Typography>
+        </Grid>
+        <Grid item container md={12}>
+          <ButtonGroup>
+            {[
+              ['Admin', 'primary'],
+              ['Client', 'primary']
+            ].map((e) => (
+              <Button
+                key={e[0]}
+                color={e[1]}
+                variant={userProfile === e[0] ? 'contained' : 'outlined'}
+                fullwidth
+                size="large"
+                onClick={() => setUserProfile(e[0])}
+              >
+                {e[0]}
+              </Button>
+            ))}
+          </ButtonGroup>
         </Grid>
         <Grid item md={12}>
           <Typography variant="h5">Getting Started</Typography>

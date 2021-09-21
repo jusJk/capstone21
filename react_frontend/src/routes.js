@@ -9,7 +9,9 @@ import DashboardApp from './pages/DashboardApp';
 import DashboardAppContact from './pages/DashboardAppContact';
 import DashboardAppExplainability from './pages/DashboardAppExplainability';
 import DashboardAppInference from './pages/DashboardAppInference';
+import DashboardAppPerformance from './pages/DashboardAppPerformance';
 import DashboardAppDrift from './pages/DashboardAppDrift';
+
 import Products from './pages/Products';
 import NotFound from './pages/Page404';
 
@@ -28,7 +30,8 @@ export default function Router() {
         { path: 'app/info/:id', element: <DashboardApp /> },
         { path: 'app/inference/:id', element: <DashboardAppInference /> },
         { path: 'app/explainability/:id', element: <DashboardAppExplainability /> },
-        { path: 'app/drift/:id', element: <DashboardAppDrift /> },
+        { path: 'app/drift/:id', element: <DashboardAppDrift userProfile={userProfile} /> },
+        { path: 'app/performance/:id', element: <DashboardAppPerformance /> },
         { path: 'app/contact/:id', element: <DashboardAppContact /> }
       ]
     },
@@ -39,7 +42,10 @@ export default function Router() {
       children: [
         { path: '404', element: <NotFound /> },
         { path: 'catalog', element: <Products /> },
-        { path: '/', element: <Landing /> }
+        {
+          path: '/',
+          element: <Landing setUserProfile={setUserProfile} userProfile={userProfile} />
+        }
       ]
     },
 

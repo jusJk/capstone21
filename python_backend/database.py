@@ -13,4 +13,4 @@ model_names = [m for m in model_folders] #get list of model names, like lpdnet/l
 
 model_info = {}
 for m in model_names:
-    model_info[m] = json.load(open(f'./database/{m}/{m}.json')) 
+    model_info[m] = json.load(open(f'./database/{m}/{m}.json'))

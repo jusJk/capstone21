@@ -28,7 +28,7 @@ const sidebarConfig = [
   },
   {
     title: 'Model Performance',
-    path: '/dashboard/app/drift',
+    path: '/dashboard/app/performance',
     icon: getIcon(activityFill)
   },
   {
@@ -38,4 +38,10 @@ const sidebarConfig = [
   }
 ];
 
-export default sidebarConfig;
+export const sidebarConfigProvider = (admin) =>
+  admin
+    ? [
+        ...sidebarConfig,
+        { title: '(Admin) Model Drift', path: '/dashboard/app/drift', icon: getIcon(activityFill) }
+      ]
+    : sidebarConfig;

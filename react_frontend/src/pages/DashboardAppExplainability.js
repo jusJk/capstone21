@@ -2,15 +2,20 @@
 import { Box, Grid, Container, Typography, Skeleton } from '@material-ui/core';
 // components
 import { useParams } from 'react-router-dom';
-
+import { useEffect, useState } from 'react';
 import Page from '../components/Page';
-
-import { APIEndPoint } from '../components/dashboard/app';
+import { getMd } from '../API/component';
+import { Markdown } from '../components/dashboard/markdown/markdownRenderer';
 
 // ----------------------------------------------------------------------
 
-export default function DashboardApp() {
+export default function DashboardAppEx() {
+  const [exMarkdown, setExMarkdown] = useState('');
   const id = useParams();
+
+  useEffect(() => {
+    getMd(`${id.id}/${id.id}_explainability.md`, setExMarkdown);
+  }, [id.id]);
 
   return (
     <Page title="Model Dashboard">
@@ -18,17 +23,8 @@ export default function DashboardApp() {
         <Box sx={{ pb: 5 }}>
           <Typography variant="h2">Model Explainability</Typography>
         </Box>
-        <Typography variant="h6" sx={{ mb: '1%' }}>
-          Start by uploading an image:
-        </Typography>
-        <APIEndPoint
-          api={{
-            type: 'POST',
-            input_type: 'image',
-            model_name: 'Image Model Explainability',
-            endpoint: `api/${id.id}/`
-          }}
-        />
+        <Markdown markdown={exMarkdown} id={id.id} />
+
         <Grid sx={{ mt: '5%' }}>
           <Box>
             <Skeleton />
