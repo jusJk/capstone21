@@ -4,6 +4,7 @@ import fileTextFill from '@iconify/icons-eva/file-text-fill';
 import lockFill from '@iconify/icons-eva/email-fill';
 import browserFill from '@iconify/icons-eva/cloud-upload-fill';
 import activityFill from '@iconify/icons-eva/activity-fill';
+import React from 'react';
 
 // ----------------------------------------------------------------------
 

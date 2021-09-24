@@ -1,8 +1,6 @@
 import { Outlet } from 'react-router-dom';
-
-// material
+import React from 'react';
 import { styled } from '@material-ui/core/styles';
-//
 import DashboardNavbar from './DashboardNavbar';
 
 // ----------------------------------------------------------------------

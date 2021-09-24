@@ -1,20 +1,15 @@
 import { Navigate, useRoutes } from 'react-router-dom';
-import { useState } from 'react';
-// layouts
+import React, { useState } from 'react';
 import DashboardLayout from './layouts/dashboard';
 import BasicLayout from './layouts/basic';
-
-//
 import DashboardApp from './pages/DashboardApp';
 import DashboardAppContact from './pages/DashboardAppContact';
 import DashboardAppExplainability from './pages/DashboardAppExplainability';
 import DashboardAppInference from './pages/DashboardAppInference';
 import DashboardAppPerformance from './pages/DashboardAppPerformance';
 import DashboardAppDrift from './pages/DashboardAppDrift';
-
 import Products from './pages/Products';
 import NotFound from './pages/Page404';
-
 import Landing from './pages/Landing';
 
 // ----------------------------------------------------------------------

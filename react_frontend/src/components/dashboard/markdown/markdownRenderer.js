@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown';
+import React from 'react';
 import remarkGfm from 'remark-gfm';
 import { styled } from '@material-ui/core/styles';
 import { Grid, Typography } from '@material-ui/core';
@@ -31,6 +32,7 @@ export function Markdown({ markdown, id, ...others }) {
         children={markdown}
         transformImageUri={(link) => linkhandler(link, id)}
         components={{ img: Image }}
+        plugins={remarkGfm}
       />
     </Typography>
   );

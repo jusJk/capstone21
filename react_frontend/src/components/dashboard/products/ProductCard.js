@@ -1,11 +1,8 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-// material
 import { Box, Card, Link, Typography, Stack } from '@material-ui/core';
 import { styled } from '@material-ui/core/styles';
-// utils
-//
 import Label from './Label';
 import { getImageUrl } from '../../../API/component';
 

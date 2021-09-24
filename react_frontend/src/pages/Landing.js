@@ -1,8 +1,7 @@
-// material
+import React from 'react';
 import { styled } from '@material-ui/core/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import { Button, Card, Grid, Typography, ButtonGroup } from '@material-ui/core';
-// components
 import Page from '../components/Page';
 
 // ----------------------------------------------------------------------

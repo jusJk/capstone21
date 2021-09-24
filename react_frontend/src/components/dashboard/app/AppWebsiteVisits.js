@@ -1,8 +1,7 @@
+import React from 'react';
 import { merge } from 'lodash';
 import ReactApexChart from 'react-apexcharts';
-// material
 import { Card, CardHeader, Box } from '@material-ui/core';
-//
 import { BaseOptionChart } from '../../charts';
 
 // ----------------------------------------------------------------------
