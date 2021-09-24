@@ -1,8 +1,4 @@
-import { useEffect } from 'react';
-import { sample } from 'lodash';
 import { getModels } from '../API/component';
-// utils
-import { mockImgProduct } from '../utils/mockImages';
 
 // ----------------------------------------------------------------------
 

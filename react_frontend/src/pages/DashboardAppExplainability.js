@@ -1,8 +1,6 @@
-// material
 import { Box, Grid, Container, Typography, Skeleton } from '@material-ui/core';
-// components
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Page from '../components/Page';
 import { getMd } from '../API/component';
 import { Markdown } from '../components/dashboard/markdown/markdownRenderer';

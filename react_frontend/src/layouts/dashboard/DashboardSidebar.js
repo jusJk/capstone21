@@ -1,8 +1,7 @@
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-// material
 import { styled } from '@material-ui/core/styles';
-import { Box, Link as link, Drawer, Typography } from '@material-ui/core';
-// components
+import { Box, Drawer, Typography, Button } from '@material-ui/core';
 
 import Scrollbar from '../../components/Scrollbar';
 import NavSection from '../../components/NavSection';
@@ -42,8 +41,21 @@ export default function DashboardSidebar({ userProfile, ...rest }) {
         '& .simplebar-content': { height: '100%', display: 'flex', flexDirection: 'column' }
       }}
     >
-      <Box sx={{ mt: 15, mb: 5, mx: 2.5 }}>
-        <AccountStyle>
+      <Box sx={{ mt: 15, mb: 5 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            padding: 0
+          }}
+        >
+          <Button component={Link} to="/catalog/" variant="secondary">
+            {'<  '}Back to Model Catalog
+          </Button>
+        </Box>
+
+        <AccountStyle sx={{ mt: 3, mx: 2.5 }}>
           {/* <Avatar src={account.photoURL} alt="photoURL" /> */}
           <Box sx={{ ml: 2 }}>
             Model

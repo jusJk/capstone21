@@ -1,10 +1,6 @@
-// material
+import React from 'react';
 import { Stack, Grid, Container, Typography, Skeleton, Box } from '@material-ui/core';
-
-// components
-
 import Page from '../components/Page';
-
 import { AppWebsiteVisits } from '../components/dashboard/app';
 
 export default function DashboardAppDrift({ userProfile }) {
