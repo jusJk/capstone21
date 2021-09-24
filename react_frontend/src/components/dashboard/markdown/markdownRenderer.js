@@ -15,6 +15,7 @@ const linkhandler = (link, id) => {
 const ImgStyle = styled('img')({
   top: 0,
   maxWidth: '40vw',
+  maxHeight: '50vh',
   margin: '1%',
   alignItems: 'center',
   borderRadius: '25px'

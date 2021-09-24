@@ -23,7 +23,7 @@ import { sendPostRequest, getImageUrl } from '../../../../API/component';
 // ----------------------------------------------------------------------
 const ImgStyle = styled('img')({
   top: 0,
-  maxWidth: '40vw',
+  maxWidth: '30vw',
   margin: '4%',
   marginLeft: '1%',
   alignItems: 'center',

@@ -6,7 +6,7 @@ Two kinds of pretrained LPD models are delivered --- one is trained on a NVIDIA-
 
 ## Example
 
-![test image](cover.jpeg)
+![test image](plate.jpg)
 
 ## Model Architecture
 
