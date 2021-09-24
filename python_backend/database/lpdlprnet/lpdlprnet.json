@@ -1,14 +1,14 @@
 {
-  "model_name": "License Plate Detection + Recogntion Net",
+  "model_name": "License Plate Detection + Recognition",
   "status": "active",
   "information": "Lorem ipsum",
   "email": "abc@stengineering.com",
   "phone": "12345678",
-  "cover": "database/lpdlprnet/plate.jpg",
+  "cover": "database/lpdlprnet/two-cars-2.jpeg",
   "api": [
     {
       "type": "GET",
-      "endpoint": "/api/lpdnet/internal",
+      "endpoint": "/api/lpdlprnet/internal",
       "status": "active",
       "input": "Check Server Availability",
       "input_type": "json",
@@ -17,7 +17,7 @@
     },
     {
       "type": "POST",
-      "endpoint": "/api/lpdnet/internal",
+      "endpoint": "/api/lpdlprnet/internal",
       "status": "active",
       "input": "Image Inference Demo",
       "input_type": "image",

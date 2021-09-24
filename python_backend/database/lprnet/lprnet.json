@@ -4,11 +4,11 @@
   "information": "Lorem ipsum",
   "email": "abc@stengineering.com",
   "phone": "12345678",
-  "cover": "database/lprnet/plate_2.jpg",
+  "cover": "database/lprnet/cal_plate.jpg",
   "api": [
     {
       "type": "GET",
-      "endpoint": "/api/lpdnet/internal",
+      "endpoint": "/api/lprnet/internal",
       "status": "active",
       "input": "Check Server Availability",
       "input_type": "json",
@@ -17,7 +17,7 @@
     },
     {
       "type": "POST",
-      "endpoint": "/api/lpdnet/internal",
+      "endpoint": "/api/lprnet/internal",
       "status": "active",
       "input": "Image Inference Demo",
       "input_type": "image",

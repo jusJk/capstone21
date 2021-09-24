@@ -27,11 +27,24 @@ def crop_image(frame, box, output_cropped_file):
 
 def create_directories(model, id, curr_time):
     # Create directories for input and output images
-    if os.path.isdir(f"triton_client/{model}/input/{id}/"):
-        os.mkdir(f"triton_client/{model}/input/{id}/{curr_time}")
-        os.mkdir(f"triton_client/{model}/output/{id}/{curr_time}")
-    else:
+    if not os.path.isdir(f"triton_client/{model}"):
+        os.mkdir(f"triton_client/{model}")
+        os.mkdir(f"triton_client/{model}/input")
+        os.mkdir(f"triton_client/{model}/output")
+    
+    if not os.path.isdir(f"triton_client/{model}/input/{id}"):
         os.mkdir(f"triton_client/{model}/input/{id}")
         os.mkdir(f"triton_client/{model}/output/{id}")
+
+    if not os.path.isdir(f"triton_client/{model}/input/{id}/{curr_time}"):
         os.mkdir(f"triton_client/{model}/input/{id}/{curr_time}")
         os.mkdir(f"triton_client/{model}/output/{id}/{curr_time}")
+
+    # if os.path.isdir(f"triton_client/{model}"):
+    #     os.mkdir(f"triton_client/{model}/input")
+    #     os.mkdir(f"triton_client/{model}/input/{id}")
+    #     os.mkdir(f"triton_client/{model}/output")
+    #     os.mkdir(f"triton_client/{model}/output/{id}")
+    #     os.mkdir(f"triton_client/{model}/input/{id}/{curr_time}")
+    #     os.mkdir(f"triton_client/{model}/output/{id}/{curr_time}")
+    # else
