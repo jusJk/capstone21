@@ -63,9 +63,9 @@ def call_lpdnet(id):
                 # and a single number, confidence score
                 for j, bbox_info in enumerate(info["all_bboxes"]):
                     crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/lpdnet/output/{id}/{curr_time}/{j}_{info['file_name']}")
-                    if id=='internal':
-                        render_image(images[info['file_name']],bbox_info['bbox'],f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}")
-                        info['overlay_image'] = f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}"
+                if id=='internal':
+                    render_image(images[info['file_name']],info["all_bboxes"],f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}")
+                    info['overlay_image'] = f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}"
                 processed[i] = info
         return processed        
     
@@ -178,11 +178,11 @@ def call_combined(id):
                     
                     reverse_mapping[f"{j}_{info['file_name']}"] = i
                     
-                    if id=='internal':
-                        render_image(images[info['file_name']],bbox_info['bbox'],f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}")
-                        info['overlay_image'] = f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}"
-                    
                     bbox_info[f"{j}_bbox"] = bbox_info.pop('bbox')
+                
+                if id=='internal':
+                    render_image(images[info['file_name']],info['all_bboxes'],f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}")
+                    info['overlay_image'] = f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}"
 
                 processed[i] = info
 
