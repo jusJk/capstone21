@@ -19,6 +19,24 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+'''
+This Template follows the overall flow of LPDNet and shows the steps necessary
+to use this image client to make calls to the triton model housed in the server.
+There are a few steps which a needed to be done before this image client can function
+   1. Ensure that the models are housed in the server with the appropriate configurations
+   2. Ensure that you have access to the port of the server which the model as this will be the url of the model
+
+This template shows the barebones structure and outline of a necessary image_client.
+More indepth information can be seen in the actual lpd_client.py file.
+
+This template serves as an example and should work for all image triton tasks (LPD, LPR, BodyPose)
+once the necessary details (as explained below) are changed.
+'''
+
+'''
+Necessary Imports for Image Client
+'''
+
 import argparse
 from copy import deepcopy
 from functools import partial
@@ -44,8 +62,19 @@ from tao_triton.python.utils.kitti import write_kitti_annotation
 from tao_triton.python.model.detectnet_model import DetectnetModel
 from tao_triton.python.model.classification_model import ClassificationModel
 
+'''
+These are dictionaries which houses the appropriate triton models and the necessary postprocessors.
+The models here are simple python classes to run model inference using this triton client
+The postprocessers here are for final post processing tasks on triton model outputs.
+If you would like to change how the final output of the models should be, this should be done in the 
+respective postprocessing files.
 
-logger = logging.getLogger(__name__)
+These models/postprocessors are imported from the tao_triton nvidia folder
+Currently, we have 3 models up and running
+   1. LPDNet - Detectnet_model & DetectNetPostprocessor
+   2. LPRNet - LprnetModel & LprnetPostprocessor
+   3. BodyPostnet - BodyPoseNetModel & BodyPoseNetPostprocessor
+'''
 
 TRITON_MODEL_DICT = {
     "detectnet_v2": DetectnetModel,
@@ -108,21 +137,29 @@ def lpd_predict(**FLAGS):
 
     Raises:
         Exception: If client creation fails
-        InferenceServerException: If failed to retrieve model config, metadata or if inference is unsuccessful.
+        InferenceSeverException: If failed to retrieve model config, metadata or if inference is unsuccessful.
 
     Returns:
-        list: Where each element is a ditionary representing the output of bounding boxes detected in the image
-        [{image_1}, {image_2}] where each image_x contains HTTPStatus, file_name, all_bboxes, confidence_score
+        [Return Type]: [Return Type Description]
     """
 
+
     """Running the inferencer client."""
+
+    '''
+    Whenever we use LPD (detectnet_v2), we need to specify the postprocessing_config.
+    This refers to the clustering specifications that is made use by lpdnet but not for lprnet & bodyposenet
+    '''
+
     if FLAGS['mode'].lower() == "detectnet_v2":
         assert os.path.isfile(FLAGS['postprocessing_config']), (
             "Clustering config must be defined for DetectNet_v2."
         )
+
     log_level = "INFO"
     if FLAGS['verbose']:
         log_level = "DEBUG"
+
     # Configure logging to get Maglev log messages.
     logging.basicConfig(format='%(asctime)s [%(levelname)s] '
                                '%(name)s: %(message)s',
@@ -130,6 +167,13 @@ def lpd_predict(**FLAGS):
 
     if FLAGS['streaming'] and FLAGS['protocol'].lower() != "grpc":
         raise Exception("Streaming is only allowed with gRPC protocol")
+
+    '''
+    This here initialises the triton client as per the protocol used to send inference to the triton server.
+    We make use of HTTP protocol for our current interences
+
+    triton_client here is used heavily from here on to load images/send inference to triton model hosted on the server.
+    '''
 
     try:
         if FLAGS['protocol'].lower() == "grpc":
@@ -145,6 +189,11 @@ def lpd_predict(**FLAGS):
     except Exception as e:
         print("client creation failed: " + str(e))
         sys.exit(1)
+
+    '''
+    Attaining model meta-data and model config based on specified model.
+    Since this image client follows the flow for lpd net, we attain model meta data and config for lpd net.
+    '''
 
     # Make sure the model matches our requirements, and get some
     # properties of the model that we need for preprocessing
@@ -162,16 +211,30 @@ def lpd_predict(**FLAGS):
         print("failed to retrieve the config: " + str(e))
         sys.exit(1)
 
+    '''
+    Converting model metadata and model config into Attr dict format so that elements
+    can be accessed as both keys as well as attributes
+    '''
+
     if FLAGS['protocol'].lower() == "grpc":
         model_config = model_config.config
     else:
         model_metadata, model_config = convert_http_metadata_config(
             model_metadata, model_config)
 
+    '''
+    Initialises lpd_net model based on model meta-data and model config
+    '''
+
     triton_model = TRITON_MODEL_DICT[FLAGS['mode'].lower()].from_metadata(model_metadata, model_config)
     target_shape = (triton_model.c, triton_model.h, triton_model.w)
     npdtype = triton_to_np_dtype(triton_model.triton_dtype)
     max_batch_size = triton_model.max_batch_size
+
+    '''
+    Saves input image/images as a custom Frame object into a list
+    '''
+
     frames = []
     if os.path.isdir(FLAGS['image_filename']):
         frames = [
@@ -205,6 +268,11 @@ def lpd_predict(**FLAGS):
     args_postprocessor = [
         FLAGS['batch_size'], frames, FLAGS['output_path'], triton_model.data_format
     ]
+
+    '''
+    Initialises postprocessor used for final post processing
+    '''
+
     if FLAGS['mode'].lower() == "detectnet_v2":
         args_postprocessor.extend([class_list, FLAGS['postprocessing_config'], target_shape])
     postprocessor = POSTPROCESSOR_DICT[FLAGS['mode'].lower()](*args_postprocessor)
@@ -220,11 +288,19 @@ def lpd_predict(**FLAGS):
     #Creating final json object
     final_response = []
 
+    '''
+    Sending image for inference to triton inference server (LPDNet)
+    '''
+
     logger.info("Sending inference request for batches of data")
     with tqdm(total=len(frames)) as pbar:
         while not last_request:
             input_filenames = []
             repeated_image_data = []
+
+            '''
+            Arranging images to send in batches as per batch_sizes set
+            '''
 
             for idx in range(FLAGS['batch_size']):
                 frame = frames[image_idx]
@@ -244,6 +320,12 @@ def lpd_predict(**FLAGS):
                 batched_image_data = repeated_image_data[0]
 
             # Send request
+            '''
+            Sending responses to triton inference server
+            Since we are not using streaming/async, responses are saved in the variable 'responses'.
+            triton_client.infer() method is the function which sends our input images to the triton server for final inference
+            '''
+
             try:
                 req_gen_args = [batched_image_data, triton_model.input_names,
                     triton_model.output_names, triton_model.triton_dtype,
@@ -314,12 +396,19 @@ def lpd_predict(**FLAGS):
             for async_request in async_requests:
                 responses.append(async_request.get_result())
 
+    '''
+    Loops through the 'responses' variable which contains the triton inference server outputs
+    and performs final post processing step from triton output for lpdnet.
+    If any changes to final output is desired, this postprocessor step should contain the main bulk of changes for it,
+    specifically in the apply function of postprocessor.
+    '''
+
     logger.info("Gathering responses from the server and post processing the inferenced outputs.")
     processed_request = 0
     with tqdm(total=len(frames)) as pbar:
-
+        
         '''
-        Loops through the number of batches
+        Loops through the number of batches. sent_count == number of batches sent
         '''
 
         while processed_request < sent_count:
@@ -331,6 +420,7 @@ def lpd_predict(**FLAGS):
             batch_boxes_output = postprocessor.apply(
                 response, this_id, render=True
             )
+            
             processed_request += 1
             pbar.update(FLAGS['batch_size'])
 

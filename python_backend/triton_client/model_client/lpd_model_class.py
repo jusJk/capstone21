@@ -55,6 +55,6 @@ class LpdModelClass(BaseModelClass):
 
 #To handle output_path
 
-test_model = LpdModelClass("hellosss");
-print(test_model.predict("../input/lpd"))
-# print(test_model.status())
+if __name__ == "__main__":
+    test_model = LpdModelClass("hellosss")
+    print(test_model.predict("../input/lpd"))
