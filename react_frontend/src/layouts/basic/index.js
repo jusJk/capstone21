@@ -1,8 +1,6 @@
 import { Outlet } from 'react-router-dom';
-
-// material
+import React from 'react';
 import { styled } from '@material-ui/core/styles';
-//
 import DashboardNavbar from './DashboardNavbar';
 
 // ----------------------------------------------------------------------
@@ -31,10 +29,10 @@ const MainStyle = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function BasicLayout() {
+export default function BasicLayout({ userProfile, setUserProfile }) {
   return (
     <RootStyle>
-      <DashboardNavbar />
+      <DashboardNavbar userProfile={userProfile} setUserProfile={setUserProfile} />
       <MainStyle>
         <Outlet />
       </MainStyle>

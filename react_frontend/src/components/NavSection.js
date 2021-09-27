@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { React, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
 import { NavLink as RouterLink, matchPath, useLocation } from 'react-router-dom';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
-// material
 import { alpha, useTheme, styled } from '@material-ui/core/styles';
 import { Box, List, Collapse, ListItemText, ListItemIcon, ListItemButton } from '@material-ui/core';
 
@@ -154,7 +153,6 @@ NavSection.propTypes = {
 };
 
 export default function NavSection({ navConfig, id, ...other }) {
-  console.log(id);
   const { pathname } = useLocation();
   const match = (path) => (path ? !!matchPath({ path, end: false }, pathname) : false);
 

@@ -1,9 +1,6 @@
-// material
 import { Box, Grid, Container, Typography } from '@material-ui/core';
-// components
 import { useParams } from 'react-router-dom';
-
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Page from '../components/Page';
 import { getModelDetails, getMd } from '../API/component';
 import { Markdown } from '../components/dashboard/markdown/markdownRenderer';
@@ -18,8 +15,8 @@ export default function DashboardApp() {
   }, [id]);
 
   useEffect(() => {
-    getMd(modelInfo.information_md, setInfoMarkdown);
-  }, [modelInfo]);
+    getMd(`${id.id}/${id.id}_info.md`, setInfoMarkdown);
+  }, [id.id]);
 
   return (
     <Page title="Model Dashboard">
@@ -33,11 +30,8 @@ export default function DashboardApp() {
             Model ID: <b>{id.id}</b>
           </Typography>
         </Box>
-        <Grid container spacing={3}>
-          <Grid item sx={{ whiteSpace: 'pre-line' }}>
-            <Markdown infoMarkdown={infoMarkdown} />
-          </Grid>
-        </Grid>
+
+        <Markdown markdown={infoMarkdown} id={id.id} />
       </Container>
     </Page>
   );

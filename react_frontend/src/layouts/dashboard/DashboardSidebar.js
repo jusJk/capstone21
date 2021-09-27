@@ -1,14 +1,13 @@
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-// material
 import { styled } from '@material-ui/core/styles';
-import { Box, Link as link, Drawer, Typography } from '@material-ui/core';
-// components
+import { Box, Drawer, Typography, Button } from '@material-ui/core';
 
 import Scrollbar from '../../components/Scrollbar';
 import NavSection from '../../components/NavSection';
 import { MHidden } from '../../components/@material-extend';
 //
-import sidebarConfig from './SidebarConfig';
+import { sidebarConfigProvider } from './SidebarConfig';
 
 // ----------------------------------------------------------------------
 
@@ -31,7 +30,7 @@ const AccountStyle = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function DashboardSidebar() {
+export default function DashboardSidebar({ userProfile, ...rest }) {
   const loc = useLocation();
   const id = loc.pathname.split('/').slice(-1)[0];
 
@@ -42,8 +41,21 @@ export default function DashboardSidebar() {
         '& .simplebar-content': { height: '100%', display: 'flex', flexDirection: 'column' }
       }}
     >
-      <Box sx={{ mt: 15, mb: 5, mx: 2.5 }}>
-        <AccountStyle>
+      <Box sx={{ mt: 15, mb: 5 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            padding: 0
+          }}
+        >
+          <Button component={Link} to="/catalog/" variant="secondary">
+            {'<  '}Back to Model Catalog
+          </Button>
+        </Box>
+
+        <AccountStyle sx={{ mt: 3, mx: 2.5 }}>
           {/* <Avatar src={account.photoURL} alt="photoURL" /> */}
           <Box sx={{ ml: 2 }}>
             Model
@@ -54,8 +66,7 @@ export default function DashboardSidebar() {
         </AccountStyle>
       </Box>
 
-      <NavSection navConfig={sidebarConfig} id={id} />
-
+      <NavSection navConfig={sidebarConfigProvider(userProfile === 'Admin')} id={id} />
       <Box sx={{ flexGrow: 1 }} />
     </Scrollbar>
   );

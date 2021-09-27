@@ -4,6 +4,7 @@ import fileTextFill from '@iconify/icons-eva/file-text-fill';
 import lockFill from '@iconify/icons-eva/email-fill';
 import browserFill from '@iconify/icons-eva/cloud-upload-fill';
 import activityFill from '@iconify/icons-eva/activity-fill';
+import React from 'react';
 
 // ----------------------------------------------------------------------
 
@@ -28,7 +29,7 @@ const sidebarConfig = [
   },
   {
     title: 'Model Performance',
-    path: '/dashboard/app/drift',
+    path: '/dashboard/app/performance',
     icon: getIcon(activityFill)
   },
   {
@@ -38,4 +39,10 @@ const sidebarConfig = [
   }
 ];
 
-export default sidebarConfig;
+export const sidebarConfigProvider = (admin) =>
+  admin
+    ? [
+        ...sidebarConfig,
+        { title: '(Admin) Model Drift', path: '/dashboard/app/drift', icon: getIcon(activityFill) }
+      ]
+    : sidebarConfig;

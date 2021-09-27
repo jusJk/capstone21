@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-// material
+import React from 'react';
 import { Grid } from '@material-ui/core';
 import ShopProductCard from './ProductCard';
 
@@ -10,7 +10,6 @@ ProductList.propTypes = {
 };
 
 export default function ProductList({ products, ...other }) {
-  console.log(products);
   return (
     <Grid container spacing={3} {...other}>
       {products.map((product) => (

@@ -1,7 +1,6 @@
-// material
 import { alpha, styled } from '@material-ui/core/styles';
-import { Box, AppBar, Toolbar, Button } from '@material-ui/core';
-
+import { Box, AppBar, Toolbar, Button, Menu, MenuItem } from '@material-ui/core';
+import React, { useState } from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
 
@@ -32,9 +31,10 @@ const ToolbarStyle = styled(Toolbar)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function DashboardNavbar() {
+export default function DashboardNavbar({ userProfile, setUserProfile }) {
   const loc = useLocation();
-
+  const [anchorEl, setAnchorEl] = useState();
+  const [userMenu, setUserMenu] = useState();
   return (
     <RootStyle>
       <ToolbarStyle>
@@ -53,9 +53,8 @@ export default function DashboardNavbar() {
             <Typography variant="subtitle1">Home</Typography>
           </Button>
         </Box>
-        <Box component={RouterLink} to="/catalog/" sx={{ px: 1 }}>
+        <Box component={RouterLink} to="/catalog/" sx={{ px: 1, flex: 1 }}>
           <Button
-            fullWidth
             size="large"
             variant={
               loc.pathname === '/catalog/' || loc.pathname.includes('dashboard/app')
@@ -65,6 +64,32 @@ export default function DashboardNavbar() {
           >
             <Typography variant="subtitle1">Model Catalog</Typography>
           </Button>
+        </Box>
+
+        <Box sx={{ px: 1 }}>
+          <Button
+            color={userProfile === 'Admin' ? 'secondary' : 'warning'}
+            size="large"
+            variant="contained"
+            onClick={(e) => {
+              setUserMenu(true);
+              setAnchorEl(e.target);
+            }}
+          >
+            <Typography variant="subtitle1">Profile: {userProfile}</Typography>
+          </Button>
+          <Menu open={userMenu} anchorEl={anchorEl} sx={{ marginTop: '1%' }}>
+            {['Admin', 'Client'].map((user) => (
+              <MenuItem
+                onClick={(e) => {
+                  setUserMenu(false);
+                  setUserProfile(user);
+                }}
+              >
+                {user}
+              </MenuItem>
+            ))}
+          </Menu>
         </Box>
       </ToolbarStyle>
     </RootStyle>

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { motion } from 'framer-motion';
-// material
+import React from 'react';
 import { Box } from '@material-ui/core';
 //
 import { varWrapEnter } from './variants';

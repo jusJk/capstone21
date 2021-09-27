@@ -1,0 +1,28 @@
+{
+  "model_name": "License Plate Detection Net",
+  "status": "active",
+  "information": "Lorem ipsum",
+  "email": "abc@stengineering.com",
+  "phone": "12345678",
+  "cover": "database/lpdnet/cover.jpg",
+  "api": [
+    {
+      "type": "GET",
+      "endpoint": "/api/lpdnet/internal",
+      "status": "active",
+      "input": "Check Server Availability",
+      "input_type": "json",
+      "return_type": "json",
+      "return": "String with status active or inactive"
+    },
+    {
+      "type": "POST",
+      "endpoint": "/api/lpdnet/internal",
+      "status": "active",
+      "input": "Image Inference Demo",
+      "input_type": "image",
+      "return_type": "json",
+      "return": "JSON object with bounding box and confidence score"
+    }
+  ]
+}

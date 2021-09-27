@@ -1,5 +1,6 @@
 # File for functions to do post processing on
 from PIL import ImageDraw, Image
+import os
 
 def render_image(frame, box, output_image_file, outline_color='red', linewidth=10):
     """Render images with overlain outputs."""
@@ -22,3 +23,28 @@ def crop_image(frame, box, output_cropped_file):
     if (box[2] - box[0]) >= 0 and (box[3] - box[1]) >= 0:
         image = image.crop((box[0],box[1],box[2],box[3]))
     image.save(output_cropped_file,"JPEG")
+
+
+def create_directories(model, id, curr_time):
+    # Create directories for input and output images
+    if not os.path.isdir(f"triton_client/{model}"):
+        os.mkdir(f"triton_client/{model}")
+        os.mkdir(f"triton_client/{model}/input")
+        os.mkdir(f"triton_client/{model}/output")
+    
+    if not os.path.isdir(f"triton_client/{model}/input/{id}"):
+        os.mkdir(f"triton_client/{model}/input/{id}")
+        os.mkdir(f"triton_client/{model}/output/{id}")
+
+    if not os.path.isdir(f"triton_client/{model}/input/{id}/{curr_time}"):
+        os.mkdir(f"triton_client/{model}/input/{id}/{curr_time}")
+        os.mkdir(f"triton_client/{model}/output/{id}/{curr_time}")
+
+    # if os.path.isdir(f"triton_client/{model}"):
+    #     os.mkdir(f"triton_client/{model}/input")
+    #     os.mkdir(f"triton_client/{model}/input/{id}")
+    #     os.mkdir(f"triton_client/{model}/output")
+    #     os.mkdir(f"triton_client/{model}/output/{id}")
+    #     os.mkdir(f"triton_client/{model}/input/{id}/{curr_time}")
+    #     os.mkdir(f"triton_client/{model}/output/{id}/{curr_time}")
+    # else

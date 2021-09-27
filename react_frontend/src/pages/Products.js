@@ -1,7 +1,5 @@
-// material
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Typography } from '@material-ui/core';
-// components
 import Page from '../components/Page';
 import { ProductList } from '../components/dashboard/products';
 import { getModels } from '../API/component';

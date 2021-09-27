@@ -1,26 +1,25 @@
 {
-  "model_name": "License Plate Detection Net",
+  "model_name": "License Plate Detection + Recognition",
   "status": "active",
   "information": "Lorem ipsum",
-  "information_md": "database/lpdnet.md",
   "email": "abc@stengineering.com",
   "phone": "12345678",
-  "cover": "static/test2.jpg",
+  "cover": "database/lpdlprnet/two-cars-2.jpeg",
   "api": [
     {
       "type": "GET",
-      "endpoint": "/api/lpdnet/internal",
+      "endpoint": "/api/lpdlprnet/internal",
       "status": "active",
-      "input": "Just ping the API to test if API is running",
+      "input": "Check Server Availability",
       "input_type": "json",
       "return_type": "json",
       "return": "String with status active or inactive"
     },
     {
       "type": "POST",
-      "endpoint": "/api/lpdnet/internal",
+      "endpoint": "/api/lpdlprnet/internal",
       "status": "active",
-      "input": "Image to run inference on",
+      "input": "Image Inference Demo",
       "input_type": "image",
       "return_type": "json",
       "return": "JSON object with bounding box and confidence score"
