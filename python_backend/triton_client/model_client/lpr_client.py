@@ -104,11 +104,19 @@ def requestGenerator(batched_image_data, input_name, output_name, dtype, protoco
     yield inputs, outputs
 
 def lpr_predict(**FLAGS):
+    """Sends image file path to client for inferences and returns postprocessed outputs
+
+    Raises:
+        Exception: If client creation fails
+        InferenceServerException: If failed to retrieve model config, metadata or if inference is unsuccessful.
+
+    Returns:
+        list: Where each element is a dictionary representing the license plates found in each iamge
+        [{image_1}, {image_2}] where each image_x contains HTTPStatus, file_name, license_plate, confidence_score
+    """
+
     """Running the inferencer client."""
-    if FLAGS['mode'].lower() == "detectnet_v2":
-        assert os.path.isfile(FLAGS['postprocessing_config']), (
-            "Clustering config must be defined for DetectNet_v2."
-        )
+
     log_level = "INFO"
     if FLAGS['verbose']:
         log_level = "DEBUG"
@@ -305,30 +313,36 @@ def lpr_predict(**FLAGS):
     logger.info("Gathering responses from the server and post processing the inferenced outputs.")
     processed_request = 0
     final_response = []
+
+    '''
+    Mapping output file as set by user used for final mapping
+    '''
+
+    mapping_output_file = FLAGS['mapping_output_file']
+    with open(mapping_output_file) as f:
+        lines = f.read().splitlines()
+        mapping_dictionary = {k:v for k,v in enumerate(lines)}
+
     with tqdm(total=len(frames)) as pbar:
         while processed_request < sent_count:
-            print("processed_request: ", processed_request)
             response = responses[processed_request]
             if FLAGS['protocol'].lower() == "grpc":
                 this_id = response.get_response().id
             else:
                 this_id = response.get_response()["id"]
-            license_plate, confidence_scores_indv_image, filename = postprocessor.apply(
-                response, this_id, render=True
+            batch_results = postprocessor.apply(
+                response, this_id, mapping_dictionary, render=True
             )
             processed_request += 1
             pbar.update(FLAGS['batch_size'])
-            if len(license_plate) != 0:
-                final_image_response = {"HTTPStatus": 200, "file_name": filename, "license_plate": license_plate, "confidence_scores":confidence_scores_indv_image}
-                final_response.append(final_image_response)
-            else:
-                final_image_response = {"HTTPStatus": 204, "file_name": filename, "license_plate": license_plate, "confidence_scores":confidence_scores_indv_image}
-                final_response.append(final_image_response)
 
-        #Need to play around with confidence scores. LPRNet seems to give nonsense output (even with low confidence scores),
-        #Check if they have a check going on such as the one in lpdnet
-        #Also check if we can implement batch processing here
-        #also confirm whether confidence score is actually confidence score
+            for license_plate, confidence_scores_indv_image, filename in batch_results:
+                if len(license_plate) != 0:
+                    final_image_response = {"HTTPStatus": 200, "file_name": filename, "license_plate": license_plate, "confidence_scores":confidence_scores_indv_image}
+                    final_response.append(final_image_response)
+                else:
+                    final_image_response = {"HTTPStatus": 204, "file_name": filename, "license_plate": license_plate, "confidence_scores":confidence_scores_indv_image}
+                    final_response.append(final_image_response)
 
     logger.info("{} PASS".format(FLAGS['mode'].lower()))
     return final_response

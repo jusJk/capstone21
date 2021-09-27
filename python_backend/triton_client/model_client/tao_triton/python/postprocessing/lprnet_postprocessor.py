@@ -72,49 +72,46 @@ class LprnetPostprocessor(Postprocessor):
         # Format the dbscan elements into classwise configurations for rendering.
         # self.configure()
 
-    def apply(self, results, this_id, render=True):
-        """Apply the post processing to the outputs tensors.
-        
-        This function takes the raw output tensors from the detectnet_v2 model
-        and performs the following steps:
-
-        1. Denormalize the output bbox coordinates
-        2. Threshold the coverage output to get the valid indices for the bboxes.
-        3. Filter out the bboxes from the "output_bbox/BiasAdd" blob.
-        4. Cluster the filterred boxes using DBSCAN.
-        5. Render the outputs on images and save them to the output_path/images
-        6. Serialize the output bboxes to KITTI Format label files in output_path/labels.
-        """
-
+    def apply(self, results, this_id, mapping_dictionary, render=True):
         output_array = {}
         this_id = int(this_id)
         #Mapping file which is specified as an argument when calling the function
         mapping_output_file = self.mapping_output_file
+
         for output_name in self.output_names:
             output_array[output_name] = results.as_numpy(output_name)
-        # print(output_array)
-        print(output_array)
+        
         predictions = output_array["tf_op_layer_ArgMax"]
         confidence_score = output_array["tf_op_layer_Max"]
-        #Reading mapping file and creating a dictionary for mapping
-        with open(mapping_output_file) as f:
-            lines = f.read().splitlines()
-        mapping_dictionary = {k:v for k,v in enumerate(lines)}
-        length_dict = len(mapping_dictionary)
-        final_output = ''
-        confidence_scores_indv_image = []
-        #Performing Mapping
-        prev_char = -1
-        current_frame = self.frames[this_id-1] 
-        filename = os.path.basename(current_frame._image_path)
-        for key_counter in range(len(predictions[0])):
-            key = predictions[0][key_counter]
-            if (key != prev_char) & (key < length_dict):
-                final_output+=mapping_dictionary[key]
-                confidence_scores_indv_image.append(np.float64(confidence_score[0][key_counter]))
-            prev_char = key
 
-        return final_output, confidence_scores_indv_image, filename
+        #Reading mapping file and creating a dictionary for mapping
+        # with open(mapping_output_file) as f:
+        #     lines = f.read().splitlines()
+        # mapping_dictionary = {k:v for k,v in enumerate(lines)}
+
+        length_dict = len(mapping_dictionary)
+
+        batch_results = []
+        for image_idx in range(self.batch_size):
+            license_plate = ''
+            confidence_scores_indv_image = []
+            prev_char = -1
+            current_idx = (this_id - 1) * self.batch_size + image_idx
+            if current_idx >= len(self.frames):
+                break
+            current_frame = self.frames[current_idx]
+            filename = os.path.basename(current_frame._image_path)
+
+            #Mapping into license plates based on mapping_dictionary
+            for key_counter in range(len(predictions[image_idx])):
+                key = predictions[image_idx][key_counter]
+                if (key != prev_char) & (key < length_dict):
+                    license_plate+=mapping_dictionary[key]
+                    confidence_scores_indv_image.append(np.float64(confidence_score[image_idx][key_counter]))
+                prev_char = key
+            batch_results.append([license_plate, confidence_scores_indv_image, filename])
+
+        return batch_results
 
         # #Creating final output file directory if it does not exist
         # current_frame = self.frames[this_id-1] 
