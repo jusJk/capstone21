@@ -33,6 +33,8 @@ class BodyPoseNetPostprocessor(Postprocessor):
             heatmap_threshold=0.1,
             paf_threshold=0.05,
             paf_ortho_dist_thresh=1,
+            min_keypoints=4,
+            min_avg_score=0.4,
             keypoints=[
                 "nose", "neck", "right_shoulder", "right_elbow", "right_wrist",
                 "left_shoulder", "left_elbow", "left_wrist", "right_hip", "right_knee",
@@ -332,7 +334,7 @@ class BodyPoseNetPostprocessor(Postprocessor):
         # Removes subsets based on configuration score or number of keypoints
         deleteIdx = []
         for i in range(len(subset)):
-            if subset[i][-1] < 4 or subset[i][-2]/subset[i][-1] < 0.4:
+            if subset[i][-1] < self.params['min_keypoints'] or subset[i][-2]/subset[i][-1] < self.params['min_avg_score']:
                 deleteIdx.append(i)
         subset = np.delete(subset, deleteIdx, axis=0)
 

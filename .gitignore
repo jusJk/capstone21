@@ -2,6 +2,7 @@
 
 **/__pycache__/*
 */.flaskenv
+.env
 .DS_Store
 
 **/triton_client/*/input/**
