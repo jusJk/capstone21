@@ -11,6 +11,6 @@ import os
 model_folders = os.listdir('./database/') #list of files in the directory
 model_names = [m for m in model_folders] #get list of model names, like lpdnet/lprnet
 
-model_info = {} 
+model_info = {}
 for m in model_names:
     model_info[m] = json.load(open(f'./database/{m}/{m}.json'))
