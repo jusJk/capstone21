@@ -17,7 +17,7 @@ class BodyPoseNetClass(BaseModelClass):
         model.
         '''
         BaseModelClass.__init__(self, client_info)
-        self._url = "35.240.147.255:6000"
+        self._url = os.environ.get('API_URL')
         self._model_name = "bodyposenet"
         self._mode = "BodyPoseNet"
 
@@ -29,9 +29,9 @@ class BodyPoseNetClass(BaseModelClass):
             triton_server_url = "http://" + self._url + "/v2/health/ready"
             response = requests.get(triton_server_url)
         except ConnectionError as error:
-            return {'HTTPStatus' : 503, 'status':'Inactive'}
+            return {'HTTPStatus': 503, 'status': 'Inactive'}
         else:
-            return {'HTTPStatus' : 200, 'status':'Active'}
+            return {'HTTPStatus': 200, 'status': 'Active'}
 
     def predict(self, file_path):
         """Runs inference on images in file_path if it exists
@@ -57,14 +57,17 @@ class BodyPoseNetClass(BaseModelClass):
         if number_files < 256:
             self._batch_size = 8
         else:
-            self._batch_size = 32
+            self._batch_size = 16
         return bodyposenet_predict(model_name=self._model_name, mode=self._mode, url=self._url,
                                    image_filename=file_path, output_path='./', verbose=False, streaming=False, async_set=False,
                                    protocol='HTTP', model_version="", batch_size=self._batch_size)
 
+
 if __name__ == '__main__':
     bp = BodyPoseNetClass(1)
     res = bp._predict('../input/bodyposenet')
-    output = plot_keypoints(res, 'bp-sample.png', '../input/bodyposenet/bp-sample.png') # image with keypoints/limbs rendered
+    print(res)
+    # image with keypoints/limbs rendered
+    output = plot_keypoints(res, 'bp-sample.png',
+                            '../input/bodyposenet/bp-sample.png')
     # TODO: Save the image in correct output path
-
