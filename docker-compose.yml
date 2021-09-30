@@ -22,7 +22,7 @@ services:
     build: ./react_frontend
     container_name: react-frontend
     volumes:
-      - ./react_frontend:/app
+      - ./react_frontend/src:/app/src
     ports:
       - "3000:3000"
     environment:
