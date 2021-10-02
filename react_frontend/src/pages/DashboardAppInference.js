@@ -19,8 +19,7 @@ export default function DashboardAppInference() {
   const [modelEndpoints, setModelEndpoints] = useState([]);
   const id = useParams();
   useEffect(() => {
-    getAvailableDemo(id.id, setModelEndpoints);
-    console.log(modelEndpoints);
+    getAvailableDemo(id.id, (e) => setModelEndpoints(e.api));
   }, [id]);
   return (
     <Page title="Model Dashboard">

@@ -5,6 +5,15 @@
   "email": "abc@stengineering.com",
   "phone": "12345678",
   "cover": "database/lpdlprnet/two-cars-2.jpeg",
+  "explainability_demo_api" :     {
+      "type": "POST",
+      "endpoint": "/api/lpdlprnet/explain/internal",
+      "status": "active",
+      "input": "Explain the prediction of your custom image",
+      "input_type": "image",
+      "return_type": "json",
+      "return": "Explainability for the uploaded picture"
+    },
   "api": [
     {
       "type": "GET",

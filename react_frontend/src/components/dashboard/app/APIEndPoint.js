@@ -62,7 +62,7 @@ export default function APIEndPoint({ api }) {
     }
     return null;
   };
-
+  console.log(api);
   return (
     <>
       <RootStyle>
