@@ -8,7 +8,7 @@ DetectNet solves this key problem by introducing a fixed 3-dimensional label for
 
 ## Example
 
-![test image](detectnet_data.png)
+![test image](database/lpdnet/detectnet_data.png)
 
 The DetectNet architecture has five parts specified in the Caffe model definition file. There are 3 important processes.
 

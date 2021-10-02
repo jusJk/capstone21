@@ -33,13 +33,20 @@ const buttonVariantPicker = (type) => {
   return colors[type];
 };
 
-const getJsonCard = (api) => <TextRequest api={api} />;
-const postImageCard = (api) => <ImageRequest api={api} />;
-const placeholderCard = (api) => <PlaceholderRequest api={api} />;
 // ----------------------------------------------------------------------
 
-export default function APIEndPoint({ api }) {
+export default function APIEndPoint({ api, callback, hideResponse }) {
   const [tryButton, setTryButton] = useState(false);
+
+  const getJsonCard = (api) => (
+    <TextRequest api={api} callback={callback} hideResponse={hideResponse} />
+  );
+  const postImageCard = (api) => (
+    <ImageRequest api={api} callback={callback} hideResponse={hideResponse} />
+  );
+  const placeholderCard = (api) => (
+    <PlaceholderRequest api={api} callback={callback} hideResponse={hideResponse} />
+  );
 
   const RootStyle = styled(Card)(({ theme }) => ({
     boxShadow: 'none',
@@ -68,7 +75,7 @@ export default function APIEndPoint({ api }) {
       <RootStyle>
         <Stack direction="row" spacing={2}>
           <Typography variant="h4">{api.type}</Typography>
-          <Typography variant="h4">{api.endpoint}</Typography>
+          <Typography variant="h4">{api.endpoint_display}</Typography>
           <Box flex={1} />
           <Button
             fullwidth

@@ -17,4 +17,4 @@ Characters id sequence. (DeepStream post-process plugin is needed to get the fin
 ## Example
 
 The input must be a cropped license plate image as follows:
-![image](ca286.png)
+![image](database/lprnet/ca286.png)
