@@ -9,6 +9,7 @@
     {
       "type": "GET",
       "endpoint": "/api/bpnet/internal",
+      "endpoint_display": "/api/bpnet/<id>",
       "status": "active",
       "input": "Check Server Availability",
       "input_type": "json",
@@ -18,6 +19,7 @@
     {
       "type": "POST",
       "endpoint": "/api/bpnet/internal",
+      "endpoint_display": "/api/bpnet/<id>",
       "status": "active",
       "input": "Image Inference Demo",
       "input_type": "image",

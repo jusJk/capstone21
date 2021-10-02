@@ -9,6 +9,7 @@
     {
       "type": "GET",
       "endpoint": "/api/lpdnet/internal",
+      "endpoint_display": "/api/lpdnet/<id>",
       "status": "active",
       "input": "Check Server Availability",
       "input_type": "json",
@@ -18,6 +19,7 @@
     {
       "type": "POST",
       "endpoint": "/api/lpdnet/internal",
+      "endpoint_display": "/api/lpdnet/<id>",
       "status": "active",
       "input": "Image Inference Demo",
       "input_type": "image",

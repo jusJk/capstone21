@@ -68,8 +68,7 @@ export function getAvailableDemo(id, callback) {
   axios
     .get(`${baseURL}/api/info/${id}`)
     .then((e) => {
-      console.log(e.data[id].api);
-      callback(e.data[id].api);
+      callback(e.data[id]);
     })
     .catch(() => {
       callback('Endpoint inactive');
