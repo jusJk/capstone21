@@ -1,7 +1,7 @@
 from app import app
 from flask import request, send_file
 from flask_cors import CORS, cross_origin
-from utils import crop_image, render_image, create_directories
+from utils import crop_image, render_image, create_directories, plot_keypoints
 import json
 import os
 from datetime import datetime
@@ -307,6 +307,8 @@ def call_bpnet(id):
                         temp[k] = v.tolist()
                 user_list.append(temp)
             processed[file_name] = user_list
+            if id=='internal':
+                plot_keypoints(response,file_name,f"triton_client/bpnet/input/{id}/{curr_time}/{file_name}")
         return processed        
     
     else:
