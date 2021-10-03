@@ -1,7 +1,7 @@
 from app import app
 from flask import request, send_file
 from flask_cors import CORS, cross_origin
-from utils import crop_image, render_image, create_directories
+from utils import crop_image, render_image, create_directories, plot_keypoints
 import json
 import os
 from datetime import datetime
@@ -63,10 +63,9 @@ def call_lpdnet(id):
                 # and a single number, confidence score
                 for j, bbox_info in enumerate(info["all_bboxes"]):
                     crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/lpdnet/output/{id}/{curr_time}/{j}_{info['file_name']}")
-                    if id=='internal':
-                        demopic_name=f"triton_client/lprnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}"
-                        render_image(images[info['file_name']],bbox_info['bbox'], demopic_name)
-                        info['overlay_image'] = demopic_name
+                if id=='internal':
+                    render_image(images[info['file_name']],info["all_bboxes"],f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}")
+                    info['overlay_image'] = f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}"
                 processed[i] = info
         return processed        
     
@@ -179,12 +178,11 @@ def call_combined(id):
                     
                     reverse_mapping[f"{j}_{info['file_name']}"] = i
                     
-                    if id=='internal':
-                        demopic_name=f"triton_client/lpdnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}"
-                        render_image(images[info['file_name']],bbox_info['bbox'], demopic_name)
-                        info['overlay_image'] = demopic_name
-                    
                     bbox_info[f"{j}_bbox"] = bbox_info.pop('bbox')
+                
+                if id=='internal':
+                    render_image(images[info['file_name']],info['all_bboxes'],f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}")
+                    info['overlay_image'] = f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}"
 
                 processed[i] = info
 
@@ -309,6 +307,8 @@ def call_bpnet(id):
                         temp[k] = v.tolist()
                 user_list.append(temp)
             processed[file_name] = user_list
+            if id=='internal':
+                plot_keypoints(response,file_name,f"triton_client/bpnet/input/{id}/{curr_time}/{file_name}")
         return processed        
     
     else:
