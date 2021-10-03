@@ -204,6 +204,56 @@ def call_combined(id):
         return {'code':404,'error':'Request not found'}
 
 
+
+@app.route('/api/lpdlprnet/explain/<id>',methods= ['POST', 'GET'])
+def call_explain_combined(id):
+    import pandas as pd
+
+    # Create directories for input and output images
+    now = datetime.now()
+    curr_time = now.strftime("%H%M%S")
+    create_directories('lpdnet',id, curr_time)
+    create_directories('lprnet',id, curr_time)
+
+    # Load input images
+    files = request.files.to_dict(flat=False)['image']
+
+    # Load filenames
+    filenames = request.form.getlist('filename')
+    
+    images = {}
+    # Save input images
+    for i, f in enumerate(files):
+        images[filenames[i]] = f
+        f.save(f"triton_client/lpdnet/input/{id}/{curr_time}/{filenames[i]}")
+        crop_image(f"triton_client/lpdnet/input/{id}/{curr_time}/{filenames[i]}",[1, 2, 300, 170], f"triton_client/lpdnet/input/{id}/{curr_time}/exp1_{filenames[i]}")
+
+    result = pd.DataFrame([{'column_a':9999, 'column_b':0000 , 'column_c':123456, },{'column_a':9998, 'column_b':1 , 'column_c':1234578, }] )
+    
+
+    # replace markdown placeholders with custom images
+    image_replace = {
+        '%placeholder1%' : f"triton_client/lpdnet/input/{id}/{curr_time}/{filenames[i]}", 
+        '%placeholder2%' : f"triton_client/lpdnet/input/{id}/{curr_time}/exp1_{filenames[i]}",
+        '%placeholder3%' : result.to_html(col_space=100, justify='center')
+    }
+    with open("database/lpdlprnet/lpdlprnet_explainability.md", 'r') as md:
+        text = md.readlines()
+        lines = []
+        for line in text: 
+            lines.append(line)
+            for key in image_replace.keys(): 
+                if key in line: 
+                    lines[-1] = line.replace(key, image_replace[key])
+                
+          
+        new_text = "\n".join(lines)
+    
+    return {'explain_markdown': new_text}
+
+
+
+
 @app.route('/api/bpnet/<id>',methods= ['POST', 'GET'])
 def call_bpnet(id):
 
@@ -261,3 +311,4 @@ def call_bpnet(id):
     
     else:
         return {'code':404,'error':'Request not found'}
+

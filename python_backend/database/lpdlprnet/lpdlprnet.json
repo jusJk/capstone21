@@ -5,10 +5,21 @@
   "email": "abc@stengineering.com",
   "phone": "12345678",
   "cover": "database/lpdlprnet/two-cars-2.jpeg",
+  "explainability_demo_api": {
+    "type": "POST",
+    "endpoint": "/api/lpdlprnet/explain/internal",
+    "endpoint_display": "/api/lpdlprnet/explain/<id>",
+    "status": "active",
+    "input": "Explain the prediction of your custom image",
+    "input_type": "image",
+    "return_type": "json",
+    "return": "Explainability for the uploaded picture"
+  },
   "api": [
     {
       "type": "GET",
       "endpoint": "/api/lpdlprnet/internal",
+      "endpoint_display": "/api/lpdlprnet/<id>",
       "status": "active",
       "input": "Check Server Availability",
       "input_type": "json",
@@ -18,6 +29,7 @@
     {
       "type": "POST",
       "endpoint": "/api/lpdlprnet/internal",
+      "endpoint_display": "/api/lpdlprnet/<id>",
       "status": "active",
       "input": "Image Inference Demo",
       "input_type": "image",

@@ -8,11 +8,15 @@ import {
   Grid,
   CardContent,
   Alert,
+  AlertTitle,
   Typography,
   Stack,
   Button,
   Box,
   ButtonGroup,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   LinearProgress
 } from '@material-ui/core';
 // utils
@@ -56,8 +60,17 @@ export default function UploadPicture(props) {
       props.api.endpoint,
       formData,
       (e) => {
-        setContent(JSON.stringify(e, null, 2));
-        getImageUrl(e['0'].overlay_image, setImgSrc);
+        const key = Object.keys(e)[0];
+
+        if (props.hideResponse !== true) {
+          if (props.hideResponse !== true) {
+            setContent(JSON.stringify(e, null, 2));
+          }
+        } else {
+          setContent('Success');
+        }
+        getImageUrl(e[key].overlay_image, setImgSrc);
+        props.callback(e);
       },
       config
     );
@@ -85,7 +98,7 @@ export default function UploadPicture(props) {
             {content === undefined ? (
               ProgressOrNothing(loading)
             ) : (
-              <Alert sx={{ m: '1.5%' }} severity="info">
+              <Alert sx={{ m: '1.5%', overflow: 'hidden' }} severity="info">
                 <pre>{content}</pre>
               </Alert>
             )}
@@ -127,6 +140,38 @@ export default function UploadPicture(props) {
           </ButtonGroup>
           <Box flex="1" />
         </Box>
+        <Accordion
+          disableGutters
+          sx={{
+            '&:before': {
+              display: 'none'
+            },
+            marginLeft: '-1%'
+          }}
+        >
+          <AccordionSummary>
+            <Button color="info" variant="outlined">
+              Python Code Sample
+            </Button>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Alert severity="secondary">
+              <p>import requests</p>
+              <br />
+              <p>baseURL = %BASEURL%</p>
+              <p>filename = %FILENAME%</p>
+              <p>filepath = %FILEPATH% </p>
+
+              <br />
+              <p>
+                response = requests.post(baseURL + "
+                {props.api.endpoint_display.replace('<id>', '%ID%')}
+                ", files = &#123;'image' : filepath,'filename' : filename &#125;)
+              </p>
+              <p>print(response.json(), flush=True)</p>
+            </Alert>
+          </AccordionDetails>
+        </Accordion>
       </CardContent>
     </Card>
   );

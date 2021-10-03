@@ -1,7 +1,20 @@
 // material
 import { React, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardContent, Typography, Button, Box, Alert, Divider } from '@material-ui/core';
+import {
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Box,
+  Alert,
+  AlertTitle,
+  Divider,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  LinearProgress
+} from '@material-ui/core';
 // utils
 import { sendGetRequest } from '../../../../API/component';
 // ----------------------------------------------------------------------
@@ -10,6 +23,7 @@ import { sendGetRequest } from '../../../../API/component';
 
 export default function SimpleResponse(props) {
   const [content, setContent] = useState('');
+  const [loading, setLoading] = useState(false);
   return (
     <Card
       variant="outlined"
@@ -20,6 +34,7 @@ export default function SimpleResponse(props) {
           {props.api.input}
         </Typography>
         <Box>
+          {loading ? <LinearProgress sx={{ m: '3%', height: '2vh', borderRadius: '5px' }} /> : null}
           {content === '' ? null : (
             <Alert sx={{ m: '1.5%' }} severity="info">
               {content}
@@ -31,15 +46,46 @@ export default function SimpleResponse(props) {
         <Box>
           <Button
             onClick={() => {
-              setContent(' ');
+              setContent('');
+              setLoading(true);
               sendGetRequest(props.api.endpoint, (e) => {
-                setContent(JSON.stringify(e));
+                if (props.hideResponse !== true) {
+                  setContent(JSON.stringify(e, null, 2));
+                } else {
+                  setContent('Success');
+                }
+                setLoading(false);
+                props.callback(e);
               });
             }}
           >
             {content === '' ? 'Send Get Request' : 'Send Again'}
           </Button>
         </Box>
+        <Accordion
+          disableGutters
+          sx={{
+            '&:before': {
+              display: 'none'
+            },
+            marginLeft: '-1%'
+          }}
+        >
+          <AccordionSummary>
+            <Button variant="outlined">Python Code Sample</Button>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Alert severity="secondary">
+              <p>import requests</p>
+              <br />
+              <p>
+                response = requests.get( %BASEURL% + {`"${props.api.endpoint.slice(0, -8)}"`} +
+                %ID%)
+              </p>
+              <p>print(response.json(), flush=True)</p>
+            </Alert>
+          </AccordionDetails>
+        </Accordion>
       </CardContent>
     </Card>
   );
