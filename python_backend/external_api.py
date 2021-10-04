@@ -1,7 +1,7 @@
 from app import app
 from flask import request, send_file
 from flask_cors import CORS, cross_origin
-from utils import crop_image, render_image, create_directories
+from utils import crop_image, render_image, create_directories, save_image
 import json
 import os
 from datetime import datetime
@@ -241,6 +241,9 @@ def call_explain_combined(id):
     if info['HTTPStatus']==204:
         # No inference bounding box was found
         processed[i] = info
+        save_image(images[info['file_name']], f"triton_client/lprnet/input/{id}/{curr_time}/exp_{info['file_name']}")
+        reverse_mapping[f"exp_{info['file_name']}"] = i
+
     else:
         # info is a list of bbox, bbox is a dict containing a list (bbox)
         # and a single number, confidence score
@@ -256,7 +259,7 @@ def call_explain_combined(id):
             
             bbox_info[f"exp_bbox"] = bbox_info.pop('bbox')
 
-        processed[i] = info
+    processed[i] = info
 
 
      # Call LPR on output of LPD
