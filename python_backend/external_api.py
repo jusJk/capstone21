@@ -14,6 +14,7 @@ from triton_client.model_client.lpr_model_class import LprModelClass
 from triton_client.model_client.bodyposenet_model_class import BodyPoseNetClass
 
 
+BASE_URL = 'http://localhost:5000/'
 @app.route('/api/lpdnet/<id>',methods= ['POST', 'GET'])
 def call_lpdnet(id):
 
@@ -235,8 +236,8 @@ def call_explain_combined(id):
 
     # replace markdown placeholders with custom images
     image_replace = {
-        '%placeholder1%' : f"triton_client/lpdnet/input/{id}/{curr_time}/{filenames[i]}", 
-        '%placeholder2%' : f"triton_client/lpdnet/input/{id}/{curr_time}/exp1_{filenames[i]}",
+        '%placeholder1%' : f"{BASE_URL}/api/get_image?path=triton_client/lpdnet/input/{id}/{curr_time}/{filenames[i]}", 
+        '%placeholder2%' : f"{BASE_URL}/api/get_image?path=triton_client/lpdnet/input/{id}/{curr_time}/exp1_{filenames[i]}",
         '%placeholder3%' : result.to_html(col_space=100, justify='center')
     }
     with open("database/lpdlprnet/lpdlprnet_explainability.md", 'r') as md:
