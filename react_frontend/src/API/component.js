@@ -98,7 +98,12 @@ export function sendPostRequest(endpoint, data, callback, config) {
 }
 
 export function getImageUrl(path, callback) {
-  callback(`${baseURL}api/get_image?path=${path}`);
+  const urlBuilder = (path) => {
+    console.log(path);
+    return path.includes(`api/get_image?path=`) ? path : `${baseURL}api/get_image?path=${path}`;
+  };
+
+  callback(`${path === undefined ? '' : urlBuilder(path)}`);
 }
 
 export function getMd(path, callback) {

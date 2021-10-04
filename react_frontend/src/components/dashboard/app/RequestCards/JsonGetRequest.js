@@ -55,7 +55,9 @@ export default function SimpleResponse(props) {
                   setContent('Success');
                 }
                 setLoading(false);
-                props.callback(e);
+                if (props.callback) {
+                  props.callback(e);
+                }
               });
             }}
           >

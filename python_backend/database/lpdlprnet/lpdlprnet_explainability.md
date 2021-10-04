@@ -8,22 +8,26 @@ Given this original base image:
 
 ### Preprocessing
 
-As with all image processing problems, the first step is to process the image.
+For this image processing problem, the first step is to process the image.
 
 ### Detection
 
-The next step is the detection phase, where we use LPD Net to detect license plates. This is done using DetectNet - a standard library that is used industry wide for object detection problems. After using LPDNet to detect the license plate, we crop into the detected license plate. The reason we do this is because LPR Net performs best when there is less noise in the image.
+The next step is the detection phase, where we use LPD Net to detect license plates. This is done using DetectNet - a standard library that is used industry wide for object detection problems.
 
-The output of LPDNet is a bounding box which we use to crop into the detected license plate.
+The output of LPDNet is as follows:
+
+%placeholder5%
+
+This represents a bounding box which we use to outline the detected license plate drawn below.
 
 ![placeholder2](%placeholder2%)
 
+After drawing the bounding box, we crop into the detected license plate and feed that as input into the recognition stage - which performs better when there are less "distractions" in the image.
+
+![placeholder3](%placeholder3%)
+
 ### Recognition
 
-Lastly, we reach the recognition phase. LPR Net runs on the output from LPD Net to product a license plate.
+Lastly, we reach the recognition phase. LPR Net runs on the output from LPD Net to product a license plate. This returns the following output:
 
-### Results
-
-We summarise the results in the following table:
-
-%placeholder3%
+%placeholder6%
