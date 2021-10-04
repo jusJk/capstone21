@@ -153,9 +153,11 @@ def return_bbox_info(frame, image_wise_bboxes):
             y1 = max(0, box[1])
             x2 = min(frame.width, box[2])
             y2 = min(frame.height, box[3])
+            width = x2 - x1
+            height = y2 - y1
             confidence_score = annotations.confidence
             indv_bbox = {}
-            indv_bbox["bbox"] = [x1, y1, x2, y2]
+            indv_bbox["bbox"] = [x1, y1, width, height]
             indv_bbox["confidence_score"] = confidence_score
             final_annotations.append(indv_bbox)
 
