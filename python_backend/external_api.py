@@ -212,6 +212,9 @@ def call_combined(id):
 def call_explain_combined(id):
     import pandas as pd
 
+    lpr = LprModelClass(id)
+    lpd = LpdModelClass(id)
+
     # Create directories for input and output images
     now = datetime.now()
     curr_time = now.strftime("%H%M%S")
@@ -225,20 +228,57 @@ def call_explain_combined(id):
     filenames = request.form.getlist('filename')
     
     images = {}
-    # Save input images
-    for i, f in enumerate(files):
-        images[filenames[i]] = f
-        f.save(f"triton_client/lpdnet/input/{id}/{curr_time}/{filenames[i]}")
-        crop_image(f"triton_client/lpdnet/input/{id}/{curr_time}/{filenames[i]}",[1, 2, 300, 170], f"triton_client/lpdnet/input/{id}/{curr_time}/exp1_{filenames[i]}")
 
-    result = pd.DataFrame([{'column_a':9999, 'column_b':0000 , 'column_c':123456, },{'column_a':9998, 'column_b':1 , 'column_c':1234578, }] )
+    # Save input images --> for explain, only use 1st file
+    images[filenames[0]] = files[0]
+    files[0].save(f"triton_client/lpdnet/input/{id}/{curr_time}/{filenames[0]}")
     
+    lpd_response = lpd.predict(f"triton_client/lpdnet/input/{id}/{curr_time}")
 
+    processed = {}
+    reverse_mapping = {}
+    i, info = 0, lpd_response[0]
+    if info['HTTPStatus']==204:
+        # No inference bounding box was found
+        processed[i] = info
+    else:
+        # info is a list of bbox, bbox is a dict containing a list (bbox)
+        # and a single number, confidence score
+        for j, bbox_info in enumerate(info["all_bboxes"]):
+            crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/lpdnet/output/{id}/{curr_time}/exp_{info['file_name']}")
+            crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/lprnet/input/{id}/{curr_time}/exp_{info['file_name']}")
+            reverse_mapping[f"exp_{info['file_name']}"] = i
+            
+            if id=='internal':
+                demopic_name=f"triton_client/lpdnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}"
+                render_image(images[info['file_name']],bbox_info['bbox'], demopic_name)
+                info['overlay_image'] = demopic_name
+            
+            bbox_info[f"exp_bbox"] = bbox_info.pop('bbox')
+
+        processed[i] = info
+
+
+     # Call LPR on output of LPD
+    lpr_response = lpr.predict(f"triton_client/lprnet/input/{id}/{curr_time}")
+
+    # Process response to return
+    for lpr_info in lpr_response:
+        file_name = lpr_info['file_name']
+        index = file_name.split("_")[0]
+        temp = {}
+        temp['license_plate'] = list(lpr_info['license_plate'])
+        temp['confidence_scores'] = lpr_info['confidence_scores']
+        processed[reverse_mapping[file_name]][f"exp_lpr"] = temp
+     
+        
     # replace markdown placeholders with custom images
     image_replace = {
         '%placeholder1%' : f"{BASE_URL}/api/get_image?path=triton_client/lpdnet/input/{id}/{curr_time}/{filenames[i]}", 
-        '%placeholder2%' : f"{BASE_URL}/api/get_image?path=triton_client/lpdnet/input/{id}/{curr_time}/exp1_{filenames[i]}",
-        '%placeholder3%' : result.to_html(col_space=100, justify='center')
+        '%placeholder2%' : f"{BASE_URL}/api/get_image?path=triton_client/lpdnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}",
+        '%placeholder3%' : f"{BASE_URL}/api/get_image?path=triton_client/lpdnet/output/{id}/{curr_time}/exp_{info['file_name']}",
+        '%placeholder5%' : pd.DataFrame(info['all_bboxes']).to_html(),
+        '%placeholder6%' : pd.DataFrame(temp).assign(lp = '')[['lp', 'license_plate', 'confidence_scores']].rename(columns={'lp':lpr_info['license_plate']}).to_html(index=False, ),
     }
     with open("database/lpdlprnet/lpdlprnet_explainability.md", 'r') as md:
         text = md.readlines()

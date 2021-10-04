@@ -2,7 +2,7 @@
 from PIL import ImageDraw, Image
 import os
 
-def render_image(frame, box, output_image_file, outline_color='red', linewidth=50):
+def render_image(frame, box, output_image_file, outline_color='yellow', linewidth= 10):
     """Render images with overlain outputs."""
     image = Image.open(frame)
     draw = ImageDraw.Draw(image)
