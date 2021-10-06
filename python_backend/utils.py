@@ -5,7 +5,8 @@ import numpy as np
 import os
 import math
 
-def render_image(frame, bboxes, output_image_file, outline_color='red', linewidth=10):
+
+def render_image(frame, bboxes, output_image_file, outline_color='yellow', linewidth=10):
     """Render images with overlain outputs."""
     image = Image.open(frame)
     draw = ImageDraw.Draw(image)
@@ -29,6 +30,9 @@ def crop_image(frame, box, output_cropped_file):
         image = image.crop((box[0],box[1],box[2],box[3]))
     image.save(output_cropped_file,"JPEG")
 
+def save_image(frame, output):
+    image = Image.open(frame)
+    image.save(output,"JPEG")
 
 def create_directories(model, id, curr_time):
     # Create directories for input and output images

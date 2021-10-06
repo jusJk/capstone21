@@ -70,7 +70,9 @@ export default function UploadPicture(props) {
           setContent('Success');
         }
         getImageUrl(e[key].overlay_image, setImgSrc);
-        props.callback(e);
+        if (props.callback) {
+          props.callback(e);
+        }
       },
       config
     );
@@ -164,11 +166,17 @@ export default function UploadPicture(props) {
 
               <br />
               <p>
-                response = requests.post(baseURL + "
-                {props.api.endpoint_display.replace('<id>', '%ID%')}
-                ", files = &#123;'image' : filepath,'filename' : filename &#125;)
+                files=[ ('image',(filename,open(filepath,'rb'),'image/jpeg')) ]
+                <br />
+                headers = {'{}'}
+                <br />
+                <br />
+                response = requests.post( baseURL + "
+                {props.api.endpoint_display.replace('<id>', '%ID%')}", headers=headers,
+                data=payload, files=files)
+                <br />
+                print(response.json(), flush=True)
               </p>
-              <p>print(response.json(), flush=True)</p>
             </Alert>
           </AccordionDetails>
         </Accordion>
