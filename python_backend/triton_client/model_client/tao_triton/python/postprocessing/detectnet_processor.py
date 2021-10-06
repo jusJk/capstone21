@@ -110,13 +110,19 @@ class DetectNetPostprocessor(Postprocessor):
         This function takes the raw output tensors from the detectnet_v2 model
         and performs the following steps:
 
-        1. Denormalize the output bbox coordinates
-        2. Threshold the coverage output to get the valid indices for the bboxes.
-        3. Filter out the bboxes from the "output_bbox/BiasAdd" blob.
-        4. Cluster the filterred boxes using DBSCAN.
-        5. Render the outputs on images and save them to the output_path/images
-        6. Serialize the output bboxes to KITTI Format label files in output_path/labels.
+        1. Denormalize the output bbox coordinates which converts bbox from relative coordinates to absolute coordinates.
+        2. Threshold the coverage output to get the valid indices for the bboxes based on a coverage threshold. This coverage output is attained from the "output_cov/Sigmoid returns from the model inference.
+        3. Cluster the filterred boxes using DBSCAN. This utilises the IOU between possible predicted rectangles and clusters them to output the best bbox.
+        4. Converts filtered boxes into KittiBbox output format with the final absolute coordinates of bbox and confidence scores
+
+        # 1. Denormalize the output bbox coordinates which converts bbox from relative coordinates to absolute coordinates.
+        # 2. Threshold the coverage output to get the valid indices for the bboxes based on a pre set coverage threshold.
+        # 3. Filter out the bboxes from the "output_bbox/BiasAdd" blob.
+        # 4. Cluster the filterred boxes using DBSCAN.
+        # 5. Converts filtered boxes into KittiBbox output format with the final absolute coordinates of bbox and confidence scores
+        # 6. Serialize the output bboxes to KITTI Format label files in output_path/labels.
         """
+
         output_array = {}
         this_id = int(this_id)
         for output_name in self.output_names:
