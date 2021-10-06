@@ -9,7 +9,7 @@ def render_image(frame, bboxes, output_image_file, outline_color='red', linewidt
     """Render images with overlain outputs."""
     image = Image.open(frame)
     draw = ImageDraw.Draw(image)
-    for bbox_info in enumerate(bboxes):
+    for bbox_info in bboxes:
         box = bbox_info['bbox']
         if (box[2] - box[0]) >= 0 and (box[3] - box[1]) >= 0:
             draw.rectangle(box, outline=outline_color)
@@ -45,7 +45,7 @@ def create_directories(model, id, curr_time):
         os.mkdir(f"triton_client/{model}/input/{id}/{curr_time}")
         os.mkdir(f"triton_client/{model}/output/{id}/{curr_time}")
 
-def plot_keypoints(results, image_filename, image_path, render_limbs=True):
+def plot_keypoints(results, image_filename, image_path, output_path, render_limbs=True):
     """Renders keypoints on input image
 
     Args:
@@ -79,7 +79,7 @@ def plot_keypoints(results, image_filename, image_path, render_limbs=True):
     to_plot = cv.addWeighted(to_plot, 0.3, canvas, 0.7, 0)
 
     if not render_limbs:
-        return to_plot
+        cv.imwrite(output_path,to_plot)
 
     for person in image_res:
         # Each edge is a joint represented by tuple (keypoint_a, keypoint_b)
@@ -100,5 +100,4 @@ def plot_keypoints(results, image_filename, image_path, render_limbs=True):
                     length/2), stickwidth), int(angle), 0, 360, 1)
                 cv.fillConvexPoly(cur_canvas, polygon, colors[i])
                 canvas = cv.addWeighted(canvas, 0.4, cur_canvas, 0.6, 0)
-
-    return canvas
+    cv.imwrite(output_path, canvas)

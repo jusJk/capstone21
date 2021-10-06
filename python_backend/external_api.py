@@ -64,8 +64,8 @@ def call_lpdnet(id):
                 for j, bbox_info in enumerate(info["all_bboxes"]):
                     crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/lpdnet/output/{id}/{curr_time}/{j}_{info['file_name']}")
                 if id=='internal':
-                    render_image(images[info['file_name']],info["all_bboxes"],f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}")
-                    info['overlay_image'] = f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}"
+                    render_image(images[info['file_name']],info["all_bboxes"],f"triton_client/lpdnet/output/overlay_lpdnet_{info['file_name']}")
+                    info['overlay_image'] = f"triton_client/lpdnet/output/overlay_lpdnet_{info['file_name']}"
                 processed[i] = info
         return processed        
     
@@ -181,8 +181,8 @@ def call_combined(id):
                     bbox_info[f"{j}_bbox"] = bbox_info.pop('bbox')
                 
                 if id=='internal':
-                    render_image(images[info['file_name']],info['all_bboxes'],f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}")
-                    info['overlay_image'] = f"database/lpdnet/tmp/overlay_lpdnet_{info['file_name']}"
+                    render_image(images[info['file_name']],info['all_bboxes'],f"triton_client/lpdnet/output/overlay_lpdnet_{info['file_name']}")
+                    info['overlay_image'] = f"triton_client/lpdnet/output/overlay_lpdnet_{info['file_name']}"
 
                 processed[i] = info
 
@@ -202,7 +202,6 @@ def call_combined(id):
     
     else:
         return {'code':404,'error':'Request not found'}
-
 
 
 @app.route('/api/lpdlprnet/explain/<id>',methods= ['POST', 'GET'])
@@ -252,8 +251,6 @@ def call_explain_combined(id):
     return {'explain_markdown': new_text}
 
 
-
-
 @app.route('/api/bpnet/<id>',methods= ['POST', 'GET'])
 def call_bpnet(id):
 
@@ -295,9 +292,11 @@ def call_bpnet(id):
         # Process response to return
         processed = {}
         for file_name, info in response['results'].items():
-            # info is a list of keypoints, keypoints is a dict containing a numpy array (coordinates)
-            # and confidence score and a number total corresponding to the number of key points identified
-            user_list = []
+            # info is a list of keypoints corresponding to number of people identified
+            # keypoints is a dict containing a numpy array (coordinates)
+            # and confidence score and a number "total" 
+            # corresponding to the number of key points identified
+            user_list = {}
             for i, keypoints in enumerate(info):
                 temp = {}
                 for k, v in keypoints.items():
@@ -305,10 +304,14 @@ def call_bpnet(id):
                         temp[k] = v
                     else:
                         temp[k] = v.tolist()
-                user_list.append(temp)
+                user_list[str(i)] = temp
             processed[file_name] = user_list
+            
             if id=='internal':
-                plot_keypoints(response,file_name,f"triton_client/bpnet/input/{id}/{curr_time}/{file_name}")
+                output_path = f"triton_client/bpnet/output/{id}/{curr_time}/{file_name}"
+                plot_keypoints(response,file_name,f"triton_client/bpnet/input/{id}/{curr_time}/{file_name}",output_path)
+                processed[file_name]['overlay_image'] = output_path
+        
         return processed        
     
     else:
