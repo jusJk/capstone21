@@ -28,24 +28,26 @@ This LPDNet inference returns raw output tensors before final post processing is
     4. Convert filtered boxes into KittiBbox output format with the final absolute coordinates of bbox and confidence scores
     5. Final post processing occurs to return the bbox coordinates and confidence scores for each input image
 
-After postprocessing occurs, we return a bounding box with confidence scores as output. This Bbox coordinates are then used to crop out the final detected licence plates.
+After postprocessing occurs, we return a bounding box with confidence scores as output. 
 
-These detections are key in the overall goal of license plate recognition (LPR) because LPR performs best when there is little noise in the form of external features other than the license plate.
-This cropped bounding box containing the license plate is then sent to the last phase for license plate recognition
+%placeholder5%
+
+The Bbox coordinates are then used to draw the final detected licence plates.
 
 ![placeholder2](%placeholder2%)
 
-After drawing the bounding box, we crop into the detected license plate and feed that as input into the recognition stage - which performs better when there are less "distractions" in the image.
+These detections are key in the overall goal of license plate recognition (LPR) because LPR performs best when there is little noise in the form of external features other than the license plate.
+
+We use the bounding box to crop into the the license plate, which is then sent to the last phase for license plate recognition
+
+![placeholder3](%placeholder3%)
+
+### Recognition
 
 License plate recognition aims to recognise characters in license plates. It utilises a sequence classification model with a ResNet backbone.
 
 After obtaining the sequence output from the license plate, the LPRNet makes use of best path decoding method in order to decode the sequence output of the model into the final predicted characters.
 
 These characters are then output as the final licence plate character.
-![placeholder3](%placeholder3%)
-
-### Recognition
-
-Lastly, we reach the recognition phase. LPR Net runs on the output from LPD Net to product a license plate. This returns the following output:
 
 %placeholder6%

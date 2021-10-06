@@ -69,7 +69,6 @@ export default function APIEndPoint({ api, callback, hideResponse }) {
     }
     return null;
   };
-  console.log(api);
   return (
     <>
       <RootStyle>
