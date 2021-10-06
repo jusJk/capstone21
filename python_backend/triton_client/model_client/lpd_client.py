@@ -169,7 +169,6 @@ def lpd_predict(**FLAGS):
             model_metadata, model_config)
 
     triton_model = TRITON_MODEL_DICT[FLAGS['mode'].lower()].from_metadata(model_metadata, model_config)
-    print((triton_model.c, triton_model.h, triton_model.w))
     target_shape = (triton_model.c, triton_model.h, triton_model.w)
     npdtype = triton_to_np_dtype(triton_model.triton_dtype)
     max_batch_size = triton_model.max_batch_size
