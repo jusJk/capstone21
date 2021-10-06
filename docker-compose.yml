@@ -1,0 +1,49 @@
+version: "3.7"
+services:
+  # triton-server:
+  #   build: ./triton
+  #   container_name: triton
+  #   ports:
+  #     - "8000:8000"
+  #     - "8001:8001"
+  #     - "8002:8002"
+  #     - "8003:8003"
+
+  # python-client:
+  #   build: ./python_client
+  #   container_name: python-client
+  #   volumes:
+  #     - ./python_client:/app
+  #   ports:
+  #     - "5000:5000"
+
+  react-frontend:
+    stdin_open: true
+    build: ./react_frontend
+    container_name: react-frontend
+    volumes:
+      - ./react_frontend/src:/app/src
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+  python-backend:
+    build: ./python_backend
+    container_name: python-backend
+    volumes:
+      - ./python_backend:/app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+    env_file:
+      - .env
+
+  # triton-client:
+  #   build: ./triton_client
+  #   container_name: triton_client
+  #   volumes:
+  #     - ./triton_client:/workspace
+  #   # command: ["/workspace/images/wait_for_it.sh", "triton-server:8000", "--", "image_client", "-u", "triton-server:8000" ,"-m", "densenet_onnx", "-c", "3", "-s", "INCEPTION", "/workspace/images/test_tp.jpg" ]
