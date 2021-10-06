@@ -35,16 +35,17 @@ This cropped bounding box containing the license plate is then sent to the last 
 
 ![placeholder2](%placeholder2%)
 
-### Recognition
+After drawing the bounding box, we crop into the detected license plate and feed that as input into the recognition stage - which performs better when there are less "distractions" in the image.
 
 License plate recognition aims to recognise characters in license plates. It utilises a sequence classification model with a ResNet backbone.
 
 After obtaining the sequence output from the license plate, the LPRNet makes use of best path decoding method in order to decode the sequence output of the model into the final predicted characters.
 
 These characters are then output as the final licence plate character.
+![placeholder3](%placeholder3%)
 
-### Results
+### Recognition
 
-We summarise the results in the following table:
+Lastly, we reach the recognition phase. LPR Net runs on the output from LPD Net to product a license plate. This returns the following output:
 
-%placeholder3%
+%placeholder6%

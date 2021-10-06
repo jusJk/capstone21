@@ -9,9 +9,12 @@ import { getImageUrl } from '../../../API/component';
 
 const linkhandler = (link, id) => {
   let imgUrl = '';
-  getImageUrl(link, (e) => {
-    imgUrl = e;
-  });
+  if (link) {
+    getImageUrl(link, (e) => {
+      imgUrl = e;
+    });
+  }
+  console.log(imgUrl);
   return imgUrl;
 };
 const ImgStyle = styled('img')({
