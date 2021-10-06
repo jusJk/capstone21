@@ -54,8 +54,8 @@ class LpdModelClass(BaseModelClass):
                            url=self._url, image_filename=file_path, verbose=False, streaming=False, async_set=False,
                            protocol='HTTP', model_version="", batch_size=self._batch_size)
 
-
 # To handle output_path
 if __name__ == "__main__":
     test_model = LpdModelClass("hellosss")
+    # print(test_model.status())
     print(test_model.predict("../input/lpd"))
