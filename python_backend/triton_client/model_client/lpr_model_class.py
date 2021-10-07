@@ -20,7 +20,7 @@ class LprModelClass(BaseModelClass):
         self._model_name = "lprnet_usa"
         self._mode = "Lprnet"
         self._class_list = "license_plate"
-        self.mapping_output_file = "/app/triton_client/postprocessing_config/us_lp_characters.txt"
+        self._mapping_output_file = "/app/triton_client/postprocessing_config/us_lp_characters.txt"
 
     def status(self):
         '''
@@ -55,7 +55,7 @@ class LprModelClass(BaseModelClass):
         return lpr_predict(model_name=self._model_name, mode=self._mode, class_list=self._class_list,
                            output_path="./",  url=self._url, image_filename=file_path, verbose=False,
                            streaming=False, async_set=False, protocol='HTTP', model_version="", batch_size=self._batch_size,
-                           mapping_output_file="/app/triton_client/postprocessing_config/us_lp_characters.txt")
+                           mapping_output_file=self._mapping_output_file )
 
 
 if __name__ == "__main__":

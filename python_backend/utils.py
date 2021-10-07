@@ -11,7 +11,7 @@ def render_image(frame, bboxes, output_image_file, outline_color='yellow', linew
     image = Image.open(frame)
     draw = ImageDraw.Draw(image)
     for bbox_info in bboxes:
-        box = bbox_info['bbox']
+        box = [value for key, value in bbox_info.items() if 'bbox' in key.lower()][0]
         if (box[2] - box[0]) >= 0 and (box[3] - box[1]) >= 0:
             draw.rectangle(box, outline=outline_color)
             for i in range(linewidth):
