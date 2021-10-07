@@ -2,6 +2,7 @@ from app import app
 from flask import request, send_file
 from flask_cors import CORS, cross_origin
 from utils import crop_image, render_image, create_directories, plot_keypoints, save_image
+import pandas as pd
 
 import json
 import os
@@ -66,8 +67,8 @@ def call_lpdnet(id):
                 for j, bbox_info in enumerate(info["all_bboxes"]):
                     crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/lpdnet/output/{id}/{curr_time}/{j}_{info['file_name']}")
                 if id=='internal':
-                    render_image(images[info['file_name']],info["all_bboxes"],f"triton_client/lpdnet/output/overlay_lpdnet_{info['file_name']}")
-                    info['overlay_image'] = f"triton_client/lpdnet/output/overlay_lpdnet_{info['file_name']}"
+                    render_image(images[info['file_name']],info["all_bboxes"],f"triton_client/lpdnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}")
+                    info['overlay_image'] = f"triton_client/lpdnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}"
                 processed[i] = info
         return processed        
     
@@ -183,8 +184,8 @@ def call_combined(id):
                     bbox_info[f"{j}_bbox"] = bbox_info.pop('bbox')
                 
                 if id=='internal':
-                    render_image(images[info['file_name']],info['all_bboxes'],f"triton_client/lpdnet/output/overlay_lpdnet_{info['file_name']}")
-                    info['overlay_image'] = f"triton_client/lpdnet/output/overlay_lpdnet_{info['file_name']}"
+                    render_image(images[info['file_name']],info["all_bboxes"],f"triton_client/lpdnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}")
+                    info['overlay_image'] = f"triton_client/lpdnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}"
 
                 processed[i] = info
 
@@ -208,7 +209,6 @@ def call_combined(id):
 
 @app.route('/api/lpdlprnet/explain/<id>',methods= ['POST', 'GET'])
 def call_explain_combined(id):
-    import pandas as pd
 
     lpr = LprModelClass(id)
     lpd = LpdModelClass(id)
