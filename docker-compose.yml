@@ -33,6 +33,7 @@ services:
     container_name: python-backend
     volumes:
       - ./python_backend:/app
+      - /d/OneDrive - National University of Singapore/Reverse/NUS/AY2122 SEM1/BT4103/Code/Capstone/Data:/data:ro
     ports:
       - "5000:5000"
     environment:
