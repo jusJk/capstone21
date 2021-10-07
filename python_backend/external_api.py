@@ -249,13 +249,12 @@ def call_explain_combined(id):
             crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/lpdnet/output/{id}/{curr_time}/exp_{info['file_name']}")
             crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/lprnet/input/{id}/{curr_time}/exp_{info['file_name']}")
             reverse_mapping[f"exp_{info['file_name']}"] = i
-            
-            if id=='internal':
-                demopic_name=f"triton_client/lpdnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}"
-                render_image(images[info['file_name']],bbox_info['bbox'], demopic_name)
-                info['overlay_image'] = demopic_name
-            
             bbox_info[f"exp_bbox"] = bbox_info.pop('bbox')
+            
+        if id=='internal':
+            demopic_name=f"triton_client/lpdnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}"
+            render_image(images[info['file_name']],info['all_bboxes'], demopic_name)
+            info['overlay_image'] = demopic_name    
 
     processed[i] = info
 
