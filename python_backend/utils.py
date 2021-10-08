@@ -105,3 +105,95 @@ def plot_keypoints(results, image_filename, image_path, output_path, render_limb
                 cv.fillConvexPoly(cur_canvas, polygon, colors[i])
                 canvas = cv.addWeighted(canvas, 0.4, cur_canvas, 0.6, 0)
     cv.imwrite(output_path, canvas)
+
+
+def chop_image(im_path, n): 
+    """
+    Chop image into n segments
+    """
+    org = cv.imread(im_path)
+   
+    im = org.copy()
+    M = im.shape[0]//n
+    N = im.shape[1]//n
+    tile_coord = [[x,x+M,y,y+N] for x in range(0,im.shape[0],M) for y in range(0,im.shape[1],N)]
+    response =[]
+    for i,matrix in enumerate(tile_coord):
+        a,b,c,d = matrix
+        ts = im.copy()
+        ts[a:b, c:d] = 0
+        response.append(ts)
+    return response
+    
+def map_confidence_to_chunk(responses, filename):
+    conf = {}
+    for r in responses:
+        key = r['file_name'].replace(filename,'')
+        try:
+            sc = r['all_bboxes'][0]['confidence_score']
+        except:
+            sc = 0.01
+        conf[key] = sc
+    
+    return conf
+
+def color_chunks(original_image_path, conf, save_as, n=2):
+    import matplotlib.pyplot as plt
+    org = cv.imread(original_image_path)
+    org = cv.cvtColor(org, cv.COLOR_BGR2RGB)
+    im = org.copy()
+    M = im.shape[0]//n
+    N = im.shape[1]//n
+    tile_coord = [[x,x+M,y,y+N] for x in range(0,im.shape[0],M) for y in range(0,im.shape[1],N)]
+    response =[]
+    coef = get_coefficients(conf)
+    mean = sum(coef)/len(coef)
+    for i,matrix in enumerate(tile_coord):
+        a,b,c,d = matrix
+        color(im[a:b,c:d], i, coef, mean )
+        
+    plt.imshow(org)
+    plt.imshow(im, alpha=0.6)
+    plt.savefig(save_as)
+        
+def conf_color(x, max_v): 
+    return (max_v-x)*255/max_v     
+
+def draw_confidence_heat_map(responses, filename, save_as, n): 
+    enforce_png_name = filename.split('/')[-1].split('.')[0] + '.png'
+    
+    conf = map_confidence_to_chunk(responses,enforce_png_name) 
+    color_chunks(filename, conf, save_as, n)
+    
+
+def get_coefficients(conf):
+    import pandas as pd
+    from sklearn.preprocessing import OneHotEncoder
+    from sklearn.linear_model import LinearRegression
+    enc = OneHotEncoder()
+    df = pd.DataFrame([int(k) for k,v in conf.items()])
+    y = [v for v in conf.values()]
+    X = 1-enc.fit_transform(df).toarray()
+    reg = LinearRegression().fit(X, y)
+    
+    return reg.coef_
+
+def color(matrix, i, coefs, mean):
+    coef=coefs[i]
+    for chunk in matrix: 
+        for pixel in chunk:
+            pixel[0] = 0
+            pixel[1] = 0
+            pixel[2] = 0
+            c, s = reg_color(coef, mean)
+            pixel[c] = s 
+         
+
+def reg_color(coef, mean):
+    if coef >= 0 :
+        #red means coefficient is positive. adding it increases conf
+        return 0, abs(coef-mean)*255
+    if coef < 0:
+        #blue means coefficient is negative, adding it reduces conf
+        return 2, abs(coef-mean)*255
+

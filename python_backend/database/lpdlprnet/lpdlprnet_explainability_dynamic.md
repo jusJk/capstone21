@@ -4,7 +4,7 @@ Under the hood, there are 2 major steps to License Plate Recognition. The first 
 
 Given this original base image:
 
-![placeholder1](database/lpdlprnet/plate.jpg)
+![placeholder1](%placeholder1%)
 
 ### Preprocessing
 
@@ -30,15 +30,25 @@ This LPDNet inference returns raw output tensors before final post processing is
 
 After postprocessing occurs, we return a bounding box with confidence scores as output.
 
+%placeholder5%
+
 The Bbox coordinates are then used to draw the final detected licence plates.
 
-![placeholder2](database/lpdlprnet/overlay_lpdnet_plate.jpg)
+![placeholder2](%placeholder2%)
 
 These detections are key in the overall goal of license plate recognition (LPR) because LPR performs best when there is little noise in the form of external features other than the license plate.
 
+#### Explaining the prediction
+
+The picture below explains the importance of each chunk of image in the prediction.
+
+These importance values are calculated using the variance in confidence scores from dropping out the respective chunks of the image from repeated requests to Triton inference server.
+
+![placeholder4](%placeholder4%)
+
 We use the bounding box to crop into the the license plate, which is then sent to the last phase for license plate recognition
 
-![placeholder3](database/lpdlprnet/exp_plate.jpg)
+![placeholder3](%placeholder3%)
 
 ### Recognition
 
@@ -48,4 +58,4 @@ After obtaining the sequence output from the license plate, the LPRNet makes use
 
 These characters are then output as the final licence plate character.
 
-## 3SAM123
+%placeholder6%

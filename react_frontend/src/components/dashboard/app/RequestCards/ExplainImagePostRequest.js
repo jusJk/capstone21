@@ -170,8 +170,6 @@ export default function UploadPicture(props) {
                 <br />
                 headers = {'{}'}
                 <br />
-                payload = {'{"filename": [filename]}'}
-                <br />
                 <br />
                 response = requests.post( baseURL + "
                 {props.api.endpoint_display.replace('<id>', '%ID%')}", headers=headers,

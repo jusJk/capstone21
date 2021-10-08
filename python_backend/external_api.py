@@ -1,7 +1,7 @@
 from app import app
 from flask import request, send_file
 from flask_cors import CORS, cross_origin
-from utils import crop_image, render_image, create_directories, plot_keypoints, save_image
+from utils import crop_image, render_image, create_directories, plot_keypoints, save_image, chop_image, draw_confidence_heat_map
 import pandas as pd
 
 import json
@@ -207,8 +207,33 @@ def call_combined(id):
         return {'code':404,'error':'Request not found'}
 
 
+# REFACTOR THIS PLEASE
+def evaluate_lpd(image_path, filename, id, save_as,n, bbox=None):
+    import cv2
+
+    lpd = LpdModelClass(id)
+    now = datetime.now()
+    curr_time = now.strftime("%d%m%y_%H%M%S")
+    create_directories('lpdnet',id, curr_time)
+
+    subimages = chop_image(image_path,  n)
+
+    # Save input images
+    for i, f in enumerate(subimages):
+        cv2.imwrite(f"triton_client/lpdnet/input/{id}/{curr_time}/{str(i) + filename.split('.')[0] + '.png'}", f)
+        
+    lpd_response = lpd.predict(f"triton_client/lpdnet/input/{id}/{curr_time}")
+    # with open('response', 'wb') as fh:
+    #     pickle.dump(lpd_response, fh)
+    draw_confidence_heat_map(lpd_response, image_path, save_as, n)
+
+
+
 @app.route('/api/lpdlprnet/explain/<id>',methods= ['POST', 'GET'])
 def call_explain_combined(id):
+
+    #level of detail:
+    n = 9
 
     lpr = LprModelClass(id)
     lpd = LpdModelClass(id)
@@ -230,12 +255,18 @@ def call_explain_combined(id):
     # Save input images --> for explain, only use 1st file
     images[filenames[0]] = files[0]
     files[0].save(f"triton_client/lpdnet/input/{id}/{curr_time}/{filenames[0]}")
-    
+
     lpd_response = lpd.predict(f"triton_client/lpdnet/input/{id}/{curr_time}")
 
+    
+    # evaluate LPD
+    save_as = f"triton_client/lpdnet/output/{id}/{curr_time}/heatmap_{filenames[0]}"
+
+    evaluate_lpd(f"triton_client/lpdnet/input/{id}/{curr_time}/{filenames[0]}",filenames[0], id, save_as, n)
+ 
     processed = {}
     reverse_mapping = {}
-    i, info = 0, lpd_response[0]
+    i, info = 0, lpd_response[0] 
     if info['HTTPStatus']==204:
         # No inference bounding box was found
         processed[i] = info
@@ -251,13 +282,12 @@ def call_explain_combined(id):
             reverse_mapping[f"exp_{info['file_name']}"] = i
             bbox_info[f"exp_bbox"] = bbox_info.pop('bbox')
             
-        if id=='internal':
+        if id=='internal': 
             demopic_name=f"triton_client/lpdnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}"
             render_image(images[info['file_name']],info['all_bboxes'], demopic_name)
             info['overlay_image'] = demopic_name    
 
     processed[i] = info
-
 
      # Call LPR on output of LPD
     lpr_response = lpr.predict(f"triton_client/lprnet/input/{id}/{curr_time}")
@@ -277,10 +307,11 @@ def call_explain_combined(id):
         '%placeholder1%' : f"{BASE_URL}/api/get_image?path=triton_client/lpdnet/input/{id}/{curr_time}/{filenames[i]}", 
         '%placeholder2%' : f"{BASE_URL}/api/get_image?path=triton_client/lpdnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}",
         '%placeholder3%' : f"{BASE_URL}/api/get_image?path=triton_client/lpdnet/output/{id}/{curr_time}/exp_{info['file_name']}",
+        '%placeholder4%' : save_as,
         '%placeholder5%' : pd.DataFrame(info['all_bboxes']).to_html(),
         '%placeholder6%' : pd.DataFrame(temp).assign(lp = '')[['lp', 'license_plate', 'confidence_scores']].rename(columns={'lp':lpr_info['license_plate']}).to_html(index=False, ),
     }
-    with open("database/lpdlprnet/lpdlprnet_explainability.md", 'r') as md:
+    with open("database/lpdlprnet/lpdlprnet_explainability_dynamic.md", 'r') as md:
         text = md.readlines()
         lines = []
         for line in text: 

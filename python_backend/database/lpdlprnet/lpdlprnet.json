@@ -10,7 +10,7 @@
     "endpoint": "/api/lpdlprnet/explain/internal",
     "endpoint_display": "/api/lpdlprnet/explain/<id>",
     "status": "active",
-    "input": "Explain the prediction of your custom image",
+    "input": "Explain the prediction of your custom image. Explainability analysis will take some time.",
     "input_type": "image",
     "return_type": "json",
     "return": "Explainability for the uploaded picture"
