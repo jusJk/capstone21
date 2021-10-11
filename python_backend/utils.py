@@ -161,7 +161,7 @@ def conf_color(x, max_v):
 
 def draw_confidence_heat_map(responses, filename, save_as, n): 
     enforce_png_name = filename.split('/')[-1].split('.')[0] + '.png'
-    
+    print(responses, flush=True)
     conf = map_confidence_to_chunk(responses,enforce_png_name) 
     color_chunks(filename, conf, save_as, n)
     

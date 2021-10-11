@@ -42,7 +42,7 @@ These detections are key in the overall goal of license plate recognition (LPR) 
 
 The picture below explains the importance of each chunk of image in the prediction.
 
-These importance values are calculated using the variance in confidence scores from dropping out the respective chunks of the image from repeated requests to Triton inference server.
+These importance values are calculated using the variance in confidence scores from dropping out chunks of the image from many repeated requests to the inference server. In the plot below, red boxes are boxes whose exclusion reduces confidence score, while blue boxes are boxes whose exclusion increases the confidence score. The more intense the color, the stronger the effect.
 
 ![placeholder4](%placeholder4%)
 
