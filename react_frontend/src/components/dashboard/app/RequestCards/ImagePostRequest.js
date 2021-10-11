@@ -41,10 +41,12 @@ export default function UploadPicture(props) {
   const [loading, setLoading] = useState(false);
 
   const _onChange = (e) => {
-    const file = e.target.files[0];
-    const url = URL.createObjectURL(file);
-    setImgSrc(url);
-    setUploadFile(file);
+    if (e.target.files.length !== 0) {
+      const file = e.target.files[0];
+      const url = URL.createObjectURL(file);
+      setImgSrc(url);
+      setUploadFile(file);
+    }
   };
 
   const handleFormUpload = () => {
