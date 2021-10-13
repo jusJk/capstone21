@@ -192,8 +192,21 @@ def color(matrix, i, coefs, mean):
 def reg_color(coef, mean):
     if coef >= 0 :
         #red means coefficient is positive. adding it increases conf
-        return 0, abs(coef-mean)*255
+        return 0, abs(coef-mean)*255/mean
     if coef < 0:
         #blue means coefficient is negative, adding it reduces conf
-        return 2, abs(coef-mean)*255
+        return 2, abs(coef-mean)*255/mean
 
+
+def replace_in_markdown(mapping, md_path):
+    with open(md_path, 'r') as md:
+        text = md.readlines()
+        lines = []
+        for line in text:
+            lines.append(line)
+            for key in mapping.keys():
+                if key in line:
+                    lines[-1] = line.replace(key, mapping[key])
+
+        new_text = "\n".join(lines)
+    return new_text

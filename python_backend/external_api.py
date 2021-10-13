@@ -1,7 +1,7 @@
 from app import app
 from flask import request, send_file
 from flask_cors import CORS, cross_origin
-from utils import crop_image, render_image, create_directories, plot_keypoints, save_image, chop_image, draw_confidence_heat_map
+from utils import crop_image, render_image, create_directories, plot_keypoints, save_image, chop_image, draw_confidence_heat_map, replace_in_markdown
 import pandas as pd
 
 import json
@@ -223,17 +223,14 @@ def evaluate_lpd(image_path, filename, id, save_as,n):
         cv2.imwrite(f"triton_client/lpdnet/input/{id}/{curr_time}/{str(i) + filename.split('.')[0] + '.png'}", f)
         
     lpd_response = lpd.predict(f"triton_client/lpdnet/input/{id}/{curr_time}")
-    # with open('response', 'wb') as fh:
-    #     pickle.dump(lpd_response, fh)
     draw_confidence_heat_map(lpd_response, image_path, save_as, n)
 
 
 
 @app.route('/api/lpdlprnet/explain/<id>',methods= ['POST', 'GET'])
 def call_explain_combined(id):
-
     #level of detail:
-    n = 7
+    n = 15
 
     lpr = LprModelClass(id)
     lpd = LpdModelClass(id)
@@ -260,7 +257,7 @@ def call_explain_combined(id):
     images[filenames[0]] = files[0]
     files[0].save(baseimage)
 
-    # SEND TO LPF
+    # SEND TO LPD
     lpd_response = lpd.predict(f"triton_client/lpdnet/input/{id}/{curr_time}")
 
     processed = {}
@@ -294,14 +291,6 @@ def call_explain_combined(id):
             info['overlay_image'] = demopic    
 
     processed[i] = info
-
-    # evaluation crop
-    # x1,y1,x2,y2 = info['all_bboxes'][0]['exp_bbox']
-    # x1,y1,x2,y2 = x1 - (x2-x1)*0.5, y1 - (y2-y1)*0.5, x2 + (x2-x1)*0.5, y2 + (y2-y1)*0.5
-    # cropbase = f"triton_client/lpdnet/input/{id}/{curr_time}/cropped_{filenames[0]}"
-    # crop_image(baseimage,[x1,y1,x2,y2],cropbase)
-    # evaluate_lpd(cropbase, f"cropped_{filenames[0]}", id, save_as, n)
-
     evaluate_lpd(baseimage, filenames[0], id, save_as, n)
 
      # Call LPR on output of LPD
@@ -319,26 +308,16 @@ def call_explain_combined(id):
         
     # replace markdown placeholders with custom images
     image_replace = {
-        '%placeholder1%' : f"{BASE_URL}/api/get_image?path={baseimage}", 
-        '%placeholder2%' : f"{BASE_URL}/api/get_image?path={demopic}",
-        '%placeholder3%' : f"{BASE_URL}/api/get_image?path={lpdout}",
-        '%placeholder4%' : f"{BASE_URL}/api/get_image?path={save_as}",
+        '%placeholder1%' : f"{baseimage}", 
+        '%placeholder2%' : f"{demopic}",
+        '%placeholder3%' : f"{lpdout}",
+        '%placeholder4%' : f"{save_as}",
         '%placeholder5%' : pd.DataFrame(info['all_bboxes']).to_html(),
         '%placeholder6%' : pd.DataFrame(temp).assign(lp = '')[['lp', 'license_plate', 'confidence_scores']].rename(columns={'lp':lpr_info['license_plate']}).to_html(index=False, ),
     }
-    with open("database/lpdlprnet/lpdlprnet_explainability_dynamic.md", 'r') as md:
-        text = md.readlines()
-        lines = []
-        for line in text: 
-            lines.append(line)
-            for key in image_replace.keys(): 
-                if key in line: 
-                    lines[-1] = line.replace(key, image_replace[key])
-                
-          
-        new_text = "\n".join(lines)
     
-    return {'explain_markdown': new_text}
+    
+    return {'explain_markdown': replace_in_markdown(image_replace, "database/lpdlprnet/lpdlprnet_explainability_dynamic.md")}
 
 
 @app.route('/api/bpnet/<id>',methods= ['POST', 'GET'])
