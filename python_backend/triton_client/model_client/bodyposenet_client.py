@@ -283,7 +283,7 @@ def bodyposenet_predict(**FLAGS):
                 responses.append(async_request.get_result())
 
     results = {}
-
+    tensor_response = {}
     logger.info(
         "Gathering responses from the server and post processing the inferenced outputs.")
     processed_request = 0
@@ -299,12 +299,16 @@ def bodyposenet_predict(**FLAGS):
                 response, this_id,
             )
             results = {**results, **batch_results}
+            tensor_response = {**tensor_response, **response}
 
             processed_request += 1
             pbar.update(FLAGS['batch_size'])
     logger.info("PASS")
 
     final_results = {}
+
+    if FLAGS.get('return_tensor'):
+        final_results['tensor_response'] = tensor_response
     final_results['results'] = results
     final_results['skeleton_edge_names'] = postprocessor.params['skeleton_edge_names']
     final_results['keypoints'] = postprocessor.params['keypoints']

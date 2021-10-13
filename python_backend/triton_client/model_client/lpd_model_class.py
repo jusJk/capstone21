@@ -51,7 +51,7 @@ class LpdModelClass(BaseModelClass):
             self._batch_size = 16
         return lpd_predict(model_name=self._model_name, mode=self._mode, class_list=self._class_list,
                            output_path="./", postprocessing_config=self._post_processing_config,
-                           url=self._url, image_filename=file_path, verbose=False, streaming=False, async_set=False,
+                           url=self._url, image_filename=file_path, verbose=False, streaming=False, async_set=True,
                            protocol='HTTP', model_version="", batch_size=self._batch_size)
 
 # To handle output_path

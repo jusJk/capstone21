@@ -139,7 +139,7 @@ def lpd_predict(**FLAGS):
         else:
             # Specify large enough concurrency to handle the
             # the number of requests.
-            concurrency = 20 if FLAGS['async_set'] else 1
+            concurrency = 1000 if FLAGS['async_set'] else 1
             triton_client = httpclient.InferenceServerClient(
                 url=FLAGS['url'], verbose=FLAGS['verbose'], concurrency=concurrency)
     except Exception as e:
@@ -311,7 +311,7 @@ def lpd_predict(**FLAGS):
         if FLAGS['async_set']:
             # Collect results from the ongoing async requests
             # for HTTP Async requests.
-            for async_request in async_requests:
+            for async_request in async_requests:  
                 responses.append(async_request.get_result())
 
     logger.info("Gathering responses from the server and post processing the inferenced outputs.")
@@ -339,6 +339,7 @@ def lpd_predict(**FLAGS):
             '''
 
             for boxes in batch_boxes_output:
+                print(response)
                 final_image_bbox_response, file_name = boxes
                 if len(final_image_bbox_response) != 0:
                     final_image_response = {"HTTPStatus": 200, "file_name": file_name, "all_bboxes": final_image_bbox_response}

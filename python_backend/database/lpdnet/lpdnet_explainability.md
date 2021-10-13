@@ -1,17 +1,31 @@
 # Explainability - LPD Net
 
-LPD Net is based on DetectNet_v2. In DetectNet, training data samples are larger images that contain multiple objects. For each object in the image the training label must capture not only the class of the object but also the coordinates of the corners of its bounding box.
+### Preprocessing
 
-Because the number of objects can vary between training images, a naive choice of label format with varying length and dimensionality would make defining a loss function difficult.
+As with all image processing problems, the first step is to process the image.
+Preprocessing includes a few key steps:
 
-DetectNet solves this key problem by introducing a fixed 3-dimensional label format that enables DetectNet to ingest images of any size with a variable number of objects present. The DetectNet data representation is inspired by the representation used by [Redmon et al. 2015].
+    1. The image is resized into (3, 480, 640)
+    2. Mean subtraction and normalization is then performed on the image
 
-## Example
+The final processed image is then sent to the triton server for inference
 
-![test image](database/lpdnet/detectnet_data.png)
+### Detection
 
-The DetectNet architecture has five parts specified in the Caffe model definition file. There are 3 important processes.
+After being sent to the triton server for inference, we perform detection to detect the bounding boxes of license plates in the image using Nvidia's LPDNet which is based on NVIDIA's DetectNet_v2 detector with ResNet18 as the feature extractor.
 
-1. Data layers ingest the training images and labels and a transformer layer applies online data augmentation.
-2. A fully-convolutional network (FCN) performs feature extraction and prediction of object classes and bounding boxes per grid square.
-3. Loss functions simultaneously measure the error in the two tasks of predicting the object coverage and object bounding box corners per grid square.
+This LPDNet inference returns raw output tensors before final post processing is done containing the following steps:
+
+    1. Denormalize the output bbox coordinates which converts bbox from relative coordinates to absolute coordinates.
+    2. Threshold the coverage output to get the valid indices for the bboxes based on a pre set coverage threshold.
+    3. Cluster the filterred valid boxes using DBSCAN.
+    4. Convert filtered boxes into KittiBbox output format with the final absolute coordinates of bbox and confidence scores
+    5. Final post processing occurs to return the bbox coordinates and confidence scores for each input image
+
+After postprocessing occurs, we return a bounding box with confidence scores as output.
+
+The Bbox coordinates are then used to draw the final detected licence plates.
+
+### Demo
+
+A dynamic demo using your own custom images can be found in the LPD+LPR Net model card.
