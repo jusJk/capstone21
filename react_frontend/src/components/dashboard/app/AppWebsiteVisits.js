@@ -24,24 +24,23 @@ const CHART_DATA = [
   }
 ];
 
-export default function AppWebsiteVisits() {
+const labels = [
+  '01/01/2003',
+  '02/01/2003',
+  '03/01/2003',
+  '04/01/2003',
+  '05/01/2003',
+  '06/01/2003',
+  '07/01/2003',
+  '08/01/2003',
+  '09/01/2003',
+  '10/01/2003',
+  '11/01/2003'
+];
+
+export default function AppWebsiteVisits({ xvalues, yvalues, title, subheader }) {
   const chartOptions = merge(BaseOptionChart(), {
-    stroke: { width: [0, 2, 3] },
-    plotOptions: { bar: { columnWidth: '11%', borderRadius: 4 } },
-    fill: { type: ['solid', 'gradient', 'solid'] },
-    labels: [
-      '01/01/2003',
-      '02/01/2003',
-      '03/01/2003',
-      '04/01/2003',
-      '05/01/2003',
-      '06/01/2003',
-      '07/01/2003',
-      '08/01/2003',
-      '09/01/2003',
-      '10/01/2003',
-      '11/01/2003'
-    ],
+    labels: xvalues === undefined ? labels : xvalues,
     xaxis: { type: 'datetime' },
     tooltip: {
       shared: true,
@@ -49,7 +48,7 @@ export default function AppWebsiteVisits() {
       y: {
         formatter: (y) => {
           if (typeof y !== 'undefined') {
-            return `${y.toFixed(0)} visits`;
+            return `${y.toFixed(0)}`;
           }
           return y;
         }
@@ -59,9 +58,14 @@ export default function AppWebsiteVisits() {
 
   return (
     <Card>
-      <CardHeader title="Website Visits" subheader="(+43%) than last year" />
+      <CardHeader title={title} subheader={subheader} />
       <Box sx={{ p: 3, pb: 1 }} dir="ltr">
-        <ReactApexChart type="line" series={CHART_DATA} options={chartOptions} height={364} />
+        <ReactApexChart
+          type="line"
+          series={yvalues === undefined ? CHART_DATA : yvalues}
+          options={chartOptions}
+          height={364}
+        />
       </Box>
     </Card>
   );

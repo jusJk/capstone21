@@ -225,12 +225,22 @@ def evaluate_lpd(image_path, filename, id, save_as,n):
     lpd_response = lpd.predict(f"triton_client/lpdnet/input/{id}/{curr_time}")
     draw_confidence_heat_map(lpd_response, image_path, save_as, n)
 
+    # delete subimages
+    for i, f in enumerate(subimages):
+        os.remove(f"triton_client/lpdnet/input/{id}/{curr_time}/{str(i) + filename.split('.')[0] + '.png'}")
 
 
 @app.route('/api/lpdlprnet/explain/<id>',methods= ['POST', 'GET'])
 def call_explain_combined(id):
+    """
+    This is a function to orchestrate the following steps: 
+    1. run lpd-lpr pipeline and spit out predictions
+    2. run evaluation of lpd and save overlay/results
+    3. replace placeholders in markdown file with their respective dynamic values
+    
+    """
     #level of detail:
-    n = 15
+    n = 11
 
     lpr = LprModelClass(id)
     lpd = LpdModelClass(id)
