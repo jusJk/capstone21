@@ -4,6 +4,7 @@ import cv2 as cv
 import numpy as np
 import os
 import math
+from datetime import datetime
 
 
 def render_image(frame, bboxes, output_image_file, outline_color='yellow', linewidth=10):
@@ -34,20 +35,24 @@ def save_image(frame, output):
     image = Image.open(frame)
     image.save(output,"JPEG")
 
-def create_directories(model, id, curr_time):
-    # Create directories for input and output images
-    if not os.path.isdir(f"triton_client/{model}"):
-        os.mkdir(f"triton_client/{model}")
-        os.mkdir(f"triton_client/{model}/input")
-        os.mkdir(f"triton_client/{model}/output")
-    
-    if not os.path.isdir(f"triton_client/{model}/input/{id}"):
-        os.mkdir(f"triton_client/{model}/input/{id}")
-        os.mkdir(f"triton_client/{model}/output/{id}")
+def create_directories(model, id):
 
-    if not os.path.isdir(f"triton_client/{model}/input/{id}/{curr_time}"):
-        os.mkdir(f"triton_client/{model}/input/{id}/{curr_time}")
-        os.mkdir(f"triton_client/{model}/output/{id}/{curr_time}")
+    curr_time = datetime.now().strftime("%d%m%y_%H%M%S")
+
+    # Create directories for input and output images
+    if not os.path.isdir(f"./models/{model}/input"):
+        os.mkdir(f"./models/{model}/input")
+        os.mkdir(f"./models/{model}/output")
+    
+    if not os.path.isdir(f"./models/{model}/input/{id}"):
+        os.mkdir(f"./models/{model}/input/{id}")
+        os.mkdir(f"./models/{model}/output/{id}")
+
+    if not os.path.isdir(f"./models/{model}/input/{id}/{curr_time}"):
+        os.mkdir(f"./models/{model}/input/{id}/{curr_time}")
+        os.mkdir(f"./models/{model}/output/{id}/{curr_time}")
+    
+    return f"./models/{model}/input/{id}/{curr_time}", f"./models/{model}/output/{id}/{curr_time}"
 
 def plot_keypoints(results, image_filename, image_path, output_path, render_limbs=True):
     """Renders keypoints on input image
@@ -210,3 +215,22 @@ def replace_in_markdown(mapping, md_path):
 
         new_text = "\n".join(lines)
     return new_text
+
+def check_request(request):
+    # Load input images
+    files = request.files.to_dict(flat=False)['image']
+    
+    # Load filenames
+    filenames = request.form.getlist('filename')
+
+    if len(files)==0:
+        return {'error':'Image not found'}
+    
+    if len(filenames)==0:
+        return {'error':'No filename for image'}
+
+    if len(files) != len(filenames):
+        return {'error':'Number of images and filenames do not match'}
+    
+    else:
+        return True

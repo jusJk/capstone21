@@ -1,7 +1,7 @@
 from app import app
 from flask import request, send_file
 from flask_cors import CORS, cross_origin
-from utils import crop_image, render_image, create_directories, plot_keypoints, save_image, chop_image, draw_confidence_heat_map, replace_in_markdown
+from utils.utils import crop_image, render_image, create_directories, plot_keypoints, save_image, chop_image, draw_confidence_heat_map, replace_in_markdown
 import pandas as pd
 
 import json
@@ -10,119 +10,14 @@ from datetime import datetime
 CORS(app)
 
 import sys
-sys.path.insert(1, 'triton_client/model_client')
-from triton_client.model_client.lpd_model_class import LpdModelClass
-from triton_client.model_client.lpr_model_class import LprModelClass
-from triton_client.model_client.bodyposenet_model_class import BodyPoseNetClass
+sys.path.insert(1, '/app/triton_client/')
+
+# from models.lpdnet.lpd_model_class import LpdModelClass
+# from models.lprnet.lpr_model_class import LprModelClass
+# from models.bpnet.bodyposenet_model_class import BodyPoseNetClass
 
 
 BASE_URL = 'http://localhost:5000/'
-@app.route('/api/lpdnet/<id>',methods= ['POST', 'GET'])
-def call_lpdnet(id):
-
-    """
-    This function responds to the external API call of obtaining
-    lpdnet
-
-    :return: JSON object 
-    """
-    
-    lpd = LpdModelClass(id)
-
-    if request.method=='GET':
-        return lpd.status()
-    
-    elif request.method=='POST':
-
-        # Create directories for input and output images
-        now = datetime.now()
-        curr_time = now.strftime("%d%m%y_%H%M%S")
-        create_directories('lpdnet',id, curr_time)
-
-        # Load input images
-        # input_stream = request.files['image']
-        files = request.files.to_dict(flat=False)['image']
-
-        # Load filenames
-        filenames = request.form.getlist('filename')
-        
-        images = {}
-        # Save input images
-        for i, f in enumerate(files):
-            images[filenames[i]] = f
-            f.save(f"triton_client/lpdnet/input/{id}/{curr_time}/{filenames[i]}")
-        
-        # Call triton inference server
-        response = lpd.predict(f"triton_client/lpdnet/input/{id}/{curr_time}")
-        
-        # Process response to return
-        processed = {}
-        for i, info in enumerate(response):
-            if info['HTTPStatus']==204:
-                # No inference bounding box was found
-                processed[i] = info
-            else:
-                # info is a list of bbox, bbox is a dict containing a list (bbox)
-                # and a single number, confidence score
-                for j, bbox_info in enumerate(info["all_bboxes"]):
-                    crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/lpdnet/output/{id}/{curr_time}/{j}_{info['file_name']}")
-                if id=='internal':
-                    render_image(images[info['file_name']],info["all_bboxes"],f"triton_client/lpdnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}")
-                    info['overlay_image'] = f"triton_client/lpdnet/output/{id}/{curr_time}/overlay_lpdnet_{info['file_name']}"
-                processed[i] = info
-        return processed        
-    
-    else:
-        return {'code':404,'error':'Request not found'}
-    
-
-@app.route('/api/lprnet/<id>',methods= ['POST', 'GET'])
-def call_lprnet(id):
-
-    """
-    This function responds to the external API call of obtaining
-    lprnet
-
-    :return: JSON object 
-    """
-    
-    lpr = LprModelClass(id)
-
-    if request.method=='GET':
-
-        return lpr.status()
-    
-    elif request.method=='POST':
-
-        # Create directories for input and output images
-        now = datetime.now()
-        curr_time = now.strftime("%H%M%S")
-        create_directories('lprnet',id, curr_time)
-
-        # Load input images
-        # input_stream = request.files['image']
-        files = request.files.to_dict(flat=False)['image']
-
-        # Load filenames
-        filenames = request.form.getlist('filename')
-        
-        images = {}
-        # Save input images
-        for i, f in enumerate(files):
-            images[filenames[i]] = f
-            f.save(f"triton_client/lprnet/input/{id}/{curr_time}/{filenames[i]}")
-        
-        # Call triton inference server
-        response = lpr.predict(f"triton_client/lprnet/input/{id}/{curr_time}")
-        
-        # Process response to return
-        processed = {}
-        for i, info in enumerate(response):
-            processed[i] = info
-        return processed        
-    
-    else:
-        return {'code':404,'error':'Request not found'}
 
 
 @app.route('/api/lpdlprnet/<id>',methods= ['POST', 'GET'])
@@ -329,70 +224,4 @@ def call_explain_combined(id):
     
     return {'explain_markdown': replace_in_markdown(image_replace, "database/lpdlprnet/lpdlprnet_explainability_dynamic.md")}
 
-
-@app.route('/api/bpnet/<id>',methods= ['POST', 'GET'])
-def call_bpnet(id):
-
-    """
-    This function responds to the external API call of obtaining
-    lpdnet
-
-    :return: JSON object 
-    """
-    
-    bpn = BodyPoseNetClass(id)
-
-    if request.method=='GET':
-        return bpn.status()
-    
-    elif request.method=='POST':
-
-        # Create directories for input and output images
-        now = datetime.now()
-        curr_time = now.strftime("%d%m%y_%H%M%S")
-        create_directories('bpnet',id, curr_time)
-
-        # Load input images
-        # input_stream = request.files['image']
-        files = request.files.to_dict(flat=False)['image']
-
-        # Load filenames
-        filenames = request.form.getlist('filename')
-        
-        images = {}
-        # Save input images
-        for i, f in enumerate(files):
-            images[filenames[i]] = f
-            f.save(f"triton_client/bpnet/input/{id}/{curr_time}/{filenames[i]}")
-        
-        # Call triton inference server
-        response = bpn.predict(f"triton_client/bpnet/input/{id}/{curr_time}")
-        #return str(response['results'])
-        # Process response to return
-        processed = {}
-        for file_name, info in response['results'].items():
-            # info is a list of keypoints corresponding to number of people identified
-            # keypoints is a dict containing a numpy array (coordinates)
-            # and confidence score and a number "total" 
-            # corresponding to the number of key points identified
-            user_list = {}
-            for i, keypoints in enumerate(info):
-                temp = {}
-                for k, v in keypoints.items():
-                    if k in ['total','score']:
-                        temp[k] = v
-                    else:
-                        temp[k] = v.tolist()
-                user_list[str(i)] = temp
-            processed[file_name] = user_list
-            
-            if id=='internal':
-                output_path = f"triton_client/bpnet/output/{id}/{curr_time}/{file_name}"
-                plot_keypoints(response,file_name,f"triton_client/bpnet/input/{id}/{curr_time}/{file_name}",output_path)
-                processed[file_name]['overlay_image'] = output_path
-        
-        return processed        
-    
-    else:
-        return {'code':404,'error':'Request not found'}
 

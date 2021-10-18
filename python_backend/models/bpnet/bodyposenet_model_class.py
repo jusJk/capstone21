@@ -3,14 +3,14 @@ import os
 import requests
 from requests.exceptions import ConnectionError
 
-from base_model_class import BaseModelClass
-from bodyposenet_client import bodyposenet_predict
+from models.base_model_class import BaseModelClass
+from .bodyposenet_client import bodyposenet_predict
 from tao_triton.python.postprocessing.utils import plot_keypoints
 
 
 class BodyPoseNetClass(BaseModelClass):
 
-    def __init__(self, client_info):
+    def __init__(self, client_info, model_name):
         '''
         Instantiate the classes with the information of the 
         querying party -- corresponding to a specific triton
@@ -18,8 +18,10 @@ class BodyPoseNetClass(BaseModelClass):
         '''
         BaseModelClass.__init__(self, client_info)
         self._url = os.environ.get('API_URL')
-        self._model_name = "bodyposenet"
+        self._model_name = model_name
         self._mode = "BodyPoseNet"
+        if model_name not in ['bodyposenet']:
+            raise ValueError("Model name is invalid -- no such model exists")
 
     def status(self):
         '''
@@ -29,9 +31,9 @@ class BodyPoseNetClass(BaseModelClass):
             triton_server_url = "http://" + self._url + "/v2/health/ready"
             response = requests.get(triton_server_url)
         except ConnectionError as error:
-            return {'HTTPStatus': 503, 'status': 'Inactive'}
+            return {'status': 'Inactive'}
         else:
-            return {'HTTPStatus': 200, 'status': 'Active'}
+            return {'status': 'Active'}
 
     def predict(self, file_path):
         """Runs inference on images in file_path if it exists
@@ -48,8 +50,7 @@ class BodyPoseNetClass(BaseModelClass):
         if os.path.exists(file_path):
             return self._predict(file_path)
         else:
-            return {'HTTPStatus': 400,
-                    'error': "File Path does not exist!"}
+            raise FileNotFoundError("File Path does not exist!")
 
     def _predict(self, file_path):
         number_files = len([name for name in os.listdir(

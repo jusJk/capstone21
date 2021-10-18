@@ -5,11 +5,5 @@
 .env
 .DS_Store
 
-**/triton_client/*/input/**
-**/triton_client/*/output/**
-
-**/static/*
-
-**/tmp/*
-
-*/test_images/*
+**/models/*/input/**
+**/models/*/output/**

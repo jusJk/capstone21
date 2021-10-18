@@ -299,7 +299,7 @@ def bodyposenet_predict(**FLAGS):
                 response, this_id,
             )
             results = {**results, **batch_results}
-            tensor_response = {**tensor_response, **response}
+            # tensor_response = {**tensor_response, **response}
 
             processed_request += 1
             pbar.update(FLAGS['batch_size'])
@@ -307,8 +307,8 @@ def bodyposenet_predict(**FLAGS):
 
     final_results = {}
 
-    if FLAGS.get('return_tensor'):
-        final_results['tensor_response'] = tensor_response
+    # if FLAGS.get('return_tensor'):
+    #     final_results['tensor_response'] = tensor_response
     final_results['results'] = results
     final_results['skeleton_edge_names'] = postprocessor.params['skeleton_edge_names']
     final_results['keypoints'] = postprocessor.params['keypoints']
