@@ -25,10 +25,8 @@ def call_bpnet(id):
 
     if id not in mapping: return make_response({'error':"Bad Request - Invalid ID"},400)
 
-    model_name=mapping[id]
-
     try:
-        bpn = BodyPoseNetClass(id, model_name)
+        bpn = BodyPoseNetClass(id, mapping[id])
     except ValueError:
         return make_response({'error':"Model not found on triton server"},503)
 
@@ -48,7 +46,7 @@ def call_bpnet(id):
 
         output = check_request(request)
 
-        if output!=True: return make_response(status,400)
+        if output!=True: return make_response(output,400)
 
         # Create directories for input and output images
         input_path, output_path = create_directories('bpnet',id)

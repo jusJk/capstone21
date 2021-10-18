@@ -48,7 +48,7 @@ def call_lprnet(id):
 
         output = check_request(request)
 
-        if output!=True: return make_response(status,400)
+        if output!=True: return make_response(output,400)
 
         # Create directories for input and output images
         input_path, output_path = create_directories('lprnet',id)
@@ -72,7 +72,7 @@ def call_lprnet(id):
             license_plate = info['license_plate']
 
             new_lp = [char for i, char in enumerate(license_plate) if confidence_scores[i]> THRESHOLD]
-            new_cs = [c for c in confidence_scores if c>THRESHOLD]
+            new_cs = [c for c in confidence_scores if c > THRESHOLD]
             
             info['license_plate'] = ''.join(new_lp)
             info['confidence_scores'] = new_cs

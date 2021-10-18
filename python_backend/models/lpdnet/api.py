@@ -47,7 +47,7 @@ def call_lpdnet(id):
 
         output = check_request(request)
 
-        if output!=True: return make_response(status,400)
+        if output!=True: return make_response(output,400)
 
         # Create directories for input and output images
         input_path, output_path = create_directories('lpdnet',id)
@@ -77,11 +77,13 @@ def call_lpdnet(id):
                 # info is a list of bbox, bbox is a dict containing a list (bbox)
                 # and a single number, confidence score
                 for j, bbox_info in enumerate(info["all_bboxes"]):
-                    confidence_score=bbox_info['confidence_score']
-                    if confidence_score < THRESHOLD:
+                    
+                    if LOGGING: crop_image(images[info['file_name']],bbox_info['bbox'],f"{output_path}/{j}_{info['file_name']}")
+                    
+                    confidence_score=bbox_info['confidence_score']  
+                    if confidence_score < THRESHOLD: 
                         continue
-                    crop_image(images[info['file_name']],bbox_info['bbox'],f"{output_path}/{j}_{info['file_name']}")
-                
+                                    
                 if id=='internal':
                     render_image(images[info['file_name']],info["all_bboxes"],f"{output_path}/overlay_lpdnet_{info['file_name']}")
                     info['overlay_image'] = f"{output_path}/overlay_lpdnet_{info['file_name']}"
