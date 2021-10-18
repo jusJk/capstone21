@@ -4,6 +4,8 @@
 */.flaskenv
 .env
 .DS_Store
+**/.DS_Store
+**.DS_Store/**
 
 **/models/*/input/**
 **/models/*/output/**
