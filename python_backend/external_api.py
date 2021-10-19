@@ -14,6 +14,7 @@ sys.path.insert(1, 'triton_client/model_client')
 from triton_client.model_client.lpd_model_class import LpdModelClass
 from triton_client.model_client.lpr_model_class import LprModelClass
 from triton_client.model_client.bodyposenet_model_class import BodyPoseNetClass
+from triton_client.model_client.trafficcamnet_model_class import TrafficCamNetModelClass
 
 
 BASE_URL = 'http://localhost:5000/'
@@ -396,3 +397,61 @@ def call_bpnet(id):
     else:
         return {'code':404,'error':'Request not found'}
 
+
+@app.route('/api/trafficcamnet/<id>',methods= ['POST', 'GET'])
+def call_trafficcamnet(id):
+    
+    """
+    This function responds to the external API call of obtaining
+    traffic cam net
+
+    :return: JSON object 
+    """
+    
+    tcn = TrafficCamNetModelClass(id)
+
+    if request.method=='GET':
+        return tcn.status()
+    
+    elif request.method=='POST':
+
+        # Create directories for input and output images
+        now = datetime.now()
+        curr_time = now.strftime("%d%m%y_%H%M%S")
+        create_directories('trafficcamnet',id, curr_time)
+
+        # Load input images
+        # input_stream = request.files['image']
+        files = request.files.to_dict(flat=False)['image']
+
+        # Load filenames
+        filenames = request.form.getlist('filename')
+        
+        images = {}
+        # Save input images
+        for i, f in enumerate(files):
+            images[filenames[i]] = f
+            f.save(f"triton_client/trafficcamnet/input/{id}/{curr_time}/{filenames[i]}")
+        
+        # Call triton inference server
+        response = tcn.predict(f"triton_client/trafficcamnet/input/{id}/{curr_time}")
+        
+        # Process response to return
+        processed = {}
+        for i, info in enumerate(response):
+            if info['HTTPStatus']==204:
+                # No inference bounding box was found
+                processed[i] = info
+            else:
+                # info is a list of bbox, bbox is a dict containing a list (bbox)
+                # and a single number, confidence score
+                for j, bbox_info in enumerate(info["all_bboxes"]):
+                    crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/trafficcamnet/output/{id}/{curr_time}/{j}_{info['file_name']}")
+                if id=='internal':
+                    render_image(images[info['file_name']],info["all_bboxes"],f"triton_client/trafficcamnet/output/{id}/{curr_time}/overlay_trafficcamnet_{info['file_name']}")
+                    info['overlay_image'] = f"triton_client/trafficcamnet/output/{id}/{curr_time}/overlay_trafficcamnet_{info['file_name']}"
+                processed[i] = info
+        return processed        
+    
+    else:
+        return {'code':404,'error':'Request not found'}
