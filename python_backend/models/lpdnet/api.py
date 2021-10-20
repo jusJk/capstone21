@@ -1,7 +1,8 @@
 from app import app
 from flask import request, send_file, make_response
 from flask_cors import CORS, cross_origin
-from utils.utils import crop_image, render_image, create_directories, save_image, check_request
+from utils.utils import crop_image, render_image, create_directories, save_image, check_request, chop_image, draw_confidence_heat_map
+import cv2
 
 import json
 import os
@@ -93,3 +94,35 @@ def call_lpdnet(id):
                 processed[i] = info
         
         return make_response(processed,200)
+
+def evaluate_lpd(image_path, filename, id, save_as,n):
+
+    mapping = json.load(open('/app/models/lpdnet/database/mapping.json'))
+    LOGGING = True #Saves output images into the folders
+    THRESHOLD = 0.9 #Threshold for bbox to be tuned
+
+    if id not in mapping: return make_response({'error':"Bad Request - Invalid ID"},400)
+
+    model_name=mapping[id]
+
+    try:
+        lpd = LpdModelClass(id,model_name)
+    except ValueError:
+        return make_response({'error':"Model not found on triton server"},503)
+
+    # Create directories for input and output images
+    input_path, output_path = create_directories('lpdnet',id)
+    
+    subimages = chop_image(image_path,  n)
+
+    # Save input images
+    for i, f in enumerate(subimages):
+        cv2.imwrite(f"{input_path}/{str(i) + filename.split('.')[0] + '.png'}", f)
+        
+    response = lpd.predict(input_path)
+
+    draw_confidence_heat_map(response, image_path, save_as, n)
+
+    # delete subimages
+    for i, f in enumerate(subimages):
+        os.remove(f"{input_path}/{str(i) + filename.split('.')[0] + '.png'}")
