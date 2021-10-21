@@ -9,3 +9,4 @@ from models.lpdnet.api import *
 from models.lprnet.api import *
 from models.bpnet.api import *
 from models.lpdlprnet.api import *
+from models.tcnet.api import *
