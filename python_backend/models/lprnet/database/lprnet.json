@@ -4,7 +4,7 @@
   "information": "Lorem ipsum",
   "email": "abc@stengineering.com",
   "phone": "12345678",
-  "cover": "database/lprnet/cal_plate.jpg",
+  "cover": "./models/lprnet/database/cal_plate.jpg",
   "api": [
     {
       "type": "GET",

@@ -4,7 +4,7 @@
   "information": "Lorem ipsum",
   "email": "abc@stengineering.com",
   "phone": "12345678",
-  "cover": "database/lpdlprnet/two-cars-2.jpeg",
+  "cover": "./models/lpdlprnet/database/two-cars-2.jpeg",
   "explainability_demo_api": {
     "type": "POST",
     "endpoint": "/api/lpdlprnet/explain/internal",

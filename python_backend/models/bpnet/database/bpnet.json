@@ -4,7 +4,7 @@
   "information": "Lorem ipsum",
   "email": "abc@stengineering.com",
   "phone": "12345678",
-  "cover": "database/bpnet/cover.png",
+  "cover": "./models/bpnet/database/cover.png",
   "api": [
     {
       "type": "GET",
