@@ -1,8 +1,10 @@
 import os
+
 import requests
-from base_model_class import BaseModelClass
-from trafficcamnet_client import trafficcamnet_predict
 from requests.exceptions import ConnectionError
+
+from models.base_model_class import BaseModelClass
+from .trafficcamnet_client import trafficcamnet_predict
 
 
 class TrafficCamNetModelClass(BaseModelClass):

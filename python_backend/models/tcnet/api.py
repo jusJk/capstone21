@@ -9,7 +9,7 @@ CORS(app)
 
 from .trafficcamnet_model_class import TrafficCamNetModelClass
 
-@app.route('/api/trafficcamnet/<id>',methods= ['POST', 'GET'])
+@app.route('/api/tcnet/<id>',methods= ['POST', 'GET'])
 def call_trafficcamnet(id):
 
     """
@@ -75,7 +75,7 @@ def call_trafficcamnet(id):
                 # and a single number, confidence score
                 for j, bbox_info in enumerate(info["all_bboxes"]):
                     
-                    if LOGGING: crop_image(images[info['file_name']],bbox_info['bbox'],f"triton_client/trafficcamnet/output/{id}/{curr_time}/{j}_{info['file_name']}")
+                    if LOGGING: crop_image(images[info['file_name']],bbox_info['bbox'],f"{output_path}/{j}_{info['file_name']}")
                 
                 if id=='internal':
                     render_image(images[info['file_name']],info["all_bboxes"],f"{output_path}/overlay_trafficcamnet_{info['file_name']}")
