@@ -21,9 +21,9 @@ class LprModelClass(BaseModelClass):
         self._mode = "Lprnet"
         self._class_list = "license_plate"
         if model_name=="lprnet_usa":
-            self._mapping_output_file = "/app/triton_client/postprocessing_config/us_lp_characters.txt"
+            self._mapping_output_file = "/app/triton_client/tao_triton/python/clustering_specs/us_lp_characters.txt"
         elif model_name=="lprnet_eu":
-            self._mapping_output_file = "/app/triton_client/postprocessing_config/eu_lp_characters.txt"
+            self._mapping_output_file = "/app/triton_client/tao_triton/python/clustering_specs/eu_lp_characters.txt"
         else:
             raise ValueError("Model name is invalid -- no such model exists")
 
