@@ -49,7 +49,7 @@ Category labels (lpd) and bounding-box coordinates for each detected license pla
 
 Image must contain a vehicle with a visible number plate.
 
-![test image](database/lpdnet/overlay_lpdnet_plate.jpg)
+![test image](models/lpdnet/database/overlay_lpdnet_plate.jpg)
 
 ## LPRNet Model
 
@@ -89,9 +89,9 @@ Characters id sequence. (DeepStream post-process plugin is needed to get the fin
 
 The input must be a cropped license plate image like the following:
 
-![image](database/lprnet/ca286.png)
-![image](database/lprnet/cal_plate.jpg)
-![image](database/lprnet/wy963.png)
+![image](models/lprnet/database/ca286.png)
+![image](models/lprnet/database/cal_plate.jpg)
+![image](models/lprnet/database/wy963.png)
 
 ### Performance
 

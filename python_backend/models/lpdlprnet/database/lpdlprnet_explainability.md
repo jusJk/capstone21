@@ -4,7 +4,7 @@ Under the hood, there are 2 major steps to License Plate Recognition. The first 
 
 Given this original base image:
 
-![placeholder1](database/lpdlprnet/plate.jpg)
+![placeholder1](models/lpdlprnet/database/plate.jpg)
 
 ### Preprocessing
 
@@ -32,13 +32,13 @@ After postprocessing occurs, we return a bounding box with confidence scores as 
 
 The Bbox coordinates are then used to draw the final detected licence plates.
 
-![placeholder2](database/lpdlprnet/overlay_lpdnet_plate.jpg)
+![placeholder2](models/lpdnet/database/overlay_lpdnet_plate.jpg)
 
 These detections are key in the overall goal of license plate recognition (LPR) because LPR performs best when there is little noise in the form of external features other than the license plate.
 
 We use the bounding box to crop into the the license plate, which is then sent to the last phase for license plate recognition
 
-![placeholder3](database/lpdlprnet/exp_plate.jpg)
+![placeholder3](models/lpdlprnet/database/exp_plate.jpg)
 
 ### Recognition
 

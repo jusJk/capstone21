@@ -30,7 +30,7 @@ const Image = (props) => <ImgStyle {...props} />;
 
 export function Markdown({ markdown, id, ...others }) {
   return (
-    <Typography variant="p" sx={{ whiteSpace: 'pre-line' }}>
+    <Typography variant="subtitle" sx={{ whiteSpace: 'pre-line' }}>
       <ReactMarkdown
         children={markdown}
         transformImageUri={(link) => linkhandler(link, id)}
