@@ -1,9 +1,23 @@
-import React from 'react';
-import { Stack, Grid, Container, Typography, Skeleton, Box } from '@material-ui/core';
+import { Box, Grid, Container, Typography, Stack } from '@material-ui/core';
+import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import Page from '../components/Page';
+import { getModelDetails, getMd } from '../API/component';
+import { Markdown } from '../components/dashboard/markdown/markdownRenderer';
 import { AppWebsiteVisits } from '../components/dashboard/app';
 
-export default function DashboardAppDrift({ userProfile }) {
+export default function DashboardAppAdmin({ userProfile }) {
+  const [modelInfo, setModelInfo] = useState({});
+  const [infoMarkdown, setInfoMarkdown] = useState('');
+  const id = useParams();
+  useEffect(() => {
+    getModelDetails(id.id, setModelInfo);
+  }, [id]);
+
+  useEffect(() => {
+    getMd(`models/${id.id}/database/${id.id}_admin.md`, setInfoMarkdown);
+  }, [id.id]);
+
   return (
     <Page title="Model Dashboard">
       {/* <DashboardSidebar id={id.id} /> */}
@@ -11,14 +25,11 @@ export default function DashboardAppDrift({ userProfile }) {
         <Container maxWidth="lg" sx={{ ml: '5%', mt: '2%' }}>
           <Stack>
             <Typography variant="h2" sx={{ mb: '1%' }}>
-              Model Drift
+              Model Admin
             </Typography>
           </Stack>
           <Box>
-            <Skeleton />
-            <Skeleton height={150} />
-            <Skeleton />
-            <Skeleton />
+            <Markdown markdown={infoMarkdown} id={id.id} />
           </Box>
           <Grid container spacing={3} sx={{ mt: '1%' }}>
             <Grid item xs={12} md={12}>

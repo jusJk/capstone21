@@ -45,4 +45,4 @@ Category labels (car) and bounding-box coordinates for each detected vehicle in 
 
 Image must contain a vehicle that is larger than 20x20 pixels after scaling to input size.
 
-![test image](database/trafficcamnet/example_image.jpg)
+![test image](models/tcnet/database/example_image.jpg)
