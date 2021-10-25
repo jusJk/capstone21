@@ -121,7 +121,7 @@ class BodyPoseNetPostprocessor(Postprocessor):
 
                 results.append(temp)
 
-            batch_results[filename] = results
+            batch_results[filename] =  {'results':results, 'paf':paf, 'heatmap':heatmap }
 
         return batch_results
 

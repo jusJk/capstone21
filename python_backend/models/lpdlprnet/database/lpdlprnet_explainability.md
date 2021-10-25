@@ -46,6 +46,6 @@ License plate recognition aims to recognise characters in license plates. It uti
 
 After obtaining the sequence output from the license plate, the LPRNet makes use of _best path decoding method_ in order to decode the sequence output of the model into the final predicted characters.
 
-These characters are then output as the final licence plate character.
+These characters are then output as the final license plate character.
 
 ## 3SAM123

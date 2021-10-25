@@ -1,6 +1,6 @@
 ## Transfer Learning
 
-LPDNet was originally trained by NVIDIA to be used on US License plates. Transfer learning was conducted to extend application of LPDNet to EU license plates as well. The figures below document the learning curves for LPDNet.
+LPDNet was originally trained by NVIDIA to be used on US License plates. Transfer learning was conducted to extend application of LPDNet to EU license plates as well. The figures below document the learning curves for LPRNet.
 
 ![learning curve](models/lprnet/database/learningcurve.jfif)
 

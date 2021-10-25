@@ -16,7 +16,7 @@ def call_lprnet(id):
     This function responds to the external API call of obtaining
     lprnet
 
-    :return: JSON object 
+    :return: JSON object
     """
 
     mapping = json.load(open('/app/models/lprnet/database/mapping.json'))
@@ -25,8 +25,8 @@ def call_lprnet(id):
 
     if id not in mapping: return make_response({'error':"Bad Request - Invalid ID"},400)
 
-    model_name=mapping[id]
-    
+    model_name=mapping[id] 
+
     try:
         lpr = LprModelClass(id,model_name)
     except ValueError:
@@ -37,12 +37,12 @@ def call_lprnet(id):
         if status['status']=='Active':
             return make_response(status,200)
         return make_response(status,503)
-    
+
     elif request.method=='POST':
 
         # Load input images
         files = request.files.to_dict(flat=False)['image']
-        
+
         # Load filenames
         filenames = request.form.getlist('filename')
 
@@ -52,19 +52,19 @@ def call_lprnet(id):
 
         # Create directories for input and output images
         input_path, output_path = create_directories('lprnet',id)
-        
+
         images = {}
         # Save input images
         for i, f in enumerate(files):
             images[filenames[i]] = f
             f.save(f"{input_path}/{filenames[i]}")
-        
+
         # Call triton inference server
         try:
             response = lpr.predict(input_path)
         except FileNotFoundError:
             return make_response({'error':"Internal Server Error"},503)
-        
+
         # Process response to return
         processed = {}
         for i, info in enumerate(response):
@@ -73,12 +73,12 @@ def call_lprnet(id):
 
             new_lp = [char for i, char in enumerate(license_plate) if confidence_scores[i]> THRESHOLD]
             new_cs = [c for c in confidence_scores if c > THRESHOLD]
-            
+
             info['license_plate'] = ''.join(new_lp)
             info['confidence_scores'] = new_cs
 
             del info['HTTPStatus']
-            
+
             processed[i] = info
-        
-        return make_response(processed,200)        
+
+        return make_response(processed,200)
