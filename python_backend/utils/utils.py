@@ -2,6 +2,7 @@
 from PIL import ImageDraw, Image
 import cv2 as cv
 import numpy as np
+import pandas as pd
 import os
 import math
 from datetime import datetime
@@ -43,7 +44,7 @@ def create_directories(model, id):
     if not os.path.isdir(f"./models/{model}/input"):
         os.mkdir(f"./models/{model}/input")
         os.mkdir(f"./models/{model}/output")
-    
+
     if not os.path.isdir(f"./models/{model}/input/{id}"):
         os.mkdir(f"./models/{model}/input/{id}")
         os.mkdir(f"./models/{model}/output/{id}")
@@ -51,7 +52,7 @@ def create_directories(model, id):
     if not os.path.isdir(f"./models/{model}/input/{id}/{curr_time}"):
         os.mkdir(f"./models/{model}/input/{id}/{curr_time}")
         os.mkdir(f"./models/{model}/output/{id}/{curr_time}")
-    
+
     return f"./models/{model}/input/{id}/{curr_time}", f"./models/{model}/output/{id}/{curr_time}"
 
 def plot_keypoints(results, image_filename, image_path, output_path, render_limbs=True):
@@ -112,97 +113,6 @@ def plot_keypoints(results, image_filename, image_path, output_path, render_limb
     cv.imwrite(output_path, canvas)
 
 
-def chop_image(im_path, n): 
-    """
-    Chop image into n segments
-    """
-    org = cv.imread(im_path)
-   
-    im = org.copy()
-    M = im.shape[0]//n
-    N = im.shape[1]//n
-    tile_coord = [[x,x+M,y,y+N] for x in range(0,im.shape[0],M) for y in range(0,im.shape[1],N)]
-    response =[]
-    for i,matrix in enumerate(tile_coord):
-        a,b,c,d = matrix
-        ts = im.copy()
-        ts[a:b, c:d] = 0
-        response.append(ts)
-    return response
-    
-def map_confidence_to_chunk(responses, filename):
-    conf = {}
-    for r in responses:
-        key = r['file_name'].replace(filename,'')
-        try:
-            sc = r['all_bboxes'][0]['confidence_score']
-        except:
-            sc = 0.01
-        conf[key] = sc
-    
-    return conf
-
-def color_chunks(original_image_path, conf, save_as, n=2):
-    import matplotlib.pyplot as plt
-    org = cv.imread(original_image_path)
-    org = cv.cvtColor(org, cv.COLOR_BGR2RGB)
-    im = org.copy()
-    M = im.shape[0]//n
-    N = im.shape[1]//n
-    tile_coord = [[x,x+M,y,y+N] for x in range(0,im.shape[0],M) for y in range(0,im.shape[1],N)]
-    response =[]
-    coef = get_coefficients(conf)
-    mean = sum(coef)/len(coef)
-    for i,matrix in enumerate(tile_coord):
-        a,b,c,d = matrix
-        color(im[a:b,c:d], i, coef, mean )
-        
-    plt.imshow(org)
-    plt.imshow(im, alpha=0.6)
-    plt.savefig(save_as)
-        
-def conf_color(x, max_v): 
-    return (max_v-x)*255/max_v     
-
-def draw_confidence_heat_map(responses, filename, save_as, n): 
-    enforce_png_name = filename.split('/')[-1].split('.')[0] + '.png'
-    print(responses, flush=True)
-    conf = map_confidence_to_chunk(responses,enforce_png_name) 
-    color_chunks(filename, conf, save_as, n)
-    
-
-def get_coefficients(conf):
-    import pandas as pd
-    from sklearn.preprocessing import OneHotEncoder
-    from sklearn.linear_model import LinearRegression
-    enc = OneHotEncoder()
-    df = pd.DataFrame([int(k) for k,v in conf.items()])
-    y = [v for v in conf.values()]
-    X = 1-enc.fit_transform(df).toarray()
-    reg = LinearRegression().fit(X, y)
-    
-    return reg.coef_
-
-def color(matrix, i, coefs, mean):
-    coef=coefs[i]
-    for chunk in matrix: 
-        for pixel in chunk:
-            pixel[0] = 0
-            pixel[1] = 0
-            pixel[2] = 0
-            c, s = reg_color(coef, mean)
-            pixel[c] = s 
-         
-
-def reg_color(coef, mean):
-    if coef >= 0 :
-        #red means coefficient is positive. adding it increases conf
-        return 0, abs(coef-mean)*255/mean
-    if coef < 0:
-        #blue means coefficient is negative, adding it reduces conf
-        return 2, abs(coef-mean)*255/mean
-
-
 def replace_in_markdown(mapping, md_path):
     with open(md_path, 'r') as md:
         text = md.readlines()
@@ -219,18 +129,48 @@ def replace_in_markdown(mapping, md_path):
 def check_request(request):
     # Load input images
     files = request.files.to_dict(flat=False)['image']
-    
+
     # Load filenames
     filenames = request.form.getlist('filename')
 
     if len(files)==0:
         return {'error':'Image not found'}
-    
+
     if len(filenames)==0:
         return {'error':'No filename for image'}
 
     if len(files) != len(filenames):
         return {'error':'Number of images and filenames do not match'}
-    
+
     else:
         return True
+
+# [x1, y1, x2, y2] and [x1, y1, x2, y2] 
+def calculate_iou_from_coords(bx1, bx2):
+    #map list of coordinates into bounding box
+    bb1, bb2 = {},{}
+    bb1['x1'], bb1['y1'], bb1['x2'], bb1['y2'] = bx1
+    bb2['x1'], bb2['y1'], bb2['x2'], bb2['y2'] = bx2
+
+    # determine the coordinates of the intersection rectangle
+    x_left = max(bb1['x1'], bb2['x1'])
+    y_top = max(bb1['y1'], bb2['y1'])
+    x_right = min(bb1['x2'], bb2['x2'])
+    y_bottom = min(bb1['y2'], bb2['y2'])
+    
+    # compute the area of both AABBs
+    bb1_area = (bb1['x2'] - bb1['x1']) * (bb1['y2'] - bb1['y1'])
+    bb2_area = (bb2['x2'] - bb2['x1']) * (bb2['y2'] - bb2['y1'])
+    if x_right < x_left or y_bottom < y_top:
+        return 0.0, bb1_area, bb2_area
+
+    # The intersection of two axis-aligned bounding boxes is always an
+    # axis-aligned bounding box
+    intersection_area = (x_right - x_left) * (y_bottom - y_top)
+
+    # compute the intersection over union by taking the intersection
+    # area and dividing it by the sum of prediction + ground-truth
+    # areas - the interesection area
+    iou = intersection_area / float(bb1_area + bb2_area - intersection_area)
+
+    return iou, bb1_area, bb2_area

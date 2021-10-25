@@ -49,7 +49,7 @@ Category labels (lpd) and bounding-box coordinates for each detected license pla
 
 Image must contain a vehicle with a visible number plate.
 
-![test image](database/lpdnet/overlay_lpdnet_plate.jpg)
+![test image](models/lpdnet/database/overlay_lpdnet_plate.jpg)
 
 ## LPRNet Model
 
@@ -89,51 +89,11 @@ Characters id sequence. (DeepStream post-process plugin is needed to get the fin
 
 The input must be a cropped license plate image like the following:
 
-![image](database/lprnet/ca286.png)
-![image](database/lprnet/cal_plate.jpg)
-![image](database/lprnet/wy963.png)
+![image](models/lprnet/database/ca286.png)
+![image](models/lprnet/database/cal_plate.jpg)
+![image](models/lprnet/database/wy963.png)
 
-### Performance
-
-For LPR Net, we define an accurately recognised license plate as one where the model has managed to read every single letter in the license plate correctly. Reported accuracy will just be the number of license plates correctly read against the total number in the test set.
-
-#### Benchmark
-
-Against the EU AUTO.RIA dataset,
-
-LPR EU Model:
-Accuracy: 4846 / 4960 or 0.9770161290322581
-
-#### Considerations
-
-Model accuracy is affected by the following factors:
 
 ## LPD + LPR Net Model
 
 The LPD+LPR Net Model simply consists of the LPD and LPRNet models working together in a pipeline. The pipeline handles all the data processing steps and intermediate data flows to provide end to end inference.
-
-<!-- ## LPD Net Model
-
-The first model is License Plate Detection Net. This model detects a license plate in an image and crops into it.
-
-### References
-
-    Redmon, J., Divvala, S., Girshick, R., Farhadi, A.: You only look once: Unified, real-time object detection. In: CVPR. (2016)
-    Erhan, D., Szegedy, C., Toshev, A., Anguelov, D.: Scalable object detection using deep neural networks, In: CVPR. (2014)
-    He, K., Zhang, X., Ren, S., Sun, J.: Deep Residual Learning for Image Recognition. In: CVPR (2015)
-
-## LPR Net Model
-
-The second model is License Plate Recognition Net. This model takes a cropped image of a license plate and reads it, producing confidence scores in the process.
-
-### References
-
-    Graves, Alex, et al. "Connectionist temporal classification: labelling unsegmented sequence data with recurrent neural networks."
-    In: Proceedings of the 23rd international conference on Machine learning (2006)
-    He, K., Zhang, X., Ren, S., Sun, J.: Deep Residual Learning for Image Recognition. In: CVPR (2015)
-
-## LPD + LPR Net Model
-
-The LPD+LPR Net Model simply consists of the LPD and LPRNet models working together in a pipeline. The pipeline handles all the data processing steps and intermediate data flows to provide end to end inference.
-
-Given a  -->

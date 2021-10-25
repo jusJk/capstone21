@@ -40,11 +40,19 @@ These detections are key in the overall goal of license plate recognition (LPR) 
 
 #### Explaining the prediction
 
-The picture below explains the importance of each chunk of image in the prediction.
+To understand this bounding box detection process a bit more, we can send multiple versions of the picture into the model and observe the variance in confidence.
 
-These importance values are calculated using the variance in confidence scores from dropping out chunks of the image from many repeated requests to the inference server. In the plot below, red boxes are boxes whose exclusion reduces confidence score, while blue boxes are boxes whose exclusion increases the confidence score. The more intense the color, the stronger the effect.
+That is:
+
+    1. We divide the picture into n superpixels using the SLIC algorithm, which groups pixels into similar chunks.
+    2. We omit one superpixel every time we hit the model
+    3. Regress the change in confidence against omitted superpixel.
+
+This procedure allows us to construct the attention map below.
 
 ![placeholder4](%placeholder4%)
+
+In the plot above, red chunks are boxes whose exclusion reduces confidence score, while blue chunks are boxes whose exclusion increases the confidence score. The more intense the color, the stronger the effect.
 
 We use the bounding box to crop into the the license plate, which is then sent to the last phase for license plate recognition
 
@@ -56,6 +64,6 @@ License plate recognition aims to recognise characters in license plates. It uti
 
 After obtaining the sequence output from the license plate, the LPRNet makes use of _best path decoding method_ in order to decode the sequence output of the model into the final predicted characters.
 
-These characters are then output as the final licence plate character.
+These characters are then output as the final license plate character.
 
 %placeholder6%

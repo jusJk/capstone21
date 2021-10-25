@@ -19,10 +19,8 @@ const linkhandler = (link, id) => {
 };
 const ImgStyle = styled('img')({
   top: 0,
-  maxWidth: '40vw',
-  maxHeight: '50vh',
+  maxWidth: '60vw',
   margin: '1%',
-  alignItems: 'center',
   borderRadius: '25px'
 });
 
@@ -30,7 +28,7 @@ const Image = (props) => <ImgStyle {...props} />;
 
 export function Markdown({ markdown, id, ...others }) {
   return (
-    <Typography variant="p" sx={{ whiteSpace: 'pre-line' }}>
+    <Typography variant="subtitle" sx={{ whiteSpace: 'pre-line' }}>
       <ReactMarkdown
         children={markdown}
         transformImageUri={(link) => linkhandler(link, id)}

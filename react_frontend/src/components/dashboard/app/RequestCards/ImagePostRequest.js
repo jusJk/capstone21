@@ -132,7 +132,7 @@ export default function UploadPicture(props) {
               component="label"
               color="info"
               size="large"
-              disabled={!imgSrc}
+              disabled={!imgSrc || loading}
               onClick={() => {
                 setContent(undefined);
                 setLoading(true);

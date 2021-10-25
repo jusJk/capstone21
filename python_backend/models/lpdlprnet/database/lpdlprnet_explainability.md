@@ -4,7 +4,7 @@ Under the hood, there are 2 major steps to License Plate Recognition. The first 
 
 Given this original base image:
 
-![placeholder1](database/lpdlprnet/plate.jpg)
+![placeholder1](models/lpdlprnet/database/plate.jpg)
 
 ### Preprocessing
 
@@ -28,17 +28,31 @@ This LPDNet inference returns raw output tensors before final post processing is
     4. Convert filtered boxes into KittiBbox output format with the final absolute coordinates of bbox and confidence scores
     5. Final post processing occurs to return the bbox coordinates and confidence scores for each input image
 
-After postprocessing occurs, we return a bounding box with confidence scores as output.
+After postprocessing occurs, we return a bounding box with confidence scores as output. The Bbox coordinates are then used to draw the final detected licence plates.
 
-The Bbox coordinates are then used to draw the final detected licence plates.
-
-![placeholder2](database/lpdlprnet/overlay_lpdnet_plate.jpg)
+![placeholder2](models/lpdnet/database/overlay_lpdnet_plate.jpg)
 
 These detections are key in the overall goal of license plate recognition (LPR) because LPR performs best when there is little noise in the form of external features other than the license plate.
 
+#### Explaining the prediction
+
+To understand this bounding box detection process a bit more, we can send multiple versions of the picture into the model and observe the variance in confidence.
+
+That is:
+
+    1. We divide the picture into n superpixels using the SLIC algorithm, which groups pixels into similar chunks.
+    2. We omit one superpixel every time we hit the model
+    3. Regress the change in confidence against omitted superpixel.
+
+This procedure allows us to construct the attention map below.
+
+![placeholder7](models/lpdlprnet/database/heatmap_plate.jpg)
+
+In the plot above, red chunks are boxes whose exclusion reduces confidence score, while blue chunks are boxes whose exclusion increases the confidence score. The more intense the color, the stronger the effect.
+
 We use the bounding box to crop into the the license plate, which is then sent to the last phase for license plate recognition
 
-![placeholder3](database/lpdlprnet/exp_plate.jpg)
+![placeholder3](models/lpdlprnet/database/exp_plate.jpg)
 
 ### Recognition
 
@@ -46,6 +60,6 @@ License plate recognition aims to recognise characters in license plates. It uti
 
 After obtaining the sequence output from the license plate, the LPRNet makes use of _best path decoding method_ in order to decode the sequence output of the model into the final predicted characters.
 
-These characters are then output as the final licence plate character.
+These characters are then output as the final license plate character.
 
 ## 3SAM123
