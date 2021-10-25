@@ -22,7 +22,7 @@ export default function DashboardAppExplainability() {
   };
 
   useEffect(() => {
-    getMd(`${id.id}/${id.id}_explainability.md`, setExMarkdown);
+    getMd(`models/${id.id}/database/${id.id}_explainability.md`, setExMarkdown);
     getAvailableDemo(id.id, handleExplainabilityDemo, [id.id]);
   }, [id.id]);
 

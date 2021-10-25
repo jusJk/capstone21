@@ -108,7 +108,7 @@ export function getImageUrl(path, callback) {
 
 export function getMd(path, callback) {
   axios
-    .get(`${baseURL}api/get_md?path=database/${path}`)
+    .get(`${baseURL}api/get_md?path=${path}`)
     .then((e) => {
       callback(e.data);
     })

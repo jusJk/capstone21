@@ -15,7 +15,7 @@ export default function DashboardApp() {
   }, [id]);
 
   useEffect(() => {
-    getMd(`${id.id}/${id.id}_info.md`, setInfoMarkdown);
+    getMd(`models/${id.id}/database/${id.id}_info.md`, setInfoMarkdown);
   }, [id.id]);
 
   return (
