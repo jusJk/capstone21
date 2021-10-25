@@ -43,6 +43,6 @@ export const sidebarConfigProvider = (admin) =>
   admin
     ? [
         ...sidebarConfig,
-        { title: '(Admin) Model Drift', path: '/dashboard/app/drift', icon: getIcon(activityFill) }
+        { title: 'Model Admin', path: '/dashboard/app/admin', icon: getIcon(activityFill) }
       ]
     : sidebarConfig;

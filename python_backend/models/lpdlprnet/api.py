@@ -236,9 +236,7 @@ def call_explain_combined(id):
             reverse_mapping[f"exp_{info['file_name']}"] = i
             bbox_info[f"exp_bbox"] = bbox_info.pop('bbox')
 
-
     processed[i] = info
-
 
     # Call LPR on output of LPD
     lpr_response = lpr.predict(output_path)
@@ -251,9 +249,6 @@ def call_explain_combined(id):
         temp = {}
         temp['license_plate'] = list(lpr_info['license_plate'])
         temp['confidence_scores'] = lpr_info['confidence_scores']
-        # processed[reverse_mapping[file_name]][f"exp_lpr"] = temp
-
-    # evaluate_lpd(baseimage, filenames[0], id, save_as, n)
 
     if id=='internal':
         render_image(images[info['file_name']],info['all_bboxes'], demopic)
