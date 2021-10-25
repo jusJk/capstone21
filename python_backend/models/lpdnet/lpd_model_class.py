@@ -59,4 +59,4 @@ class LpdModelClass(BaseModelClass):
 if __name__ == "__main__":
     test_model = LpdModelClass("hellosss")
     # print(test_model.status())
-    print(test_model.predict("../input/lpd"))
+    # print(test_model.predict("../..triton_client/lptnet/input/052850"))

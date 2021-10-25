@@ -1,10 +1,11 @@
 from app import app
 from flask import request, send_file, make_response
 from flask_cors import CORS, cross_origin
-from utils.utils import create_directories, check_request, crop_image, render_image, replace_in_markdown, save_image
+from utils.utils import create_directories, check_request, crop_image, render_image, replace_in_markdown, save_image, calculate_iou_from_coords
 from models.lpdlprnet.lpdlprutils import chop_image, draw_confidence_heat_map
 import pandas as pd
 import datetime
+import itertools
 
 import json
 import os
@@ -12,7 +13,6 @@ CORS(app)
 
 from models.lpdnet.lpd_model_class import LpdModelClass
 from models.lprnet.lpr_model_class import LprModelClass
-
 
 @app.route('/api/lpdlprnet/<id>',methods= ['POST', 'GET'])
 def call_combined(id):
@@ -75,6 +75,25 @@ def call_combined(id):
         except FileNotFoundError:
             return make_response({'error':"Internal Server Error"},503)
 
+        # Calculate IOU from among all permutations of bboxes for each image response and remove smaller box if iou > 0.1
+        for i, info in enumerate(lpd_response):
+            bboxes = lpd_response[i]['all_bboxes']
+            bboxes_idx = range(len(bboxes))
+            to_remove_set = set() #Ensure we only remove the necessary image once
+            for combinations in itertools.combinations(bboxes_idx, 2):
+                first, second = combinations
+                (iou, first_area, second_area) = calculate_iou_from_coords(bboxes[first]['bbox'], bboxes[second]['bbox'])
+                if iou > 0.1:
+                    if first_area < second_area:
+                        to_remove_set.add(first)
+                    else:
+                        to_remove_set.add(second)
+            
+            to_remove_ls = list(to_remove_set)
+            to_remove_ls.sort(reverse = True) #Sorting in reverse to remove index from the back (prevent index out of bounds due to removal)
+            for to_remove in to_remove_ls:
+                lpd_response[i]['all_bboxes'].pop(to_remove)
+
         # Save the lpd output images into a new folder
         processed = {}
         reverse_mapping = {}
@@ -94,7 +113,7 @@ def call_combined(id):
                         continue
                     crop_image(images[info['file_name']],bbox_info['bbox'],f"{output_path}/{j}_{info['file_name']}")
 
-                    reverse_mapping[f"{j}_{info['file_name']}"] = i
+                    reverse_mapping[f"{j}_{info['file_name']}"] = i #Tracking multiple bbox in an image
 
                     bbox_info[f"{j}_bbox"] = bbox_info.pop('bbox')
 
@@ -117,19 +136,19 @@ def call_combined(id):
             license_plate = lpr_info['license_plate']
 
             new_lp = [char for i, char in enumerate(license_plate) if confidence_scores[i]> LPR_THRESHOLD]
-            new_cs = [c for c in confidence_scores if c > LPR_THRESHOLD]
+            new_cs = [c for c in confidence_scores if c > LPR_THRESHOLD] 
 
             file_name = lpr_info['file_name']
             index = file_name.split("_")[0]
 
             # No license plate was detected -- filter it out
             if len(new_lp)==0:
-                del processed[reverse_mapping[file_name]]["all_bboxes"][index]
+                del processed[reverse_mapping[file_name]]["all_bboxes"][int(index)]
+            else:
+                temp['license_plate'] = ''.join(new_lp)
+                temp['confidence_scores'] = new_cs
 
-            temp['license_plate'] = ''.join(new_lp)
-            temp['confidence_scores'] = new_cs
-
-            processed[reverse_mapping[file_name]][f"{index}_lpr"] = temp
+                processed[reverse_mapping[file_name]][f"{index}_lpr"] = temp
 
         # Overlay images in the end to avoid errors
         if id=='internal':
