@@ -1,7 +1,7 @@
 from app import app
 from flask import request, send_file, make_response
 from flask_cors import CORS, cross_origin
-from utils.utils import crop_image, render_image, create_directories, save_image, check_request, calculate_iou_from_coords
+from utils.utils import crop_image, render_image, create_directories, save_image, check_request, filter_overlapping_bbox
 import itertools
 import cv2
 
@@ -67,23 +67,7 @@ def call_lpdnet(id):
             return make_response({'error':"Internal Server Error"},503)
             
         # Calculate IOU from among all permutations of bboxes for each image response and remove smaller box if iou > 0.1
-        for i, info in enumerate(response):
-            bboxes = response[i]['all_bboxes']
-            bboxes_idx = range(len(bboxes))
-            to_remove_set = set() #Ensure we only remove the necessary image once
-            for combinations in itertools.combinations(bboxes_idx, 2): #Comparing between all combinations of bboxes
-                first, second = combinations
-                (iou, first_area, second_area) = calculate_iou_from_coords(bboxes[first]['bbox'], bboxes[second]['bbox'])
-                if iou > 0:
-                    if first_area < second_area:
-                        to_remove_set.add(first)
-                    else:
-                        to_remove_set.add(second)
-            
-            to_remove_ls = list(to_remove_set)
-            to_remove_ls.sort(reverse = True) #Sorting in reverse to remove index from the back (prevent index out of bounds due to removal)
-            for to_remove in to_remove_ls:
-                response[i]['all_bboxes'].pop(to_remove)
+        response = filter_overlapping_bbox(response)
 
         # Process response to return
         processed = {}
