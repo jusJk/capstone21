@@ -6,6 +6,7 @@ import pandas as pd
 import os
 import math
 from datetime import datetime
+import itertools
 
 
 def render_image(frame, bboxes, output_image_file, outline_color='yellow', linewidth=10):
@@ -174,3 +175,25 @@ def calculate_iou_from_coords(bx1, bx2):
     iou = intersection_area / float(bb1_area + bb2_area - intersection_area)
 
     return iou, bb1_area, bb2_area
+
+def filter_overlapping_bbox(lpd_response):
+
+    for i, info in enumerate(lpd_response):
+        bboxes = lpd_response[i]['all_bboxes']
+        bboxes_idx = range(len(bboxes))
+        to_remove_set = set() #Ensure we only remove the necessary image once
+        for combinations in itertools.combinations(bboxes_idx, 2):
+            first, second = combinations
+            (iou, first_area, second_area) = calculate_iou_from_coords(bboxes[first]['bbox'], bboxes[second]['bbox'])
+            if iou > 0.1:
+                if first_area < second_area:
+                    to_remove_set.add(first)
+                else:
+                    to_remove_set.add(second)
+        
+        to_remove_ls = list(to_remove_set)
+        to_remove_ls.sort(reverse = True) #Sorting in reverse to remove index from the back (prevent index out of bounds due to removal)
+        for to_remove in to_remove_ls:
+            lpd_response[i]['all_bboxes'].pop(to_remove)
+    
+    return lpd_response
