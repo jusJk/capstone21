@@ -1,7 +1,8 @@
 from app import app
 from flask import request, send_file, make_response
 from flask_cors import CORS, cross_origin
-from utils.utils import crop_image, render_image, create_directories, save_image, check_request
+from utils.utils import crop_image, render_image, create_directories, save_image, check_request, filter_overlapping_bbox
+import itertools
 import cv2
 
 import json
@@ -64,6 +65,9 @@ def call_lpdnet(id):
             response = lpd.predict(input_path)
         except FileNotFoundError:
             return make_response({'error':"Internal Server Error"},503)
+            
+        # Calculate IOU from among all permutations of bboxes for each image response and remove smaller box if iou > 0.1
+        response = filter_overlapping_bbox(response)
 
         # Process response to return
         processed = {}

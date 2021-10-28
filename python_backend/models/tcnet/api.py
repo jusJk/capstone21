@@ -1,7 +1,7 @@
 from app import app
 from flask import request, send_file, make_response
 from flask_cors import CORS, cross_origin
-from utils.utils import create_directories, check_request, crop_image, render_image
+from utils.utils import create_directories, check_request, crop_image, render_image, filter_overlapping_bbox
 
 import json
 import os
@@ -59,7 +59,12 @@ def call_trafficcamnet(id):
             f.save(f"{input_path}/{filenames[i]}")
 
         # Call triton inference server
-        response = tcn.predict(input_path)
+        try:
+            response = tcn.predict(input_path)
+        except FileNotFoundError:
+            return make_response({'error':"Internal Server Error"},503)
+
+        response = filter_overlapping_bbox(response)
 
         # Process response to return
         processed = {}

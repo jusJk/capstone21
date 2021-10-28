@@ -2,9 +2,11 @@
 from PIL import ImageDraw, Image
 import cv2 as cv
 import numpy as np
+import pandas as pd
 import os
 import math
 from datetime import datetime
+import itertools
 
 
 def render_image(frame, bboxes, output_image_file, outline_color='yellow', linewidth=10):
@@ -143,3 +145,55 @@ def check_request(request):
 
     else:
         return True
+
+# [x1, y1, x2, y2] and [x1, y1, x2, y2] 
+def calculate_iou_from_coords(bx1, bx2):
+    #map list of coordinates into bounding box
+    bb1, bb2 = {},{}
+    bb1['x1'], bb1['y1'], bb1['x2'], bb1['y2'] = bx1
+    bb2['x1'], bb2['y1'], bb2['x2'], bb2['y2'] = bx2
+
+    # determine the coordinates of the intersection rectangle
+    x_left = max(bb1['x1'], bb2['x1'])
+    y_top = max(bb1['y1'], bb2['y1'])
+    x_right = min(bb1['x2'], bb2['x2'])
+    y_bottom = min(bb1['y2'], bb2['y2'])
+    
+    # compute the area of both AABBs
+    bb1_area = (bb1['x2'] - bb1['x1']) * (bb1['y2'] - bb1['y1'])
+    bb2_area = (bb2['x2'] - bb2['x1']) * (bb2['y2'] - bb2['y1'])
+    if x_right < x_left or y_bottom < y_top:
+        return 0.0, bb1_area, bb2_area
+
+    # The intersection of two axis-aligned bounding boxes is always an
+    # axis-aligned bounding box
+    intersection_area = (x_right - x_left) * (y_bottom - y_top)
+
+    # compute the intersection over union by taking the intersection
+    # area and dividing it by the sum of prediction + ground-truth
+    # areas - the interesection area
+    iou = intersection_area / float(bb1_area + bb2_area - intersection_area)
+
+    return iou, bb1_area, bb2_area
+
+def filter_overlapping_bbox(lpd_response):
+
+    for i, info in enumerate(lpd_response):
+        bboxes = lpd_response[i]['all_bboxes']
+        bboxes_idx = range(len(bboxes))
+        to_remove_set = set() #Ensure we only remove the necessary image once
+        for combinations in itertools.combinations(bboxes_idx, 2):
+            first, second = combinations
+            (iou, first_area, second_area) = calculate_iou_from_coords(bboxes[first]['bbox'], bboxes[second]['bbox'])
+            if iou > 0.1:
+                if first_area < second_area:
+                    to_remove_set.add(first)
+                else:
+                    to_remove_set.add(second)
+        
+        to_remove_ls = list(to_remove_set)
+        to_remove_ls.sort(reverse = True) #Sorting in reverse to remove index from the back (prevent index out of bounds due to removal)
+        for to_remove in to_remove_ls:
+            lpd_response[i]['all_bboxes'].pop(to_remove)
+    
+    return lpd_response
