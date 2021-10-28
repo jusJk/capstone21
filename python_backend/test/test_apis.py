@@ -1,6 +1,6 @@
 import requests
-import docker
 
+# Api urls
 BASE_URL = "http://localhost:5000"
 LPD_US_URL = "/api/lpdnet/internal"
 LPD_EU_URL = "/api/lpdnet/neil"
@@ -9,41 +9,7 @@ LPR_EU_URL = "/api/lprnet/neil"
 LPDLPR_URL = "/api/lpdlprnet/internal"
 BPNET_URL = "/api/bpnet/internal"
 TCNET_URL = "/api/tcnet/internal"
-
-# def get_docker_ip():
-#     client = docker.DockerClient()
-#     container = client.containers.get("python-backend")
-#     print('HI')
-#     print(container.attrs['NetworkSettings'])
-#     return container.attrs['NetworkSettings']['IPAddress']
-
-# def is_responsive(url):
-#     try:
-#         response = requests.get(url)
-#         if response.status_code == 200:
-#             return True
-#     except ConnectionError:
-#         return False
-
-# @pytest.fixture(scope="session")
-# def docker_compose_file(pytestconfig):
-#     return os.path.join(str(pytestconfig.rootdir), "../../", "docker-compose.yml")
-
-# @pytest.fixture(scope="session")
-# def http_service(docker_ip, docker_services):
-#     """Ensure that HTTP service is up and responsive."""
-
-#     # `port_for` takes a container port and returns the corresponding host port
-#     port = docker_services.port_for("python-backend", 5000)
-#     url = "http://{}:{}".format(docker_ip, port)
-#     print(url)
-#     return url
-
-# def test_status_code(http_service):
-#     status = 200
-#     response = requests.get(http_service + "/api/lpdnet/internal")
-
-#     assert response.status_code == status
+TCLPDLPRNET_URL = "/api/tclpdlprnet/internal"
 
 ## Get Tests
 def test_lpr_eu_get():
@@ -74,6 +40,10 @@ def test_tcnet_get():
     response_tcnet = requests.get(BASE_URL + TCNET_URL)
     assert response_tcnet.status_code == 200
 
+def test_tclpdlprnet_get():
+    response_tcnet = requests.get(BASE_URL + TCLPDLPRNET_URL)
+    assert response_tcnet.status_code == 200
+
 ## Post Tests
 def test_lpr_us_post():
     fname_1 = 'ca286.png'
@@ -91,19 +61,18 @@ def test_lpr_us_post():
     assert body['1']['license_plate'] == "4339C"
 
 def test_lpr_eu_post():
-    fname_1 = 'test_077.jpg'
-    fname_2 = 'eu10.jpg'
-    request_files=[ ('image',(fname_1,open("lpr/"+fname_1,'rb'),'image/jpeg')) , ('image',(fname_2,open("lpr/"+fname_2,'rb'),'image/jpeg'))]
+    fname = 'test_077.jpg'
+    request_files=[ ('image',(fname,open("lpr/"+fname,'rb'),'image/jpeg')) ]
     headers = {}
-    payload = {'filename':[fname_1, fname_2]}
+    payload = {'filename':[fname]}
     response = requests.post(BASE_URL + LPR_US_URL,
         headers=headers, 
         data=payload, 
         files=request_files)
     assert response.status_code == 200
     body = response.json()
-    assert body['1']['license_plate'] == "RK735AS"
-    assert body['0']['license_plate'] == "WA56660"
+    print(body)
+    assert body['0']['license_plate'] == "RK735AS"
 
 def test_lpd_us_post():
     fname_1 = 'cal-cp-6.jpg'
@@ -175,5 +144,22 @@ def test_tcnet_post():
     assert len(body['0']['all_bboxes']) == 1
     assert len(body['1']['all_bboxes']) >= 2
 
+def test_tclpdlprnet_post():
+    fname = 'two-cars-2.jpg'
+    request_files=[('image',(fname,open("lpd/"+fname,'rb'),'image/jpeg'))]
+    headers = {}
+    payload = {'filename':[fname]}
+    response = requests.post(BASE_URL + TCLPDLPRNET_URL,
+        headers=headers, 
+        data=payload, 
+        files=request_files)
+    assert response.status_code == 200
+    body = response.json()['two-cars-2.jpg']
+    assert len(body['tcnet_response']['all_bboxes']) == 2
+    assert len(body['lpd_response']) == 2
+    assert body['lpr_response']['0']['license_plate'] == "8KSG816"
+    assert body['lpr_response']['1']['license_plate'] == "8LCS549"
+
+
 if __name__ == "__main__":
-    test_tcnet_post()
+    pass
