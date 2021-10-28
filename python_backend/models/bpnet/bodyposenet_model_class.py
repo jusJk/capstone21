@@ -16,24 +16,23 @@ class BodyPoseNetClass(BaseModelClass):
         querying party -- corresponding to a specific triton
         model.
         '''
-        BaseModelClass.__init__(self, client_info)
-        self._url = os.environ.get('API_URL')
-        self._model_name = model_name
+        url = os.environ.get('API_URL')
+        BaseModelClass.__init__(self, client_info, url, model_name)
         self._mode = "BodyPoseNet"
         if model_name not in ['bodyposenet']:
-            raise ValueError("Model name is invalid -- no such model exists")
+            raise ValueError("Model name is invalid -- no such model exists")           
 
-    def status(self):
-        '''
-        Returns the status of the model
-        '''
-        try:
-            triton_server_url = "http://" + self._url + "/v2/health/ready"
-            response = requests.get(triton_server_url)
-        except ConnectionError as error:
-            return {'status': 'Inactive'}
-        else:
-            return {'status': 'Active'}
+    # def status(self):
+    #     '''
+    #     Returns the status of the model
+    #     '''
+    #     try:
+    #         triton_server_url = "http://" + self._url + "/v2/health/ready"
+    #         response = requests.get(triton_server_url)
+    #     except ConnectionError as error:
+    #         return {'status': 'Inactive'}
+    #     else:
+    #         return {'status': 'Active'}
 
     def predict(self, file_path,return_tensor=False):
         """Runs inference on images in file_path if it exists

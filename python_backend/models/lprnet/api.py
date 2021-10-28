@@ -82,3 +82,9 @@ def call_lprnet(id):
             processed[i] = info
 
         return make_response(processed,200)
+
+def test_lprnet():
+    id='internal'
+    mapping = json.load(open('/app/models/lprnet/database/mapping.json'))
+    model = LprModelClass(id, mapping[id])
+    print('LPRnet: ', model.status())

@@ -199,3 +199,11 @@ def call_explain_bpnet(id):
     
 
         return make_response(processed,200)
+
+
+
+def test_bpnet():
+    id='internal'
+    mapping = json.load(open('/app/models/bpnet/database/mapping.json'))
+    model = BodyPoseNetClass(id, mapping[id])
+    print('BPnet: ', model.status())

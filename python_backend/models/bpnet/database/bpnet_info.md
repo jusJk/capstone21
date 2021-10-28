@@ -12,9 +12,9 @@ The default model predicts 18 keypoints including nose, neck, right_shoulder, ri
 
 This is a fully convolutional model with architecture consisting of:
 
-    - a backbone network (like VGG)
-    - an initial estimation stage that does a pixel-wise prediction of confidence maps (heatmaps) and part affinity fields
-    - multistage refinement (0 to N stages) on the initial predictions.
+    - A backbone network (like VGG)
+    - An initial estimation stage that does a pixel-wise prediction of confidence maps (heatmaps) and part affinity fields
+    - Multistage refinement (0 to N stages) on the initial predictions.
 
 ## Training Algorithm
 
@@ -30,9 +30,11 @@ The training algorithm optimizes the network to minimize the loss on confidence 
 
 Primary use case for this model is to detect human poses in a given RGB image. BodyPoseNet is commonly used for activity/gesture recognition, fall detection, posture analysis etc.
 
+The model may not give results if the (1) the image is too crowded, (2) the person in the image is occluded by other objects or persons and (3) if there is no clear distinction between the person and the background.
+
 ### Input
 
-Network accepts H X W x 3 input. The images are pre-processed to handle normalization, resizing while maintaining the aspect ratio etc.
+Network accepts H X W x 3 input. The images are pre-processed using normalisation and are resized to the network input dimensions of 288 x 384 x 3.
 
 ### Output
 
