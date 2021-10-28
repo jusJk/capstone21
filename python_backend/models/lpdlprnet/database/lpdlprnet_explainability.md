@@ -28,13 +28,27 @@ This LPDNet inference returns raw output tensors before final post processing is
     4. Convert filtered boxes into KittiBbox output format with the final absolute coordinates of bbox and confidence scores
     5. Final post processing occurs to return the bbox coordinates and confidence scores for each input image
 
-After postprocessing occurs, we return a bounding box with confidence scores as output.
-
-The Bbox coordinates are then used to draw the final detected licence plates.
+After postprocessing occurs, we return a bounding box with confidence scores as output. The Bbox coordinates are then used to draw the final detected licence plates.
 
 ![placeholder2](models/lpdnet/database/overlay_lpdnet_plate.jpg)
 
 These detections are key in the overall goal of license plate recognition (LPR) because LPR performs best when there is little noise in the form of external features other than the license plate.
+
+#### Explaining the prediction
+
+To understand this bounding box detection process a bit more, we can send multiple versions of the picture into the model and observe the variance in confidence.
+
+That is:
+
+    1. We divide the picture into n superpixels using the SLIC algorithm, which groups pixels into similar chunks.
+    2. We omit one superpixel every time we hit the model
+    3. Regress the change in confidence against omitted superpixel.
+
+This procedure allows us to construct the attention map below.
+
+![placeholder7](models/lpdlprnet/database/heatmap_plate.jpg)
+
+In the plot above, red chunks are boxes whose exclusion reduces confidence score, while blue chunks are boxes whose exclusion increases the confidence score. The more intense the color, the stronger the effect.
 
 We use the bounding box to crop into the the license plate, which is then sent to the last phase for license plate recognition
 

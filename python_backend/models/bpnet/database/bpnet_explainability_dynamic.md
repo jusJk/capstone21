@@ -12,7 +12,7 @@ We will explore these steps in the sections below.
 
 First, given the base image:
 
-![placeholder1](models/bpnet/database/runner.jpg)
+![placeholder1](%placeholder1%)
 
 ## Backbone Network
 
@@ -22,13 +22,15 @@ The backbone network is used for transfer learning and feature extraction. For B
 
 ## Confidence Maps and Part Affinity Fields
 
-![heatmap1](models/bpnet/database/heatmap1_runner.jpg)
-![heatmap2](models/bpnet/database/heatmap2_runner.jpg)
-![paf1](models/bpnet/database/paf1_runner.jpg)
-![paf2](models/bpnet/database/paf2_runner.jpg)
+![heatmap1](%placeholder2a%)
+![heatmap2](%placeholder2b%)
+![paf1](%placeholder2c%)
+![paf2](%placeholder2d%)
 
 ## Multistage Refinement
 
 ## Results
 
-![placeholder4](models/bpnet/database/runner_overlay.jpg)
+%placeholder3%
+
+![placeholder4](%placeholder4%)
