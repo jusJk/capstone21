@@ -11,3 +11,9 @@ from models.bpnet.api import *
 from models.lpdlprnet.api import *
 from models.tcnet.api import *
 from models.tclpdlprnet.api import *
+
+if __name__ == '__main__':
+    test_bpnet()
+    test_lpdnet()
+    test_lprnet()
+    test_tcnet()

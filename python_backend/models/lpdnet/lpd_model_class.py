@@ -13,26 +13,25 @@ class LpdModelClass(BaseModelClass):
         querying party -- corresponding to a specific triton
         model.
         '''
-        BaseModelClass.__init__(self, client_info)
+        url = os.environ.get('API_URL')
+        BaseModelClass.__init__(self, client_info, url, model_name)
         self._post_processing_config = "/app/triton_client/tao_triton/python/clustering_specs/clustering_config_lpdnet.prototxt"
-        self._url = os.environ.get('API_URL')
-        self._model_name = model_name
         self._mode = "DetectNet_v2"
         self._class_list = "license_plate"
         if model_name not in ['lpdnet_usa','lpdnet_eu']:
             raise ValueError("Model name is invalid -- no such model exists")
 
-    def status(self):
-        '''
-        Returns the status of the model
-        '''
-        try:
-            triton_server_url = "http://" + self._url + "/v2/health/ready"
-            response = requests.get(triton_server_url)
-        except ConnectionError as error:
-            return {'status': 'Inactive'}
-        else:
-            return {'status': 'Active'}
+    # def status(self):
+    #     '''
+    #     Returns the status of the model
+    #     '''
+    #     try:
+    #         triton_server_url = "http://" + self._url + "/v2/health/ready"
+    #         response = requests.get(triton_server_url)
+    #     except ConnectionError as error:
+    #         return {'status': 'Inactive'}
+    #     else:
+    #         return {'status': 'Active'}
 
     def predict(self, file_path):
         '''

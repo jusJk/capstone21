@@ -131,3 +131,9 @@ def call_lpdnet(id):
 #     # delete subimages
 #     for i, f in enumerate(subimages):
 #         os.remove(f"{input_path}/{str(i) + filename.split('.')[0] + '.png'}")
+
+def test_lpdnet():
+    id='internal'
+    mapping = json.load(open('/app/models/lpdnet/database/mapping.json'))
+    model = LpdModelClass(id, mapping[id])
+    print('LPDnet: ', model.status())

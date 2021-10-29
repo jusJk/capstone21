@@ -96,3 +96,9 @@ def call_trafficcamnet(id):
                 processed[i] = info
         
         return make_response(processed,200)        
+
+def test_tcnet():
+    id='internal'
+    mapping = json.load(open('/app/models/tcnet/database/mapping.json'))
+    model = TrafficCamNetModelClass(id, mapping[id])
+    print('TCnet: ', model.status())
