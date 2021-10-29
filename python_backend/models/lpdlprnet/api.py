@@ -94,6 +94,7 @@ def call_combined(id):
                     
                     confidence_score=bbox_info['confidence_score']
                     if confidence_score < LPD_THRESHOLD:
+                        del info["all_bboxes"][j]
                         continue
                     
                     crop_image(images[info['file_name']],bbox_info['bbox'],f"{output_path}/{j}_{info['file_name']}")
