@@ -27,6 +27,7 @@ def call_tclpdlpr_combined(id):
     LOGGING = True #Saves output images into the folders
     LPD_THRESHOLD = 0.6 #Threshold to filter images
     LPR_THRESHOLD = 0.6
+    TCN_THRESHOLD = 0.6
 
     if (id not in lpd_mapping) or (id not in lpr_mapping)  or (id not in tc_mapping): 
         return make_response({'error':"Bad Request - Invalid ID"},400)
@@ -97,6 +98,11 @@ def call_tclpdlpr_combined(id):
                 # and a single number, confidence score
                 for j, bbox_info in enumerate(info["all_bboxes"]):
                     
+                    confidence_score=bbox_info['confidence_score']
+                    if confidence_score < TCN_THRESHOLD:
+                        del info["all_bboxes"][j]
+                        continue
+                    
                     crop_image(tcn_input[info['file_name']],bbox_info['bbox'],f"{output_path}/{j}_{info['file_name']}")
         
                     tcn_mapping[f"{j}_{info['file_name']}"] = info['file_name']
@@ -141,6 +147,7 @@ def call_tclpdlpr_combined(id):
                     
                     confidence_score=bbox_info['confidence_score']
                     if confidence_score < LPD_THRESHOLD:
+                        del info["all_bboxes"][j]
                         continue
                     
                     crop_image(lpd_input[info['file_name']],bbox_info['bbox'],f"{output_path}/{j}_{info['file_name']}")

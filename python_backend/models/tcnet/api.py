@@ -20,7 +20,7 @@ def call_trafficcamnet(id):
 
     mapping = json.load(open('/app/models/tcnet/database/mapping.json'))
     LOGGING = True #Saves output images into the folders
-    THRESHOLD = 0.9 #Threshold for bbox to be tuned
+    THRESHOLD = 0.6 #Threshold for bbox to be tuned
 
     if id not in mapping: return make_response({'error':"Bad Request - Invalid ID"},400)
 
@@ -81,6 +81,11 @@ def call_trafficcamnet(id):
                 for j, bbox_info in enumerate(info["all_bboxes"]):
                     
                     if LOGGING: crop_image(images[info['file_name']],bbox_info['bbox'],f"{output_path}/{j}_{info['file_name']}")
+
+                    confidence_score=bbox_info['confidence_score']
+                    if confidence_score < THRESHOLD:
+                        del info["all_bboxes"][j]
+                        continue
                 
                 if id=='internal':
                     render_image(images[info['file_name']],info["all_bboxes"],f"{output_path}/overlay_trafficcamnet_{info['file_name']}")
