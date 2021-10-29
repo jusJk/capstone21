@@ -9,7 +9,7 @@ Creative Commons Attribution 4.0 International License), with good performance.
 
 ## Model Architecture
 
-This model is a sequence classification model with a ResNet backbone. And it will take the image as network input and produce sequence output.
+This model is a sequence classification model with a ResNet backbone and will take the image as network input and produce sequence output. While the original stride of the ResNet network is 32, the stride is tuned from 32 to 4 to make it more applicable to the small spatial size of the license plate image.
 
 Just like other computer vision tasks, we extract the image features which is fed into a classifier. Unlike normal image classification tasks where the model only gives a single class ID for one image, the LPRNet model produces a sequence of class IDs. The image feature is divided into slices along the horizontal dimension and each slice is assigned a character ID in the prediction.
 
