@@ -6,7 +6,7 @@ This model card is a pipeline of 2 models, described below.
 
 ### Model Overview
 
-The model described in this card detect one or more license plate objects from a car image and return a box around each object, as well as an lpd label for each object. This model is based on NVIDIA's pretrained models, which are trained on a NVIDIA-owned US license plate dataset and a public Chinese City Parking dataset(CCPD).
+The model described in this card detects one or more license plate objects from a car image and returns a box around each object, as well as an lpd label for each object. This model is based on NVIDIA's pretrained models, which are trained on a NVIDIA-owned US license plate dataset and a public Chinese City Parking dataset(CCPD).
 
 ### Model Architecture
 
@@ -63,9 +63,14 @@ Creative Commons Attribution 4.0 International License), with good performance.
 ### Model Architecture
 
 This model is a sequence classification model with a ResNet backbone. And it will take the image as network input and produce sequence output.
+
+Just like other computer vision tasks, we extract the image features which is fed into a classifier. Unlike normal image classification tasks where the model only gives a single class ID for one image, the LPRNet model produces a sequence of class IDs. The image feature is divided into slices along the horizontal dimension and each slice is assigned a character ID in the prediction.
+
 Training Algorithm
 
 The training algorithm optimizes the network to minimize the connectionist temporal classification (CTC) loss between a ground truth characters sequence of a license plate and a predicted characters sequence. Then the license plate will be decoded from the sequence output of the model through best path decoding method (greedy decoding).
+
+![image](models/lpdlprnet/database/lpr_model_architecture.png)
 
 ### Reference
 
@@ -92,7 +97,6 @@ The input must be a cropped license plate image like the following:
 ![image](models/lprnet/database/ca286.png)
 ![image](models/lprnet/database/cal_plate.jpg)
 ![image](models/lprnet/database/wy963.png)
-
 
 ## LPD + LPR Net Model
 
