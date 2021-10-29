@@ -7,7 +7,7 @@ import DashboardAppContact from './pages/DashboardAppContact';
 import DashboardAppExplainability from './pages/DashboardAppExplainability';
 import DashboardAppInference from './pages/DashboardAppInference';
 import DashboardAppPerformance from './pages/DashboardAppPerformance';
-import DashboardAppDrift from './pages/DashboardAppDrift';
+import DashboardAppAdmin from './pages/DashboardAppAdmin';
 import Products from './pages/Products';
 import NotFound from './pages/Page404';
 import Landing from './pages/Landing';
@@ -25,7 +25,7 @@ export default function Router() {
         { path: 'app/info/:id', element: <DashboardApp /> },
         { path: 'app/inference/:id', element: <DashboardAppInference /> },
         { path: 'app/explainability/:id', element: <DashboardAppExplainability /> },
-        { path: 'app/drift/:id', element: <DashboardAppDrift userProfile={userProfile} /> },
+        { path: 'app/admin/:id', element: <DashboardAppAdmin userProfile={userProfile} /> },
         { path: 'app/performance/:id', element: <DashboardAppPerformance /> },
         { path: 'app/contact/:id', element: <DashboardAppContact /> }
       ]
