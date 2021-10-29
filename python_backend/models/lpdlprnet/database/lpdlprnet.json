@@ -1,0 +1,64 @@
+{
+  "model_name": "License Plate Detection + Recognition",
+  "status": "active",
+  "information": "Lorem ipsum",
+  "email": "abc@stengineering.com",
+  "phone": "12345678",
+  "cover": "./models/lpdlprnet/database/two-cars-2.jpeg",
+  "explainability_demo_api": {
+    "type": "POST",
+    "endpoint": "/api/lpdlprnet/explain/internal",
+    "endpoint_display": "/api/lpdlprnet/explain/<id>",
+    "status": "active",
+    "input": "Explain the prediction of your custom image. Explainability analysis will take some time.",
+    "input_type": "image",
+    "return_type": "json",
+    "return": "Explainability for the uploaded picture"
+  },
+  "api": [
+    {
+      "type": "GET",
+      "endpoint": "/api/lpdlprnet/internal",
+      "endpoint_display": "/api/lpdlprnet/<id>",
+      "status": "active",
+      "input": "Check Server Availability",
+      "input_type": "json",
+      "return_type": "json",
+      "return": "String with status active or inactive"
+    },
+    {
+      "type": "POST",
+      "endpoint": "/api/lpdlprnet/internal",
+      "endpoint_display": "/api/lpdlprnet/<id>",
+      "status": "active",
+      "input": "Image Inference Demo",
+      "input_type": "image",
+      "return_type": "json",
+      "return": "JSON object with bounding box and confidence score"
+    }
+  ],
+  "stats": {
+    "performance": {
+      "x": [
+        "01/01/2021",
+        "02/01/2021",
+        "03/01/2021",
+        "04/01/2021",
+        "05/01/2021",
+        "06/01/2021",
+        "07/01/2021",
+        "08/01/2021",
+        "09/01/2021",
+        "10/01/2021",
+        "11/01/2021"
+      ],
+      "y": [
+        {
+          "name": "Usage",
+          "type": "column",
+          "data": [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30]
+        }
+      ]
+    }
+  }
+}

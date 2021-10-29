@@ -1,7 +1,7 @@
 from app import app
 from database import model_info
 import os
-from flask import send_file, request
+from flask import send_file, request, make_response
 
 @app.route('/api/models/list')
 def get_all_models():
@@ -11,8 +11,7 @@ def get_all_models():
 
     :return: Dictionary//JSON 
     """
-    info = {'code':200, 
-            'models':[ 
+    info = {'models':[ 
                 {
                 'id': m, 
                 'name': model_info.get(m).get('model_name'),
@@ -20,7 +19,7 @@ def get_all_models():
                 'status' : model_info.get(m).get('status')
                 } 
             for m in model_info.keys()]}   
-    return info
+    return make_response(info,200)
 
 @app.route('/api/info/<id>')
 def get_model_info(id):  
@@ -34,7 +33,7 @@ def get_model_info(id):
     if id in model_info: 
         return {id:model_info[id]}
     else:
-        return {'error':'invalid model name'}
+        return make_response({'error':'invalid model name'},400)
 
 
 @app.route('/api/get_image')
@@ -43,7 +42,7 @@ def get_image():
     if os.path.isfile(file_path):
         return send_file(file_path)
     else:
-        return {'error':'invalid file name'} 
+        return make_response({'error':'invalid file name'},400) 
 
 
 @app.route('/api/get_md')
@@ -52,4 +51,5 @@ def get_md():
     if os.path.isfile(file_path):
         return send_file(file_path)
     else:
-        return {'error':'invalid file name'}
+        return make_response({'error':'invalid file name'},400)
+

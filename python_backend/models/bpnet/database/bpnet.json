@@ -1,0 +1,40 @@
+{
+  "model_name": "2D Body Pose Recognition",
+  "status": "active",
+  "information": "Lorem ipsum",
+  "email": "abc@stengineering.com",
+  "phone": "12345678",
+  "cover": "./models/bpnet/database/cover.png",
+  "explainability_demo_api": {
+   "type": "POST",
+   "endpoint": "/api/bpnet/explain/internal",
+   "endpoint_display": "/api/bpnet/explain/<id>",
+   "status": "active",
+   "input": "Explain the prediction of your custom image. Explainability analysis will take some time.",
+   "input_type": "image",
+   "return_type": "json",
+   "return": "Explainability for the uploaded picture"
+  },
+  "api": [
+    {
+      "type": "GET",
+      "endpoint": "/api/bpnet/internal",
+      "endpoint_display": "/api/bpnet/<id>",
+      "status": "active",
+      "input": "Check Server Availability",
+      "input_type": "json",
+      "return_type": "json",
+      "return": "String with status active or inactive"
+    },
+    {
+      "type": "POST",
+      "endpoint": "/api/bpnet/internal",
+      "endpoint_display": "/api/bpnet/<id>",
+      "status": "active",
+      "input": "Image Inference Demo",
+      "input_type": "image",
+      "return_type": "json",
+      "return": "JSON object with bounding box and confidence score"
+    }
+  ]
+}

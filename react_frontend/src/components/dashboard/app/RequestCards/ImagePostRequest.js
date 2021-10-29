@@ -41,10 +41,12 @@ export default function UploadPicture(props) {
   const [loading, setLoading] = useState(false);
 
   const _onChange = (e) => {
-    const file = e.target.files[0];
-    const url = URL.createObjectURL(file);
-    setImgSrc(url);
-    setUploadFile(file);
+    if (e.target.files.length !== 0) {
+      const file = e.target.files[0];
+      const url = URL.createObjectURL(file);
+      setImgSrc(url);
+      setUploadFile(file);
+    }
   };
 
   const handleFormUpload = () => {
@@ -130,7 +132,7 @@ export default function UploadPicture(props) {
               component="label"
               color="info"
               size="large"
-              disabled={!imgSrc}
+              disabled={!imgSrc || loading}
               onClick={() => {
                 setContent(undefined);
                 setLoading(true);
@@ -169,6 +171,8 @@ export default function UploadPicture(props) {
                 files=[ ('image',(filename,open(filepath,'rb'),'image/jpeg')) ]
                 <br />
                 headers = {'{}'}
+                <br />
+                payload = {'{"filename": [filename]}'}
                 <br />
                 <br />
                 response = requests.post( baseURL + "
