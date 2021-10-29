@@ -87,6 +87,7 @@ def call_lpdnet(id):
 
                     confidence_score=bbox_info['confidence_score']
                     if confidence_score < THRESHOLD:
+                        del info["all_bboxes"][j]
                         continue
 
                 if id=='internal':
