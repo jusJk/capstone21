@@ -3,6 +3,8 @@ import requests
 import pytest
 import os
 from requests.exceptions import ConnectionError
+from plugin import DockerComposeExecutor, Services, get_docker_services
+import docker
 
 # Api urls
 BASE_URL = "http://localhost:5000"
@@ -27,6 +29,41 @@ def is_responsive(url):
 @pytest.fixture(scope="session")
 def docker_compose_file(pytestconfig):
     return os.path.join(str(pytestconfig.rootdir), "../../", "docker-compose.yml")
+
+@pytest.fixture(scope="session")
+def docker_services(docker_compose_file, docker_compose_project_name, docker_cleanup):
+    """Start all services from a docker compose file (`docker-compose up`).
+    After test are finished, shutdown all services (`docker-compose down`)."""
+    client = docker.from_env()
+    img_exists = True
+    container_exists = True
+    try:
+        client.images.get("capstone21_python-backend")
+    except docker.errors.NotFound:
+        img_exists=False
+
+    try:
+        client.containers.get("capstone21_python-backend")
+    except docker.errors.NotFound:
+        container_exists=False
+    
+    if img_exists:
+        docker_compose = DockerComposeExecutor(
+            docker_compose_file, docker_compose_project_name
+        )
+        docker_compose.execute("up -d")
+        try:
+            # Let test(s) run.
+            yield Services(docker_compose)
+        finally:
+            # Clean up.
+            cmd = "stop" if container_exists else "down"
+            docker_compose.execute(cmd)
+    else:
+        with get_docker_services(
+            docker_compose_file, docker_compose_project_name, docker_cleanup, docker_cleanup
+        ) as docker_service:
+            yield docker_service
 
 @pytest.fixture(scope="session")
 def http_service(docker_services):
@@ -77,7 +114,7 @@ def test_tclpdlprnet_get():
     response_tcnet = requests.get(BASE_URL + TCLPDLPRNET_URL)
     assert response_tcnet.status_code == 200
 
-## Post Tests
+# Post Tests
 def test_lpr_us_post():
     fname_1 = 'ca286.png'
     fname_2 = 'wy963.png'
