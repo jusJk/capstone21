@@ -1,4 +1,8 @@
+# Requires pytest-docker to be present in the python environment to run the script
 import requests
+import pytest
+import os
+from requests.exceptions import ConnectionError
 
 # Api urls
 BASE_URL = "http://localhost:5000"
@@ -10,6 +14,35 @@ LPDLPR_URL = "/api/lpdlprnet/internal"
 BPNET_URL = "/api/bpnet/internal"
 TCNET_URL = "/api/tcnet/internal"
 TCLPDLPRNET_URL = "/api/tclpdlprnet/internal"
+
+# Start containers
+def is_responsive(url):
+    try:
+        response = requests.get(url+"/api/lpdnet/internal")
+        if response.status_code == 200:
+            return True
+    except ConnectionError:
+        return False
+
+@pytest.fixture(scope="session")
+def docker_compose_file(pytestconfig):
+    return os.path.join(str(pytestconfig.rootdir), "../../", "docker-compose.yml")
+
+@pytest.fixture(scope="session")
+def http_service(docker_services):
+    """Ensure that HTTP service is up and responsive."""
+
+    # `port_for` takes a container port and returns the corresponding host port
+    port = docker_services.port_for("python-backend", 5000)
+    url = "http://localhost:{}".format(port)
+    docker_services.wait_until_responsive(
+        timeout=30.0, pause=0.1, check=lambda: is_responsive(url)
+    )
+    return url
+
+def test_status_code(http_service):
+    response = requests.get(http_service + "/api/lpdnet/internal")
+    assert response.status_code == 200
 
 ## Get Tests
 def test_lpr_eu_get():
