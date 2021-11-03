@@ -1,27 +1,15 @@
-FROM nvcr.io/nvidia/tritonserver:21.07-py3
-WORKDIR /app
+FROM nvcr.io/nvidia/tritonserver:21.03-py3
 
-COPY . .
+# Setting up TensorRT Paths.
+ENV TRT_LIB_PATH=/usr/lib/x86_64-linux-gnu
+ENV TRT_INC_PATH=/usr/include/x86_64-linux-gnu
 
-EXPOSE 8080
+# Download and install TAO Toolkit converter
+RUN wget https://developer.nvidia.com/cuda111-cudnn80-trt72-0 -P /opt/tao-converter && \
+    apt-get update && apt-get install unzip libssl-dev -y && \
+    unzip /opt/tao-converter/cuda111-cudnn80-trt72-0 -d /opt/tao-converter && \
+    chmod +x /opt/tao-converter/cuda11.1-trt7.2/tao-converter
 
-RUN bash fetch_models.sh
+ENV PATH=/opt/tao-converter/cuda11.1-trt7.2:$PATH
 
-EXPOSE 8000
-EXPOSE 8001
-EXPOSE 8002
-
-ENTRYPOINT ["tritonserver", "--model-repository=model_repository"]
-
-# # Nvidia Triton Inference Server as base image
-# FROM nvcr.io/nvidia/tritonserver:21.07-py3
-
-# # Go to home directory and paste examples folder (contains model_repository and fetch_models.sh)
-# WORKDIR /
-# COPY ./examples examples
-
-# # Pull the model definitions
-# RUN bash /examples/fetch_models.sh
-
-# WORKDIR /opt/tritonserver
-# ENTRYPOINT ["tritonserver", "--model-repository=/examples/model_repository"]
+EXPOSE 6000
