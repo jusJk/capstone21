@@ -1,13 +1,21 @@
 set -ex
 
-# TensorFlow inception
-mkdir -p model_repository/inception_graphdef/1
-wget -O /tmp/inception_v3_2016_08_28_frozen.pb.tar.gz \
-     https://storage.googleapis.com/download.tensorflow.org/models/inception_v3_2016_08_28_frozen.pb.tar.gz
-(cd /tmp && tar xzf inception_v3_2016_08_28_frozen.pb.tar.gz)
-mv /tmp/inception_v3_2016_08_28_frozen.pb model_repository/inception_graphdef/1/model.graphdef
+# LPDnet USA
+wget --content-disposition https://api.ngc.nvidia.com/v2/models/nvidia/tlt_lpdnet/versions/pruned_v1.0/zip -O /tmp/tlt_lpdnet_pruned_v1.0.zip
+(cd /tmp && unzip tlt_lpdnet_pruned_v1.0.zip)
+mv /tmp/usa_pruned.etlt ./model_repository/lpdnet_usa/usa_pruned.etlt
 
-# ONNX densenet
-mkdir -p model_repository/densenet_onnx/1
-wget -O model_repository/densenet_onnx/1/model.onnx \
-     https://contentmamluswest001.blob.core.windows.net/content/14b2744cf8d6418c87ffddc3f3127242/9502630827244d60a1214f250e3bbca7/08aed7327d694b8dbaee2c97b8d0fcba/densenet121-1.2.onnx
+# LPRnet USA
+wget --content-disposition https://api.ngc.nvidia.com/v2/models/nvidia/tlt_lprnet/versions/deployable_v1.0/zip -O /tmp/tlt_lprnet_deployable_v1.0.zip
+(cd /tmp && unzip tlt_lprnet_deployable_v1.0.zip)
+mv /tmp/us_lprnet_baseline18_deployable.etlt ./model_repository/lprnet_usa/us_lprnet_baseline18_deployable.etlt
+
+# BodyposeNet
+wget --content-disposition https://api.ngc.nvidia.com/v2/models/nvidia/tao/bodyposenet/versions/deployable_v1.0.1/zip -O /tmp/bodyposenet_deployable_v1.0.1.zip
+(cd /tmp && unzip bodyposenet_deployable_v1.0.1.zip)
+mv /tmp/model.etlt ./model_repository/bodyposenet/model.etlt
+
+# TrafficCamNet
+wget --content-disposition https://api.ngc.nvidia.com/v2/models/nvidia/tao/trafficcamnet/versions/pruned_v1.0.1/zip -O /tmp/trafficcamnet_pruned_v1.0.1.zip
+(cd /tmp && unzip trafficcamnet_pruned_v1.0.1.zip)
+mv /tmp/resnet18_trafficcamnet_pruned.etlt ./model_repository/trafficcamnet/resnet18_trafficcamnet_pruned.etlt

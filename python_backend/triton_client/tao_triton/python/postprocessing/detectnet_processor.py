@@ -100,6 +100,7 @@ class DetectNetPostprocessor(Postprocessor):
             self.dbscan_elements[class_name] = dbscan(
                 eps=classwise_clustering_config[class_name].dbscan_config.dbscan_eps,
                 min_samples=classwise_clustering_config[class_name].dbscan_config.dbscan_min_samples,
+                metric='precomputed'
             )
             self.coverage_thresholds[class_name] = classwise_clustering_config[class_name].coverage_threshold
             self.box_color[class_name] = classwise_clustering_config[class_name].bbox_color
