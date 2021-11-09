@@ -1,11 +1,9 @@
 import os
-
 import requests
 from requests.exceptions import ConnectionError
 
 from models.base_model_class import BaseModelClass
 from .lpr_client import lpr_predict
-
 
 class LprModelClass(BaseModelClass):
 
@@ -63,5 +61,5 @@ class LprModelClass(BaseModelClass):
 
 
 if __name__ == "__main__":
-    test_model = LprModelClass("hellosss")
-    print(test_model.predict("../input/lpr/"))
+    test_model = LprModelClass("hellosss", "lprnet_usa")
+    # print(test_model.predict("../input/lpr/"))

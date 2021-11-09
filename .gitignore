@@ -9,3 +9,6 @@
 
 **/models/*/input/**
 **/models/*/output/**
+
+python_backend/triton_client/lpdnet/*
+python_backend/triton_client/lprnet/*
