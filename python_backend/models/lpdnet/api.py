@@ -15,10 +15,9 @@ from .lpd_model_class import LpdModelClass
 def call_lpdnet(id):
 
     """
-    This function responds to the external API call of obtaining
-    lpdnet
+    This function responds to the external API call of obtaining lpdnet
 
-    :return: JSON object
+    return: JSON object
     """
     mapping = json.load(open('/app/models/lpdnet/database/mapping.json'))
     LOGGING = True #Saves output images into the folders

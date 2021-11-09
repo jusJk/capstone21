@@ -73,21 +73,28 @@ class LprnetPostprocessor(Postprocessor):
         # self.configure()
 
     def apply(self, results, this_id, mapping_dictionary, render=True):
+        """Apply the post processing
+        
+        This function takes the raw output from the lprnet model
+        and maps output into their corresponding license plate characters as per mapping_dictionary parsed into the function
+
+       Args:
+            results: Triton Server Response for each batch of image
+            this_id: Unique ID for each response
+            mapping_dictionary: dictionary to map to triton output to corresponding license plate character
+        Returns:
+            batch_results: returns a list containing predicted license plate, confidence score and file name for each iamge in the batch
+
+        """
+
         output_array = {}
         this_id = int(this_id)
-        #Mapping file which is specified as an argument when calling the function
-        mapping_output_file = self.mapping_output_file
 
         for output_name in self.output_names:
             output_array[output_name] = results.as_numpy(output_name)
         
         predictions = output_array["tf_op_layer_ArgMax"]
         confidence_score = output_array["tf_op_layer_Max"]
-
-        #Reading mapping file and creating a dictionary for mapping
-        # with open(mapping_output_file) as f:
-        #     lines = f.read().splitlines()
-        # mapping_dictionary = {k:v for k,v in enumerate(lines)}
 
         length_dict = len(mapping_dictionary)
 
@@ -112,30 +119,4 @@ class LprnetPostprocessor(Postprocessor):
             batch_results.append([license_plate, confidence_scores_indv_image, filename])
 
         return batch_results
-
-        # #Creating final output file directory if it does not exist
-        # current_frame = self.frames[this_id-1] 
-        # filename = os.path.basename(current_frame._image_path)
-        # output_label_file = os.path.join(
-        #     self.output_path, "infer_labels",
-        #     "{}.txt".format(os.path.splitext(filename)[0])
-        # )
-
-        # # output_image_file = os.path.join(
-        # #     self.output_path, "infer_images",
-        # #     "{}.jpg".format(os.path.splitext(filename)[0])
-        # # )
-
-        # if not os.path.exists(os.path.dirname(output_label_file)):
-        #     os.makedirs(os.path.dirname(output_label_file))
-
-        # # if not os.path.exists(os.path.dirname(output_image_file)):
-        # #     os.makedirs(os.path.dirname(output_image_file))
-        # # file_path = output_label_file + ""
-
-        # #Creating text file for final output
-        # print(output_label_file)
-        # with open(output_label_file, 'w') as file:
-        #     file.write(final_output)
-
         
