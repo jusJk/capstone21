@@ -54,7 +54,6 @@ def evaluate_bpnet(image_path, heatmap, paf, output_path, filename):
             if  i*3+j < 18:
                 col_name = n_cols[8 + i*3+j]
                 ax[i,j].imshow(org)
-                ax[i,j].set_title(col_name)
                 ax[i,j].imshow(paf[:,:, 8 + i*3+j], alpha=0.5)
 
     plt.savefig(f"{output_path}/paf2_{filename}", bbox_inches='tight')
@@ -64,7 +63,6 @@ def evaluate_bpnet(image_path, heatmap, paf, output_path, filename):
             if  i*3+j < 18:
                 col_name = n_cols[ i*3+j]
                 ax[i,j].imshow(org)
-                ax[i,j].set_title(col_name)
                 ax[i,j].imshow(paf[:,:, i*3+j], alpha=0.5)
 
     plt.savefig(f"{output_path}/paf1_{filename}", bbox_inches='tight')
