@@ -132,7 +132,7 @@ def lpr_predict(**FLAGS):
         else:
             # Specify large enough concurrency to handle the
             # the number of requests.
-            concurrency = 20 if FLAGS['async_set'] else 1
+            concurrency = 500 if FLAGS['async_set'] else 1
             triton_client = httpclient.InferenceServerClient(
                 url=FLAGS['url'], verbose=FLAGS['verbose'], concurrency=concurrency)
     except Exception as e:
