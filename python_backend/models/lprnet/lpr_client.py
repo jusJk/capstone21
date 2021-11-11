@@ -38,12 +38,8 @@ from tritonclient.utils import InferenceServerException
 from tritonclient.utils import triton_to_np_dtype
 
 from tao_triton.python.types import Frame, UserData
-# from tao_triton.python.postprocessing.detectnet_processor import DetectNetPostprocessor
-# from tao_triton.python.postprocessing.classification_postprocessor import ClassificationPostprocessor
 from tao_triton.python.postprocessing.lprnet_postprocessor import LprnetPostprocessor
 from tao_triton.python.utils.kitti import write_kitti_annotation
-# from tao_triton.python.model.detectnet_model import DetectnetModel
-# from tao_triton.python.model.classification_model import ClassificationModel
 from tao_triton.python.model.lprnet_model import LprnetModel
 
 logger = logging.getLogger(__name__)
@@ -136,7 +132,7 @@ def lpr_predict(**FLAGS):
         else:
             # Specify large enough concurrency to handle the
             # the number of requests.
-            concurrency = 20 if FLAGS['async_set'] else 1
+            concurrency = 500 if FLAGS['async_set'] else 1
             triton_client = httpclient.InferenceServerClient(
                 url=FLAGS['url'], verbose=FLAGS['verbose'], concurrency=concurrency)
     except Exception as e:
@@ -171,6 +167,7 @@ def lpr_predict(**FLAGS):
     max_batch_size = triton_model.max_batch_size
     frames = []
     if os.path.isdir(FLAGS['image_filename']):
+        #Converts image input to a Frame Object for inference
         frames = [
             Frame(os.path.join(FLAGS['image_filename'], f),
                   triton_model.data_format,
@@ -239,7 +236,7 @@ def lpr_predict(**FLAGS):
             else:
                 batched_image_data = repeated_image_data[0]
 
-            # Send request
+            # Send request to triton server for inference
             try:
                 req_gen_args = [batched_image_data, triton_model.input_names,
                     triton_model.output_names, triton_model.triton_dtype,
@@ -310,20 +307,26 @@ def lpr_predict(**FLAGS):
             for async_request in async_requests:
                 responses.append(async_request.get_result())
 
+    # Processes response from triton server after inference
     logger.info("Gathering responses from the server and post processing the inferenced outputs.")
     processed_request = 0
     final_response = []
 
     '''
-    Mapping output file as set by user used for final mapping
+    Mapping output file as set by user used for final mapping into license plate characters
     '''
 
     mapping_output_file = FLAGS['mapping_output_file']
     with open(mapping_output_file) as f:
         lines = f.read().splitlines()
-        mapping_dictionary = {k:v for k,v in enumerate(lines)}
+        mapping_dictionary = {k:v for k,v in enumerate(lines)} #Creating mapping dictionary for mapping
 
     with tqdm(total=len(frames)) as pbar:
+
+        '''
+        Loops through all batches to apply post processing to images in the batch
+        '''
+        
         while processed_request < sent_count:
             response = responses[processed_request]
             if FLAGS['protocol'].lower() == "grpc":
@@ -336,6 +339,9 @@ def lpr_predict(**FLAGS):
             processed_request += 1
             pbar.update(FLAGS['batch_size'])
 
+            '''
+            For each image in each batch, save final response and output in appropriate format to backend
+            '''
             for license_plate, confidence_scores_indv_image, filename in batch_results:
                 if len(license_plate) != 0:
                     final_image_response = {"HTTPStatus": 200, "file_name": filename, "license_plate": license_plate, "confidence_scores":confidence_scores_indv_image}
@@ -346,15 +352,3 @@ def lpr_predict(**FLAGS):
 
     logger.info("{} PASS".format(FLAGS['mode'].lower()))
     return final_response
-
-    # # For connecting lpd to lpr
-    # if FLAGS['mode'].lower() == "detectnet_v2":
-    #     # continue with lprnet
-    #     FLAGS['mode'] = "Lprnet"
-    #     FLAGS['model_name'] = "lprnet_usa"
-    #     FLAGS['image_filename'] =  FLAGS['output_path'] + "/cropped_images/."
-    #     FLAGS['output_path'] = "./output/lprnet_usa"
-    #     main(FLAGS)
-
-# if __name__ == '__main__':
-#     main()

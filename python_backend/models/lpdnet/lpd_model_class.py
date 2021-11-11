@@ -4,7 +4,6 @@ from models.base_model_class import BaseModelClass
 from .lpd_client import lpd_predict
 from requests.exceptions import ConnectionError
 
-
 class LpdModelClass(BaseModelClass):
 
     def __init__(self, client_info, model_name):
@@ -43,8 +42,8 @@ class LpdModelClass(BaseModelClass):
             raise FileNotFoundError("File Path does not exist!")
 
     def _predict(self, file_path):
-        number_files = len([name for name in os.listdir(
-            file_path) if os.path.isfile(file_path+name)])
+        number_files = len([name for name in os.listdir(file_path) if os.path.isfile(file_path+name)])
+        #   Setting Batch Size based on number of input image
         if number_files < 256:
             self._batch_size = 8
         else:
@@ -56,6 +55,7 @@ class LpdModelClass(BaseModelClass):
 
 # To handle output_path
 if __name__ == "__main__":
-    test_model = LpdModelClass("hellosss")
+    test_model = LpdModelClass("hello", "lpdnet_usa")
     # print(test_model.status())
-    # print(test_model.predict("../..triton_client/lptnet/input/052850"))
+    # print(os.getcwd())
+    # print(test_model.predict("./lpdnet/input/internal/091121_095842"))

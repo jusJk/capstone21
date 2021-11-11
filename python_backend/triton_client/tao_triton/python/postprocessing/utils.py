@@ -143,18 +143,25 @@ def render_image(frame, image_wise_bboxes, output_image_file, box_color, linewid
 
 
 def return_bbox_info(frame, image_wise_bboxes):
-    """Returns final Bbox with file name"""
+    """Returns final Bbox (x1, y1, x2, y2) with file name
+    
+    Args:
+        frame (Frame object): Frame object representation of each image
+        image_wise_bboxes (List): BBoxes detected for each frame
+    Returns:
+        final_annotations (List of Dictionary): Dictionary of bounding boxes with confidence scores stored in a list
+    """
     final_annotations = []
     for annotations in image_wise_bboxes:  # Looping through all bboxes detected in the image
         class_name = annotations.category
         box = annotations.box
-        if (box[2] - box[0]) >= 0 and (box[3] - box[1]) >= 0:
-            x1 = max(0, box[0])
-            y1 = max(0, box[1])
-            x2 = min(frame.width, box[2])
-            y2 = min(frame.height, box[3])
-            width = x2 - x1
-            height = y2 - y1
+        if (box[2] - box[0]) >= 0 and (box[3] - box[1]) >= 0: #Performing logical checks on bbox produced
+            x1 = max(0, box[0]) # x coordinate of upper left point in the bbox
+            y1 = max(0, box[1]) # y coordinate of upper left point in the bbox
+            x2 = min(frame.width, box[2]) # x coordinate of bottom point in the bbox, has to be smaller than width of entire frame
+            y2 = min(frame.height, box[3]) # y coordinate of bottom point in the bbox, has to be smaller than height of entire frame
+            width = x2 - x1 # Width of bounding box
+            height = y2 - y1 # Height of bounding box
             confidence_score = annotations.confidence
             indv_bbox = {}
             indv_bbox["bbox"] = [x1, y1, x2, y2]

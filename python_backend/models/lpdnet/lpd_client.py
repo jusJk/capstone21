@@ -19,8 +19,6 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import argparse
-from copy import deepcopy
 from functools import partial
 import logging
 import os
@@ -39,11 +37,8 @@ from tritonclient.utils import triton_to_np_dtype
 
 from tao_triton.python.types import Frame, UserData
 from tao_triton.python.postprocessing.detectnet_processor import DetectNetPostprocessor
-from tao_triton.python.postprocessing.classification_postprocessor import ClassificationPostprocessor
 from tao_triton.python.utils.kitti import write_kitti_annotation
 from tao_triton.python.model.detectnet_model import DetectnetModel
-from tao_triton.python.model.classification_model import ClassificationModel
-
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +49,6 @@ TRITON_MODEL_DICT = {
 POSTPROCESSOR_DICT = {
     "detectnet_v2": DetectNetPostprocessor,
 }
-
 
 def completion_callback(user_data, result, error):
     """Callback function used for async_stream_infer()."""
@@ -111,7 +105,7 @@ def lpd_predict(**FLAGS):
         InferenceServerException: If failed to retrieve model config, metadata or if inference is unsuccessful.
 
     Returns:
-        list: Where each element is a ditionary representing the output of bounding boxes detected in the image
+        list: Where each element is a dictionary representing the output of bounding boxes detected in the image
         [{image_1}, {image_2}] where each image_x contains HTTPStatus, file_name, all_bboxes, confidence_score
     """
 
@@ -139,7 +133,7 @@ def lpd_predict(**FLAGS):
         else:
             # Specify large enough concurrency to handle the
             # the number of requests.
-            concurrency = 1000 if FLAGS['async_set'] else 1
+            concurrency = 500 if FLAGS['async_set'] else 1
             triton_client = httpclient.InferenceServerClient(
                 url=FLAGS['url'], verbose=FLAGS['verbose'], concurrency=concurrency)
     except Exception as e:
@@ -174,6 +168,7 @@ def lpd_predict(**FLAGS):
     max_batch_size = triton_model.max_batch_size
     frames = []
     if os.path.isdir(FLAGS['image_filename']):
+        #Converts image input to a Frame Object for inference
         frames = [
             Frame(os.path.join(FLAGS['image_filename'], f),
                   triton_model.data_format,
@@ -220,12 +215,13 @@ def lpd_predict(**FLAGS):
     #Creating final json object
     final_response = []
 
-    logger.info("Sending inference request for batches of data")
+    logger.info("Sending inference request for all data which is split into batches")
     with tqdm(total=len(frames)) as pbar:
         while not last_request:
             input_filenames = []
             repeated_image_data = []
-
+            
+            #Creating batches to be sent for inference
             for idx in range(FLAGS['batch_size']):
                 frame = frames[image_idx]
                 img = frame.load_image()
@@ -243,7 +239,7 @@ def lpd_predict(**FLAGS):
             else:
                 batched_image_data = repeated_image_data[0]
 
-            # Send request
+            # Send request to triton server for inference
             try:
                 req_gen_args = [batched_image_data, triton_model.input_names,
                     triton_model.output_names, triton_model.triton_dtype,
@@ -314,12 +310,13 @@ def lpd_predict(**FLAGS):
             for async_request in async_requests:  
                 responses.append(async_request.get_result())
 
+    # Processes response from triton server after inference
     logger.info("Gathering responses from the server and post processing the inferenced outputs.")
     processed_request = 0
     with tqdm(total=len(frames)) as pbar:
 
         '''
-        Loops through the number of batches
+        Loops through all batches to apply post processing to images in the batch
         '''
 
         while processed_request < sent_count:
@@ -328,18 +325,16 @@ def lpd_predict(**FLAGS):
                 this_id = response.get_response().id
             else:
                 this_id = response.get_response()["id"]
-            batch_boxes_output = postprocessor.apply(
+            batch_boxes_output = postprocessor.apply( #Sends batch by batch
                 response, this_id, render=True
             )
             processed_request += 1
             pbar.update(FLAGS['batch_size'])
 
             '''
-            For each image in each batch, save final response
+            For each image in each batch, save final response and output in appropriate format to backend
             '''
-
             for boxes in batch_boxes_output:
-                print(response)
                 final_image_bbox_response, file_name = boxes
                 if len(final_image_bbox_response) != 0:
                     final_image_response = {"HTTPStatus": 200, "file_name": file_name, "all_bboxes": final_image_bbox_response}
@@ -348,9 +343,3 @@ def lpd_predict(**FLAGS):
                 final_response.append(final_image_response)
 
     return final_response
-
-    logger.info("PASS")
-
-# if __name__ == '__main__':
-
-#verbose, async_set, streaming, model_name, model_version, batch_size, mode, url, protocol, image_filename, class_list, output_path, postprocessing_config

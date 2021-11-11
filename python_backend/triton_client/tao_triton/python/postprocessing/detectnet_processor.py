@@ -100,6 +100,7 @@ class DetectNetPostprocessor(Postprocessor):
             self.dbscan_elements[class_name] = dbscan(
                 eps=classwise_clustering_config[class_name].dbscan_config.dbscan_eps,
                 min_samples=classwise_clustering_config[class_name].dbscan_config.dbscan_min_samples,
+                metric='precomputed'
             )
             self.coverage_thresholds[class_name] = classwise_clustering_config[class_name].coverage_threshold
             self.box_color[class_name] = classwise_clustering_config[class_name].bbox_color
@@ -113,14 +114,14 @@ class DetectNetPostprocessor(Postprocessor):
         1. Denormalize the output bbox coordinates which converts bbox from relative coordinates to absolute coordinates.
         2. Threshold the coverage output to get the valid indices for the bboxes based on a coverage threshold. This coverage output is attained from the "output_cov/Sigmoid returns from the model inference.
         3. Cluster the filterred boxes using DBSCAN. This utilises the IOU between possible predicted rectangles and clusters them to output the best bbox.
-        4. Converts filtered boxes into KittiBbox output format with the final absolute coordinates of bbox and confidence scores
-
-        # 1. Denormalize the output bbox coordinates which converts bbox from relative coordinates to absolute coordinates.
-        # 2. Threshold the coverage output to get the valid indices for the bboxes based on a pre set coverage threshold.
-        # 3. Filter out the bboxes from the "output_bbox/BiasAdd" blob.
-        # 4. Cluster the filterred boxes using DBSCAN.
-        # 5. Converts filtered boxes into KittiBbox output format with the final absolute coordinates of bbox and confidence scores
-        # 6. Serialize the output bboxes to KITTI Format label files in output_path/labels.
+        4. Converts filtered boxes into KittiBbox output format with the final absolute coordinates of bbox (x1, y1, x2, y2) and confidence scores
+        
+        Args:
+            results: Triton Server Response for each batch of image
+            this_id: Unique ID for each response
+        Returns:
+            batch_boxes_output: returns a list containing all bounding boxes for each image in the batch
+        
         """
 
         output_array = {}
@@ -132,12 +133,15 @@ class DetectNetPostprocessor(Postprocessor):
                 len(self.classes), output_array["output_cov/Sigmoid"].shape[1]
             )
         )
+        #   Denormalise output bbox coordinates
         abs_bbox = denormalize_bounding_bboxes(
             output_array["output_bbox/BiasAdd"], self.stride,
             self.offset, self.bbox_norm, len(self.classes), self.scale_w,
             self.scale_h, self.data_format, self.target_shape, self.frames,
             this_id - 1
         )
+
+        #   Threshold  coverage output to get valid indices
         valid_indices = thresholded_indices(
             output_array["output_cov/Sigmoid"], len(self.classes),
             self.classes,
@@ -163,6 +167,8 @@ class DetectNetPostprocessor(Postprocessor):
                 ).T[indices[class_idx]]
                 pairwise_dist = \
                     1.0 * (1.0 - iou_vectorized(classwise_bboxes))
+
+                #   Clustering similar boxes using DBScan to form final bounding boxes as output, filtering out some boxes in the process
                 labeling = self.dbscan_elements[self.classes[class_idx]].fit_predict(
                     X=pairwise_dist,
                     sample_weight=classwise_covs
@@ -183,9 +189,12 @@ class DetectNetPostprocessor(Postprocessor):
                     mean_box_w = mean_bbox[2] - mean_bbox[0]
                     mean_box_h = mean_bbox[3] - mean_bbox[1]
                     bbox_area = mean_box_w * mean_box_h
+
+                    #Filtering out valid boxes based on thresholds set
                     valid_box = aggregated_w > cw_config.dbscan_config.\
                         dbscan_confidence_threshold and mean_box_h > cw_config.minimum_bounding_box_height
                     if valid_box:
+                        #Converts filtered boxes into KittiBbox output format with the final absolute coordinates of bbox and confidence scores
                         clustered_boxes.append(
                             KittiBbox(
                                 self.classes[class_idx], 0, 0, 0,
@@ -212,54 +221,3 @@ class DetectNetPostprocessor(Postprocessor):
                     final_bboxes = return_bbox_info(current_frame, batchwise_boxes[image_idx])
                     batch_boxes_output.append([final_bboxes, filename])
                 return batch_boxes_output
-
-                    # output_label_file = os.path.join(
-                    #     self.output_path, "infer_labels",
-                    #     "{}.txt".format(os.path.splitext(filename)[0])
-                    # )
-                    # output_image_file = os.path.join(
-                    #     self.output_path, "infer_images",
-                    #     "{}.jpg".format(os.path.splitext(filename)[0])
-                    # )
-                    # if not os.path.exists(os.path.dirname(output_label_file)):
-                    #     os.makedirs(os.path.dirname(output_label_file))
-                    # if not os.path.exists(os.path.dirname(output_image_file)):
-                    #     os.makedirs(os.path.dirname(output_image_file))
-                    # processes.append(
-                    #     pool.apply_async(
-                    #         write_kitti_annotation, (output_label_file, batchwise_boxes[image_idx])
-                    #     )
-                    # )
-                    # processes.append(
-                    #     pool.apply_async(
-                    #         render_image,
-                    #         (current_frame, batchwise_boxes[image_idx],
-                    #          output_image_file, self.box_color,
-                    #          self.pproc_config.linewidth)
-                    #     )
-                    # )
-
-                    # # Saving cropped image in output_path/cropeed_images
-                    # # output_cropped_file = os.path.join(
-                    # #     self.output_path, "cropped_images",
-                    # #     "{}.jpg".format(os.path.splitext(filename)[0])
-                    # # )
-
-                    # # if not os.path.exists(os.path.dirname(output_cropped_file)):
-                    # #     os.makedirs(os.path.dirname(output_cropped_file))
-
-                    # # Crops Image
-                    # # image = Image.open(current_frame._image_path)
-                    # # image = image.crop(mean_bbox)
-                    # # image.save(output_cropped_file, 'JPEG')
-
-                    # processes.append(
-                    #     pool.apply_async(
-                    #         return_bbox,
-                    #         (current_frame, batchwise_boxes[image_idx])
-                    #     )
-                    # )
-
-
-                # for p in processes:
-                #     p.wait()

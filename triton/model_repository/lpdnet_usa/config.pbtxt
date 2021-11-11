@@ -1,0 +1,32 @@
+name: "lpdnet_usa"
+platform: "tensorrt_plan"
+max_batch_size: 16
+input [
+                {
+                        name: "input_1"
+                        data_type: TYPE_FP32
+                        format: FORMAT_NCHW
+                        dims: [3, 480, 640]
+                }
+]
+
+output [
+                {
+                        name: "output_bbox/BiasAdd"
+                        data_type: TYPE_FP32
+                        dims: [4, 30, 40]
+                },
+                {
+                        name: "output_cov/Sigmoid"
+                        data_type: TYPE_FP32
+                        dims: [1, 30, 40]
+                }
+]
+
+dynamic_batching { preferred_batch_size: [8, 16] }
+instance_group [ { count: 2 } ]
+optimization { execution_accelerators {
+  gpu_execution_accelerator : [
+    { name : "auto_mixed_precision" }
+  ]
+}}
